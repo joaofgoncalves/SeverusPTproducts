@@ -1,0 +1,200 @@
+
+
+statusList <-function(){
+  
+  return(c(
+    "NOT COMPLETED",
+    "COMPLETED",
+    
+    "GEE NOT COMPLETED",
+    "GEE TASKED",
+    "GEE PROCESSING",
+    "GEE PROCESSING ERROR",
+    "GEE COMPLETED",
+    "GEE CANCELLED",
+    "GEE STATUS UNKNOWN",
+    
+    "POST NOT COMPLETED",
+    "POST TASKED",
+    "POST PROCESSING",
+    "POST PROCESSING ERROR",
+    "POST COMPLETED",
+    
+    "METADATA NOT COMPLETED",
+    "METADATA TASKED",
+    "METADATA PROCESSING",
+    "METADATA PROCESSING ERROR",
+    "METADATA COMPLETED",
+    
+    "CLOSING NOT COMPLETED",
+    "CLOSING TASKED",
+    "CLOSING PROCESSING",
+    "CLOSING PROCESSING ERROR",
+    "CLOSING COMPLETED"
+   )
+  )
+}
+
+# TODO: Add processing levels to this template table
+
+makeTasksTable <- function(n){
+  
+  taskTable <- data.frame(
+    
+    # Task identifiers & status
+    taskID          = integer(n),
+    taskUID         = character(n),
+    mainStatus      = character(n),
+    fileName        = character(n),
+    
+    # Analysis parameters
+    satCode           = character(n),
+    baseIndex         = character(n),
+    severityIndicator = character(n),
+    burntAreaDataset  = character(n),
+    referenceYear     = integer(n),
+    preFireRef        = integer(n), # in months
+    preFireType       = character(n), # either single/static or moving/relative to the homologous year -1
+    postFireRef       = integer(n), # in months
+    minFireSize       = double(n),
+    
+    # GEE task code & status
+    geeTaskID       = character(n),
+    geeTaskCode     = character(n), # The Task ID from GEE platform
+    geeTaskStatus   = character(n),
+    
+    # Post-processing task code & status 
+    postProcTaskID      = character(n),
+    postProcTaskStatus  = character(n),
+    
+    # Metadata task code & status
+    metadataTaskID      = character(n),
+    metadataTaskStatus  = character(n),
+    
+    # Closing task code & status
+    closingTaskID       = character(n),
+    closingTaskStatus   = character(n)
+  )
+  
+  return(taskTable)
+}
+
+
+# TODO: Add processing levels to the generated tasks
+
+generateTasks <- function(taskTable = NULL, satCode, baseIndex, 
+                          severityIndicator, burntAreaDataset,
+                          referenceYear, preFireRef, preFireType, 
+                          postFireRef, minFireSize){
+  
+  # Generate combinations of parameters
+  taskCombns <- expand.grid(satCode, baseIndex, severityIndicator, 
+                            burntAreaDataset, referenceYear, preFireRef, 
+                            preFireType, postFireRef, minFireSize)
+  
+  # Name columns for indexing
+  colnames(taskCombns) <- c("satCode","baseIndex", "severityIndicator", 
+                            "burntAreaDataset","referenceYear", "preFireRef", 
+                            "preFireType", "postFireRef", "minFireSize")
+  
+  # Generate a new task table 
+  nr <- nrow(taskCombns)
+  newTaskTable <- makeTasksTable(nr)
+  
+  if(is.null(taskTable)){
+    taskID_start <- 1
+    taskID_end <- nr
+  }else{
+    taskID_start <- nrow(taskTable) + 1
+    taskID_end <- nrow(taskTable) + nr
+  }
+  
+  ### Save the task parameters to the task table
+  
+  # Sat data and indices
+  newTaskTable$satCode           <- taskCombns$satCode
+  newTaskTable$baseIndex         <- taskCombns$baseIndex
+  newTaskTable$severityIndicator <- taskCombns$severityIndicator
+  newTaskTable$minFireSize       <- taskCombns$minFireSize
+  
+  # Burned dataset and reference year
+  newTaskTable$burntAreaDataset  <- taskCombns$burntAreaDataset
+  newTaskTable$referenceYear     <- taskCombns$referenceYear
+  
+  # Reference periods
+  newTaskTable$preFireRef        <- taskCombns$preFireRef
+  newTaskTable$preFireType       <- taskCombns$preFireType
+  newTaskTable$postFireRef       <- taskCombns$postFireRef
+  
+  # Main task identifiers
+  newTaskTable$taskID          <- taskID_start:taskID_end
+  newTaskTable$taskUID         <- uuid::UUIDgenerate(n = nr)
+  newTaskTable$mainStatus      <- "NOT COMPLETED"
+  
+  # GEE task codes & status
+  newTaskTable$geeTaskID       <- uuid::UUIDgenerate(n = nr)
+  newTaskTable$geeTaskCode     <- NA # The Task ID from GEE platform
+  newTaskTable$geeTaskStatus   <- "GEE NOT COMPLETED"
+  
+  # Post-processing tasks code & status 
+  newTaskTable$postProcTaskID      <- uuid::UUIDgenerate(n = nr)
+  newTaskTable$postProcTaskStatus  <- "POST NOT COMPLETED"
+  
+  # Metadata tasks code & status
+  newTaskTable$metadataTaskID      <- uuid::UUIDgenerate(n = nr)
+  newTaskTable$metadataTaskStatus  <- "METADATA NOT COMPLETED"
+  
+  # Closing tasks code & status
+  newTaskTable$closingTaskID       <- uuid::UUIDgenerate(n = nr)
+  newTaskTable$closingTaskStatus   <- "CLOSING NOT COMPLETED"
+  
+  
+  if(is.null(taskTable)){
+    return(newTaskTable)
+  }else{
+    return(rbind(taskTable, newTaskTable))
+  }
+  
+}
+
+readTaskTable <- function(){
+  
+  # Acquire a lock over the file
+  lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
+                               SPT_TASK_TABLE_BASENAME,
+                               ".lock"), timeout = 30000)
+  if(is.null(lck))
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  
+  
+  tb <- read.csv(SPT_TASK_TABLE_PATH)
+  
+  filelock::unlock(lck)
+  
+  return(tb)
+  
+}
+
+writeTaskTable <- function(taskTable){
+  
+  # Acquire a lock over the file
+  lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
+                        SPT_TASK_TABLE_BASENAME,
+                        ".lock"), timeout = 30000)
+  if(is.null(lck))
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  
+  # After getting the lock write the file
+  write.csv(taskTable, 
+            file      = SPT_TASK_TABLE_PATH,
+            row.names = FALSE)
+  
+  # Unlock to the file to make it available 
+  # to other processes if needed
+  filelock::unlock(lck)
+  return(TRUE)
+}
+
+
+
+
