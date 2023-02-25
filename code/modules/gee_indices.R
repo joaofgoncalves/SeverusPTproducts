@@ -1,10 +1,16 @@
 
+# TODO: Add Landsat indices
+
+# TODO: Add MODIS indices
+
+# TODO: Adapt functions to work with general band names: red, green, blue, ... etc
+
+# TODO: Add Sentinel-2 TCT indices
 
 
 ## ----------------------------------------------------------------------------------- ##
 ## SENTINEL-2 FUNCTIONS ----
 ## ----------------------------------------------------------------------------------- ##
-
 
 maskS2clouds <- function(image){
   
@@ -22,8 +28,8 @@ maskS2clouds <- function(image){
 }
 
 
-calcS2_NDVI <- function(im) {
-  out <- ee$Image$normalizedDifference(im, c('B8', 'B4'))
+calc_NDVI <- function(im) {
+  out <- ee$Image$normalizedDifference(im, c('NIR', 'Red'))
   out <- out$set("system:time_start", im$get("system:time_start"))
   out <- out$rename('NDVI')
   out <- out$copyProperties(im)
@@ -31,22 +37,23 @@ calcS2_NDVI <- function(im) {
 }
 
 
-calcS2_NBR <- function(im) {
-  out <- ee$Image$normalizedDifference(im, c('B8', 'B12'))
+calc_NBR <- function(im) {
+  out <- ee$Image$normalizedDifference(im, c('NIR', 'SWIR2'))
   out <- out$set("system:time_start", im$get("system:time_start"))
   out <- out$rename('NBR')
   out <- out$copyProperties(im)
   return(out)
 }
 
-
-calcS2_EVI <- function(img){
+## Still specific to Sentinel-2 because of the scale parameter...??!
+## TODO: Add a parameter to select the list in the expression which handles the sat code?!
+calc_EVI <- function(img){
   out <- ee$Image(img$expression(
-    '2.5 * ((NIR - RED) / (NIR + 6 * RED - 7.5 * BLUE + 1))', 
+    '2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))', 
     list(
-      NIR = img$select('B8')$toFloat()$multiply(0.0001),
-      RED = img$select('B4')$toFloat()$multiply(0.0001),
-      BLUE = img$select('B2')$toFloat()$multiply(0.0001)
+      NIR = img$select('NIR')$toFloat()$multiply(0.0001),
+      Red = img$select('Red')$toFloat()$multiply(0.0001),
+      Blue = img$select('Blue')$toFloat()$multiply(0.0001)
     ))
   )
   
