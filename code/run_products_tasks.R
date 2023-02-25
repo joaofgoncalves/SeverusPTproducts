@@ -1,6 +1,5 @@
 
 
-
 ## --------------------------------------------------------------------------- ##
 ## LOAD LIBS ----
 ## --------------------------------------------------------------------------- ##
@@ -135,7 +134,7 @@ for(tidx in xs){
       symbol$arrow_right, "Update GEE task status...\n\n")))
     
     # Wait for a couple of seconds and then update the taskTable status for GEE
-    Sys.sleep(time = 20)
+    Sys.sleep(time = 30)
     updateGEEtaskStatus(geeTaskObj, task, taskTable=NULL)
     
     # Refresh the target task status by re-loading it
@@ -334,14 +333,14 @@ for(tidx in xs){
       SpatialResolution    = paste(res(r0)[1], "meters"),
       TemporalResolution   = paste(task$preFireRef,"months composite"),
       CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
-      CalculationDate      = getCurrentDatetime(),
+      CalculationDate      = paste(getCurrentDatetime(),"Lisbon GMT +00:00"),
       CalculationPlatforms = "Google Earth Engine; R/RStudio",
       BurntAreaDataset     = task$burntAreaDataset,
       BurntAreaDatasetURL  = getBurntAreaDataURL(task$burntAreaDataset),
       ReferenceYear        = task$referenceYear,
       MinFireSize          = paste(task$minFireSize,"hectares"),
       SatCollectionData    = paste(task$satCode,getSatMissionName(task$satCode),sep=" - "),
-      SatProcLevel         = "Surface reflectance (L2A)",
+      SatProcLevel         = getProcessingLevels(task$procLevel),#"Surface reflectance (L2A)",
       #SatColVersion        = 
       CloudMask            = "Yes",
       BaseIndex            = paste(task$baseIndex, getSpectralIndexName(task$baseIndex),sep=" - "),
