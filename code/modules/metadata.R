@@ -1,5 +1,18 @@
 
 
+getBurntAreaDatasetCode <- function(baDataset) {
+  baCodes <- list(
+    ICNF    = "I",
+    EFFIS   = "E",
+    MCD64   = "M",
+    MICNF   = "C",
+    FireCCI = "F",
+    VIIRS   = "V"
+  )
+
+  return(baCodes[[baDataset]])
+}
+
 exportMetaToJSON <- function(x, outFilePath) {
   # Export the data.frame to a prettified JSON file
   json_text <- jsonlite::toJSON(x, pretty = TRUE)
@@ -67,12 +80,12 @@ getSpectralIndexName <- function(spiAcronym) {
     TCTB = "Tasseled Cap Transformation - Brightness",
     TCTG = "Tasseled Cap Transformation - Greenness",
     TCTW = "Tasseled Cap Transformation - Wetness",
-    LST = "Land Surface Temperature",
-    LAI = "Leaf Area Index",
-    GPP = "Gross Primary Productivity",
-    NPP = "Net Primary Productivity",
-    ALB = "Albedo",
-    FVC = "Fractional Vegetation Cover"
+    LST  = "Land Surface Temperature",
+    LAI  = "Leaf Area Index",
+    GPP  = "Gross Primary Productivity",
+    NPP  = "Net Primary Productivity",
+    ALB  = "Albedo",
+    FVC  = "Fractional Vegetation Cover"
   )
 
   return(spiNames[[spiAcronym]])
@@ -87,12 +100,12 @@ getSpecIndFormula <- function(spiAcronym) {
     TCTB = "N/A",
     TCTG = "N/A",
     TCTW = "N/A",
-    LST = "N/A",
-    LAI = "N/A",
-    GPP = "N/A",
-    NPP = "N/A",
-    ALB = "N/A",
-    FVC = "N/A"
+    LST  = "N/A",
+    LAI  = "N/A",
+    GPP  = "N/A",
+    NPP  = "N/A",
+    ALB  = "N/A",
+    FVC  = "N/A"
   )
 
   return(spiForms[[spiAcronym]])
@@ -117,7 +130,7 @@ getSatMissionName <- function(satCode) {
 
 
 getSeverityIndicatorForm <- function(spi, si) {
-  if (si == "DELTA") {
+  if (si %in% c("DELTA", "DLT")) {
     return(paste(si, " = ", spi, "_prefire - ", spi, "_postfire", sep = ""))
   } else {
     return("N/A")
@@ -136,3 +149,15 @@ getBurntAreaDataURL <- function(baDataset) {
 
   return(baDataURL)
 }
+
+getProcessingLevels <- function(procLevel) {
+  if (procLevel %in% c("L1C", "L1")) {
+    return("Level-1/1C: Top-of-the-atmosphere reflectance (TOAR)")
+  } else if (procLevel %in% c("L2A", "L2")) {
+    return("Level-2/2A: Surface reflectance (SR)")
+  } else {
+    return("N/A")
+  }
+}
+
+
