@@ -35,7 +35,55 @@ statusList <-function(){
   )
 }
 
-# TODO: Add processing levels to this template table
+checkValues <- function(value, what, verbose=TRUE) {
+  
+  # Validate numeric values
+  if(what %in% c("preFireRef", "postFireRef", "minFireSize")){
+    if(all(is.numeric(value)) && all((value > 0))){
+      return(TRUE)
+    }else{
+      return(FALSE)
+    }
+  }
+  
+  # Validate other params with specific values/bounded
+  vals <- list(
+    satCode = c(
+      "S2MSI", "MOD", "MYD", "MCD", "L5TM", "L7ETM",
+      "L8OLI", "L8TIRS", "LTH"
+    ),
+    procLevel = c("L1", "L1C", "L2", "L2A",
+                  "NA","N/A",NA), # This may be undefined if MODIS is selected!
+    modisProduct = c(
+      "MOD09A1", "MOD13Q1", "MOD09GQ", "MOD09Q1", "MYD09A1",
+      "MYD09GQ", "MYD09Q1", "MYD13Q1", "MCD43A4",
+      "NA","N/A",NA # This may be undefined if S2/Landsat are selected!
+    ),
+    baseIndex = c(
+      "NBR", "NDVI", "EVI", "TCTB", "TCTG", "TCTW", "LST",
+      "LAI", "GPP", "NPP", "ALB", "FVC"
+    ),
+    severityIndicator = c("DELTA", "DLT", "RDELTA", "RDT", "S95"),
+    burntAreaDataset = c(
+      "ICNF", "EFFIS", "MCD64", "MICNF",
+      "FireCCI", "VIIRS"
+    ),
+    referenceYear = 2001:as.integer(format(Sys.Date(), "%Y")),
+    # preFireRef = c(),
+    preFireType = c("moving", "fixed", "m", "f", "mov", "fix")
+  )
+  
+  if (!(what %in% names(vals))) {
+    if(verbose) message("Parameter ",what," cannot be checked by method checkValues")
+    return(TRUE)
+  } else {
+    if (all(value %in% vals[[what]])){
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
+}
 
 makeTasksTable <- function(n){
   
@@ -49,6 +97,8 @@ makeTasksTable <- function(n){
     
     # Analysis parameters
     satCode           = character(n),
+    procLevel         = character(n),
+    modisProduct      = character(n),
     baseIndex         = character(n),
     severityIndicator = character(n),
     burntAreaDataset  = character(n),
@@ -80,22 +130,37 @@ makeTasksTable <- function(n){
 }
 
 
-# TODO: Add processing levels to the generated tasks
-
-generateTasks <- function(taskTable = NULL, satCode, baseIndex, 
-                          severityIndicator, burntAreaDataset,
+generateTasks <- function(taskTable = NULL, satCode, procLevel, modisProduct, 
+                          baseIndex, severityIndicator, burntAreaDataset,
                           referenceYear, preFireRef, preFireType, 
                           postFireRef, minFireSize){
   
+  
+  params <- as.list(match.call())
+  params <- params[-c(1,2)]
+  
+  for(nm in names(params)){
+    
+    if(inherits(params[[nm]],"call")){
+      if(!checkValues(eval(params[[nm]]), nm)){
+        stop("The ",nm," value is invalid. Check function call parameters.")
+      }
+    }else{
+      if(!checkValues(params[[nm]], nm)){
+        stop("The ",nm," value is invalid. Check function call parameters.")
+      }
+    }
+  }
+  
   # Generate combinations of parameters
-  taskCombns <- expand.grid(satCode, baseIndex, severityIndicator, 
+  taskCombns <- expand.grid(satCode, procLevel, modisProduct, baseIndex, severityIndicator, 
                             burntAreaDataset, referenceYear, preFireRef, 
                             preFireType, postFireRef, minFireSize)
   
   # Name columns for indexing
-  colnames(taskCombns) <- c("satCode","baseIndex", "severityIndicator", 
-                            "burntAreaDataset","referenceYear", "preFireRef", 
-                            "preFireType", "postFireRef", "minFireSize")
+  colnames(taskCombns) <- c("satCode","procLevel", "modisProduct", "baseIndex", 
+                            "severityIndicator", "burntAreaDataset","referenceYear", 
+                            "preFireRef", "preFireType", "postFireRef", "minFireSize")
   
   # Generate a new task table 
   nr <- nrow(taskCombns)
@@ -113,6 +178,10 @@ generateTasks <- function(taskTable = NULL, satCode, baseIndex,
   
   # Sat data and indices
   newTaskTable$satCode           <- taskCombns$satCode
+  newTaskTable$procLevel         <- taskCombns$procLevel
+  newTaskTable$modisProduct      <- taskCombns$modisProduct
+  
+  # Add indices and severity indicators
   newTaskTable$baseIndex         <- taskCombns$baseIndex
   newTaskTable$severityIndicator <- taskCombns$severityIndicator
   newTaskTable$minFireSize       <- taskCombns$minFireSize
