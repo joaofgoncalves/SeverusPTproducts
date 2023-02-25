@@ -7,15 +7,18 @@
 ## TASK MANAGEMENT FUNCTIONS ----
 ## ----------------------------------------------------------------------------------- ##
 
-getGEEtaskStatus <- function(task){
+getGEEtaskStatus <- function(geeTask){
   
-  out <- ee_utils_py_to_r(ee$batch$Task$status(task))
+  # Check task Status and convert back to a R list object
+  out <- ee_utils_py_to_r(ee$batch$Task$status(geeTask))
   
-  out$ExportOptions  <- task[["config"]][["fileExportOptions"]]
+  # Add extra parameters to feed the download function without using the
+  # actual GEE task object (which is non-storable)
+  out$ExportOptions  <- geeTask[["config"]][["fileExportOptions"]]
   out$filenamePrefix <- out$ExportOptions[["driveDestination"]][["filenamePrefix"]]
   out$fileFormat     <- out$ExportOptions[["fileFormat"]]
   
-  # Get URI for google drive
+  # Get URI for google drive if the calculation is finished
   if("destination_uris" %in% names(out)){
     out$basename_uri   <- basename(out[["destination_uris"]])
   }
@@ -111,9 +114,7 @@ checkGEEtaskCompletion <- function(geeTask, sleep=30, verbose=FALSE){
           "| approx. run time:",mins,"mins",round(secs),"seconds\n")
     }
     
-    if(status == "COMPLETED" || 
-       status == "FAILED" || 
-       status == "CANCELLED"){
+    if(status %in% c("COMPLETED", "FAILED", "CANCELLED")){
       break
     }else{
       Sys.sleep(sleep)
@@ -186,16 +187,16 @@ getTaskFileName <- function(task){
   burntAreaDataset  = getBurntAreaDataset(task)
   referenceYear     = getReferenceYear(task)
   
-  minFireSizeHa             = getMinFireSize(task)
+  #minFireSizeHa             = getMinFireSize(task)
   fixedPreFireWindowSize    = getPreFireRef(task)
   preFireWindowType         = getPreFireType(task)
   postFireWindowEndMonths   = getPostFireRef(task)
-  postFireWindowDays        = getPostWindowDays(task)
+  #postFireWindowDays        = getPostWindowDays(task)
   
   
   refPeriods = paste0(
     # Pre-fire ref period
-    ifelse(preFireWindowType=="moving","R","S"),padNumber(fixedPreFireWindowSize),
+    ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),padNumber(fixedPreFireWindowSize),
     # Post-fire ref period
     "P",padNumber(postFireWindowEndMonths))
   
