@@ -1,14 +1,24 @@
 
+# TODO: Add Relative Delta calcs
+
+# TODO: Add other methods?? RBR??
+
+# TODO: Add indices to other satellites Landsat and MODIS
+
 
 
 processGEEtask <- function(task, outFolder = "GEE", boundBox, 
                            coordRefSys = 'EPSG:32629'){
   
-  
+  # Get run parameters
   mainTaskStatus    = getTaskStatus(task,taskStep = "main")
+  
   satCode           = getSatCode(task)
+  procLevel         = getProcLevel(task)
+  modisProduct      = getModisProduct(task)
   baseIndex         = getBaseIndex(task)
   severityIndicator = getSeverityIndicator(task)
+  
   burntAreaDataset  = getBurntAreaDataset(task)
   referenceYear     = getReferenceYear(task)
 
@@ -18,10 +28,10 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
   postFireWindowEndMonths   = getPostFireRef(task)
   postFireWindowDays        = getPostWindowDays(task)
 
-
-
+  
   refPeriods = paste0(# Pre-fire ref period
-                      ifelse(preFireWindowType=="moving","R","S"),padNumber(fixedPreFireWindowSize),
+                      ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),
+                      padNumber(fixedPreFireWindowSize),
                       # Post-fire ref period
                       "P",padNumber(postFireWindowEndMonths))
 
@@ -36,29 +46,26 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
     fireDateFieldName = SPT_EFFIS_DATE_FIELD
   }
   
+
   if(satCode == "S2MSI"){
-    
-    # Spatial resolution  
-    spatialRes = 20
     
     # Cloud mask function
     cloudMaskFun = maskS2clouds
     
     # Spectral indices
     if(baseIndex == "NBR"){
-      baseIndexFun = calcS2_NBR
+      baseIndexFun = calc_NBR
     }
     if(baseIndex == "NDVI"){
-      baseIndexFun = calcS2_NDVI
+      baseIndexFun = calc_NDVI
     }
     if(baseIndex == "EVI"){
-      baseIndexFun = calcS2_EVI
+      baseIndexFun = calc_EVI
     }
   }
   
-  if(satCode %in% c("LT5TM","LT5ETM","LT8OLI","LTH")){
-    spatialRes = 30
-  }
+  # Get the spatial resolution of the data
+  spatialRes <- getSpatialResolution(task)
   
 
   # Create the burned area feature collection  
@@ -67,13 +74,20 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
   ## Convert burned area polygons to a list to iterate more easily
   baList = ee$FeatureCollection$toList(baData, baData$size())
   
-  sits = getGEEsatImageCollection(satCode="S2MSI")
+  # Get the Image Collection object to handle in GEE
+  sits = getGEEsatImageCollection(satCode   = satCode, 
+                                  procLevel = procLevel,
+                                  modisProduct = modisProduct)
+  
   
   # Set the start and end of the post-fire window
   timeWindowStart = ee$Number(postFireWindowDays[1])
   timeWindowEnd   = ee$Number(postFireWindowDays[2])
   
   
+  # Function to iterate through each burned area polygon
+  #
+  #
   accumulate = function(currentListItem, previousImgResult){
     
     # Get a single feature from the iterated list
@@ -93,13 +107,13 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
     
     # Pre-fire window by type
     # Fixed window made n days before the ignition date
-    if(preFireWindowType == "fixed"){
+    if(preFireWindowType %in% c("fixed","fix","f")){
       
       prefireDate_sta = ee$Date(fd$advance(ee$Number((-1)*fixedPreFireWindowSize),'day'))
       prefireDate_end = fd
       
       # Moving window referencing the same period one year before
-    }else if(preFireWindowType == "moving"){
+    }else if(preFireWindowType %in% c("moving","mov","m")){
       
       prefireDate_sta = postfireDate_sta$advance(-1, 'year')
       prefireDate_end = postfireDate_end$advance(-1, 'year')
@@ -134,8 +148,6 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
       ee$Image$clip(selFeat$geometry()) %>% 
       ee$Image$toInt()
     
-    # TODO: Add Relative Delta calcs
-    # TODO: Add other methods?? RBR??
     
     imColClip = ee$ImageCollection(list(imgDiffClip))
     
@@ -170,13 +182,7 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
   
   geeProcTask$start()
   
-  #writeGEEtaskHandle(geeProcTask)
   return(geeProcTask)
   
 }
-
-
-
-
-
 
