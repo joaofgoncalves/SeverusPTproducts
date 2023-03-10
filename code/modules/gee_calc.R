@@ -1,11 +1,4 @@
 
-# TODO: Add Relative Delta calcs
-
-# TODO: Add other methods?? RBR??
-
-# TODO: Add indices to other satellites Landsat and MODIS
-
-
 
 processGEEtask <- function(task, outFolder = "GEE", boundBox, 
                            coordRefSys = 'EPSG:32629'){
@@ -42,26 +35,82 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
   if(burntAreaDataset=="ICNF"){
     fireDateFieldName = SPT_ICNF_DATE_FIELD
   }
-  if(burntAreaDataset=="EFFIS"){
+  else if(burntAreaDataset=="EFFIS"){
     fireDateFieldName = SPT_EFFIS_DATE_FIELD
   }
+  else{
+    stop("Unsupported burnt area dataset name in burntAreaDataset!")
+  }
   
-
+  # Cloud mask & scale data functions
+  #
+  
+  # SENTINEL-2
   if(satCode == "S2MSI"){
+    cloudMaskFun = maskClouds_S2
+    scaleDataFun = scaleData_S2
+  }
+  
+  # LANDSAT MISSIONS
+  else if(satCode %in% c("L5TM", "L7ETM", "L8OLI", "L9OLI")){
     
-    # Cloud mask function
-    cloudMaskFun = maskS2clouds
+    if(satCode == "L5TM"){
+      cloudMaskFun = maskClouds_LT5
+    }else if(satCode == "L7ETM"){
+      cloudMaskFun = maskClouds_LT7
+    }else if(satCode == "L8OLI"){
+      cloudMaskFun = maskClouds_LT8
+    }else if(satCode == "L9OLI"){
+      cloudMaskFun = maskClouds_LT9
+    }else{
+      stop("Invalid satCode value in processGEEtask function")
+    }
     
-    # Spectral indices
-    if(baseIndex == "NBR"){
-      baseIndexFun = calc_NBR
+    if(procLevel %in% c("L1", "L1C")){
+      scaleDataFun = scaleData_LT_TOA
+    }else if(procLevel %in% c("L2", "L2A")){
+      scaleDataFun = scaleData_LT_SR
+    }else{
+      stop("Invalid procLevel value in processGEEtask function")
     }
-    if(baseIndex == "NDVI"){
-      baseIndexFun = calc_NDVI
+  }
+  else{
+    stop("Unsupported satellite code in satCode!")
+  }
+  
+  
+  # Spectral indices
+  if(baseIndex == "NBR"){
+    baseIndexFun = calc_NBR
+  }
+  else if(baseIndex == "NDVI"){
+    baseIndexFun = calc_NDVI
+  } 
+  else if(baseIndex == "EVI"){
+    baseIndexFun = calc_EVI
+  } 
+  
+  ## ---- TASSELED CAPS TRANSFORMATIONS ---- ## 
+  ##
+  else if(baseIndex == "TCTB"){
+    if(satCode == "S2MSI"){
+      baseIndexFun = calc_TCTB_S2 
     }
-    if(baseIndex == "EVI"){
-      baseIndexFun = calc_EVI
+  }
+  else if(baseIndex == "TCTG"){
+    if(satCode == "S2MSI"){
+      baseIndexFun = calc_TCTG_S2 
     }
+  }
+  else if(baseIndex == "TCTW"){
+    if(satCode == "S2MSI"){
+      baseIndexFun = calc_TCTW_S2 
+    }
+  }
+  ## END TCT
+  
+  else{
+    stop("Unsupported spectral index in baseIndex!")
   }
   
   # Get the spatial resolution of the data
@@ -124,31 +173,68 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
       ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
       ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
       ee$ImageCollection$map(cloudMaskFun) %>% 
+      ee$ImageCollection$map(scaleDataFun) %>% 
       ee$ImageCollection$map(baseIndexFun) %>% 
       ee$ImageCollection$select(baseIndex) %>% 
-      ee$ImageCollection$median() %>% 
-      ee$Image$multiply(10000) %>% 
-      ee$Image$toInt()
+      ee$ImageCollection$median() #%>% 
+      # ee$Image$multiply(10000) %>% 
+      # ee$Image$toInt()
     
     # Post-fire reference image
     postFire = sits %>% 
       ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
       ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
       ee$ImageCollection$map(cloudMaskFun) %>% 
+      ee$ImageCollection$map(scaleDataFun) %>% 
       ee$ImageCollection$map(baseIndexFun) %>% 
       ee$ImageCollection$select(baseIndex) %>% 
-      ee$ImageCollection$median() %>% 
-      ee$Image$multiply(10000) %>% 
-      ee$Image$toInt()
+      ee$ImageCollection$median() #%>% 
+      # ee$Image$multiply(10000) %>% 
+      # ee$Image$toInt()
     
-    # Calculate delta 
-    imgDiffClip = 
-      ee$Image$subtract(ee$Image(preFire), ee$Image(postFire)) %>% 
-      ee$Image$rename(severityIndicator) %>% 
-      ee$Image$clip(selFeat$geometry()) %>% 
-      ee$Image$toInt()
-    
-    
+    if(severityIndicator %in% c("DELTA", "DLT")){
+      # Calculate delta
+      imgDiffClip = 
+        ee$Image$subtract(ee$Image(preFire), ee$Image(postFire)) %>% 
+        ee$Image$rename(severityIndicator) %>% 
+        ee$Image$clip(selFeat$geometry()) %>% 
+        ee$Image$multiply(10000) %>% 
+        ee$Image$toInt()
+    }
+    else if(severityIndicator == "RBR"){
+      # Calculate the relativized burn ratio
+      # Parks et al (2014) Remote Sensing https://www.mdpi.com/2072-4292/6/3/1827#
+      #  A New Metric for Quantifying Burn Severity: The Relativized Burn Ratio 
+      
+      imgDiffClip = 
+        ee$Image$divide(
+          ee$Image$subtract(ee$Image(preFire), ee$Image(postFire)),
+          ee$Image$add(ee$Image(preFire), 1.001)
+        ) %>%
+        ee$Image$rename(severityIndicator) %>% 
+        ee$Image$clip(selFeat$geometry()) %>% 
+        ee$Image$multiply(10000) %>% 
+        ee$Image$toInt()
+
+    }
+    else if(severityIndicator %in% c("RDELTA","RDT")){
+      
+      # Calculate relative difference delta
+      imgDiffClip = 
+        ee$Image$divide(
+          ee$Image$subtract(ee$Image(preFire), ee$Image(postFire)),
+          ee$Image$sqrt(ee$Image$abs(ee$Image(preFire)))
+        )%>% 
+        ee$Image$rename(severityIndicator) %>% 
+        ee$Image$clip(selFeat$geometry()) %>% 
+        ee$Image$multiply(10000) %>% 
+        ee$Image$toInt()
+      
+    }
+    else{
+      stop("Wrong value in severityIndicator for method processGEEtask")
+    }
+      
     imColClip = ee$ImageCollection(list(imgDiffClip))
     
     imColPrevious = ee$ImageCollection(list(ee$Image(ee$List(previousImgResult)$get(0))))
