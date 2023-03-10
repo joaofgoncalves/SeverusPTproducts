@@ -122,6 +122,8 @@ getSatMissionName <- function(satCode) {
     L7ETM  = "Landsat-7/ETM+",
     L8OLI  = "Landsat-8/OLI",
     L8TIRS = "Landsat-8/TIRS",
+    L8OLI  = "Landsat-9/OLI",
+    L9TIRS = "Landsat-9/TIRS",
     LTH    = "Landsat Harmonized (LT-5,7,8)"
   )
 
@@ -152,9 +154,9 @@ getBurntAreaDataURL <- function(baDataset) {
 
 getProcessingLevels <- function(procLevel) {
   if (procLevel %in% c("L1C", "L1")) {
-    return("Level-1/1C: Top-of-the-atmosphere reflectance (TOAR)")
+    return("Level L1/L1C: Top-of-the-atmosphere reflectance (TOAR)")
   } else if (procLevel %in% c("L2A", "L2")) {
-    return("Level-2/2A: Surface reflectance (SR)")
+    return("Level L2/L2A: Surface reflectance (SR)")
   } else {
     return("N/A")
   }
