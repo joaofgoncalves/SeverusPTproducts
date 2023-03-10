@@ -34,7 +34,6 @@ getGEEburntAreaDataset <- function(baDataset, referenceYear, minFireSizeHa = 5) 
 }
 
 
-# TODO: Get the bands and rename them for making spectral indices calculation generic
 
 getGEEsatImageCollection <- function(satCode = "S2MSI",
                                      procLevel = "L2A", modisProduct = NULL) {
@@ -49,11 +48,11 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
       
       # Harmonized Sentinel-2 MSI: MultiSpectral Instrument, Level-2A
       imCol = ee$ImageCollection("COPERNICUS/S2_SR_HARMONIZED") %>% 
-              ee$ImageCollection$select(c("B2","B3","B4","B5","B6","B7",
-                                          "B8","B8A","B11","B12","QA60"),
+              ee$ImageCollection$select(c("B2", "B3", "B4", "B5", "B6", "B7",
+                                          "B8", "B8A", "B11", "B12", "QA60"),
                                         # Renamed bands
-                                        c("Blue", "Green", "Red","RE1","RE2",
-                                          "RE3","NIR","RE4","SWIR1", "SWIR2","QA60"))
+                                        c("Blue", "Green", "Red", "RE1", "RE2", "RE3",
+                                          "NIR", "RE4", "SWIR1", "SWIR2", "QA60"))
       return(imCol)
       
     } else if (procLevel %in% c("L1C", "L1")) {
