@@ -27,7 +27,20 @@ source("./CODE/modules/metadata.R")
 # registerDoParallel(cl)
 
 
-ee_Initialize("joaofgo@gmail.com", gcs = TRUE, drive=TRUE)
+if(!file_dates("gee_last_init.log", tdelta = 10)){
+  
+  cat("\nRefreshing previous GEE initialization at:",
+      readr::read_lines("gee_last_init.log",n_max = 1),"\n\n")
+  
+  ee_Initialize("joaofgo@gmail.com", gcs = TRUE, drive=TRUE)
+  create_file("gee_last_init.log")
+  
+}else{
+  cat("\nLast GEE initialization is OK:",
+      readr::read_lines("gee_last_init.log",n_max = 1),"\n\n")
+}
+
+
 
 # CAOP + buffer 5km
 ptbox = ee$Geometry$Polygon(c(c(
@@ -165,7 +178,7 @@ for(tidx in xs){
       # Refresh the target task status by re-loading it
       task <- getTask(taskUID = ttb$taskUID[tidx])
       
-      stop(symbol$cross,"GEE Process ID:", geeProcCheck$id, "failed")
+      stop(symbol$cross,"GEE Process ID: ", geeProcCheck$id, " failed")
     }
     
     cat(green(bold(
@@ -181,7 +194,6 @@ for(tidx in xs){
     taskMd <- dataframeToMarkdown(taskToDataframe(task))
     print(taskMd)
     cat("\n\n")
-    
     
   }else{
     
@@ -324,7 +336,6 @@ for(tidx in xs){
     #
     #
     meta <- metaTableTemplate(list(
-      
       ProductType          = "Observed/historical severity",
       ProductName          = paste("Fire/burn severity / Indicator:",
                                    task$severityIndicator,task$baseIndex,
@@ -446,8 +457,6 @@ for(tidx in xs){
   cat(green(bold(symbol$check, "TASK COMPLETED\n")))
   cat(green(bold("-----------------------------------------------------------------------\n\n")))
   
-  
-  #TRUE    
 }
 
 
