@@ -333,29 +333,32 @@ for(tidx in xs){
       TemporalResolution   = paste(task$preFireRef,"months composite"),
       CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
       CalculationDate      = paste(getCurrentDatetime(),"Lisbon GMT +00:00"),
-      CalculationPlatforms = "Google Earth Engine; R/RStudio",
+      CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
+                                   "/ rgee-version:",packageVersion("rgee")),
       BurntAreaDataset     = task$burntAreaDataset,
       BurntAreaDatasetURL  = getBurntAreaDataURL(task$burntAreaDataset),
       ReferenceYear        = task$referenceYear,
       MinFireSize          = paste(task$minFireSize,"hectares"),
       SatCollectionData    = paste(task$satCode,getSatMissionName(task$satCode),sep=" - "),
       SatProcLevel         = getProcessingLevels(task$procLevel),#"Surface reflectance (L2A)",
-      #SatColVersion        = 
-      CloudMask            = "Yes",
+      #SatColVersion       =
+      CloudMaskUsed        = "Yes",
+      CloudMaskMethod      = "Pixel QA band: Cirrus, clouds and/or cloud shadows removed",
       BaseIndex            = paste(task$baseIndex, getSpectralIndexName(task$baseIndex),sep=" - "),
-      BaseIndexFormula     = getSpecIndFormula(task$baseIndex),
+      BaseIndexFormula     = getSpecIndFormula(task$baseIndex, task$satCode),
       SeverityIndicator    = task$severityIndicator,
       SeverityIndicatorForm = getSeverityIndicatorForm(task$baseIndex, task$severityIndicator),
       CompAggMeasure        = "Median",
-      PreFireType           = task$preFireType,
+      PreFireType           = paste(task$preFireType, "/ considers the year before fire, i.e., homologous year"),
       PreFireRefPeriod      = paste(task$preFireRef,"months"),
       PostFireType          = "moving",
       PostFireRefPeriod     = paste("Start post-fire window:",
                                     task$postFireRef-task$preFireRef,"months",
-                                   "/ End:",task$postFireRef,"months",", i.e.,", 
-                                   paste(getPostWindowDays(task),collapse=" to "),
-                                   "days after ignition date")
-      ))
+                                    "/ End:",task$postFireRef,"months",", i.e.,",
+                                    paste(getPostWindowDays(task),collapse=" to "),
+                                    "days after ignition date"),
+      VersionNumber         = SPT_VERSION
+    ))
     
     # Export metadata to Markdown txt and JSON files
     out <- try({
