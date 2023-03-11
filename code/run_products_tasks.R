@@ -18,6 +18,7 @@ source("./CODE/modules/gee_data.R")
 source("./CODE/modules/gee_indices.R")
 source("./CODE/modules/gee_utils.R")
 source("./CODE/modules/gee_calc.R")
+source("./CODE/modules/gee_prepare.R")
 source("./CODE/modules/post_proc.R")
 source("./CODE/modules/metadata.R")
 
@@ -26,7 +27,7 @@ source("./CODE/modules/metadata.R")
 # registerDoParallel(cl)
 
 
-ee_Initialize("joaofgo", gcs = TRUE, drive=TRUE)
+ee_Initialize("joaofgo@gmail.com", gcs = TRUE, drive=TRUE)
 
 # CAOP + buffer 5km
 ptbox = ee$Geometry$Polygon(c(c(
@@ -62,8 +63,6 @@ for(tidx in xs){
   # source("./CODE/modules/post_proc.R")
   # source("./CODE/modules/metadata.R")
   
-
-
 
   # Read the main task table
   ttb <- readTaskTable()
@@ -266,7 +265,7 @@ for(tidx in xs){
     # Convert zeros no NA (zeros are the default null/no-data value exported by GEE)
     #
     #
-    r0 <- try(rasterZerosToNA(outFilePath, writeRast=TRUE, datatype ="INT2S"))
+    r0 <- try(rasterZerosToNA(outFilePath, writeRast=TRUE, datatype ="INT4S"))
     
     cat(green(bold(
       symbol$arrow_right, "Projecting raster data to ETRS-1989/PT-TM06...\n\n")))
@@ -275,7 +274,7 @@ for(tidx in xs){
     # Project data to ETRS 1989 / PT TM 06 CRS
     #
     #
-    r1 <- try(projPTTM06(outFilePath, datatype ="INT2S", method="near"))
+    r1 <- try(projPTTM06(outFilePath, datatype ="INT4S", method="near"))
     
     if(inherits(r0,"try-error") || inherits(r1,"try-error")){
       
@@ -370,7 +369,7 @@ for(tidx in xs){
     
     if(inherits(out,"try-error")){
       # Update the taskTable status for post-processing
-      updateMetaTaskStatus(task, state="METADATA PROCESSING ERROR")
+      updateMetaTaskStatus(task, state = "METADATA PROCESSING ERROR")
       # Refresh the target task status by re-loading it
       task <- getTask(taskUID = ttb$taskUID[tidx])
       
@@ -378,7 +377,7 @@ for(tidx in xs){
       
     }else{
       # Update the taskTable status for post-processing
-      updateMetaTaskStatus(task, state="METADATA COMPLETED")
+      updateMetaTaskStatus(task, state = "METADATA COMPLETED")
       # Refresh the target task status by re-loading it
       task <- getTask(taskUID = ttb$taskUID[tidx])
     }
@@ -447,7 +446,5 @@ for(tidx in xs){
   
   #TRUE    
 }
-
-
 
 
