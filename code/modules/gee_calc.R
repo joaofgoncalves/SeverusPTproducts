@@ -6,7 +6,7 @@ getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
     stop("The spectral index is specific to a satellite which has not been defined. Check satCode")
   }
   
-  if((baseIndex %in% c("TCTB","TCTG","TCTW")) && satCode %in% c("MOD","MYD")){
+  if((baseIndex %in% c("TCTB","TCTG","TCTW")) && (satCode %in% c("MOD","MYD"))){
     if(!(modisProduct %in% c("MOD09A1","MYD09A1"))){
       stop("MODIS product not supported")
     }
@@ -24,7 +24,13 @@ getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
     
     # Satellite specific indices
     NBRP = list(
-      S2MSI = calc_NBRP_S2
+      S2MSI = calc_NBRP_S2,
+      L5TM  = calc_NBRP,
+      L7ETM = calc_NBRP,
+      L8OLI = calc_NBRP,
+      L9OLI = calc_NBRP,
+      MOD   = calc_NBRP,
+      MYD   = calc_NBRP
     ),
     
     TCTB = list(
@@ -66,14 +72,14 @@ getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
 }
 
 
-getMaskFun <- function(satCode, modisProduct=NULL){
+getCloudMaskFun <- function(satCode, modisProduct=NULL){
   
   
   if((satCode %in% c("MOD","MYD")) && is.null(modisProduct)){
     stop("modisProduct must be defined")
   }
   
-  makFuns <- list(
+  maskFuns <- list(
     
     S2MSI = maskClouds_S2,
     
@@ -93,9 +99,9 @@ getMaskFun <- function(satCode, modisProduct=NULL){
   )
   
   if(satCode %in% c("MOD","MYD")){
-    return(indexFunctions[[satCode]][[modisProduct]])
+    return(maskFuns[[satCode]][[modisProduct]])
   }else{
-    return(indexFunctions[[satCode]])
+    return(maskFuns[[satCode]])
   }
 }
 
@@ -111,7 +117,7 @@ getScaleDataFun <- function(satCode, procLevel=NULL, modisProduct=NULL){
     stop("Processing level (procLevel) must be defined")
   }
   
-  makFuns <- list(
+  scaleFuns <- list(
     
     S2MSI = scaleData_S2,
     
@@ -155,13 +161,13 @@ getScaleDataFun <- function(satCode, procLevel=NULL, modisProduct=NULL){
   )
   
   if(satCode %in% c("MOD","MYD")){
-    return(indexFunctions[[satCode]][[modisProduct]])
+    return(scaleFuns[[satCode]][[modisProduct]])
   }
   else if(satCode %in% c("L5TM", "L7ETM", "L8OLI", "L9OLI")){
-    return(indexFunctions[[satCode]][[procLevel]])
+    return(scaleFuns[[satCode]][[procLevel]])
   }
   else{
-    return(indexFunctions[[satCode]])
+    return(scaleFuns[[satCode]])
   }
 }
 
@@ -394,7 +400,7 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
       ee$ImageCollection$map(cloudMaskFun) %>% 
       ee$ImageCollection$map(scaleDataFun) %>% 
       ee$ImageCollection$map(baseIndexFun) %>% 
-      ee$ImageCollection$select(baseIndex) %>% 
+      #ee$ImageCollection$select(baseIndex) %>% 
       ee$ImageCollection$median() #%>% 
       # ee$Image$multiply(10000) %>% 
       # ee$Image$toInt()
@@ -406,7 +412,7 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
       ee$ImageCollection$map(cloudMaskFun) %>% 
       ee$ImageCollection$map(scaleDataFun) %>% 
       ee$ImageCollection$map(baseIndexFun) %>% 
-      ee$ImageCollection$select(baseIndex) %>% 
+      #ee$ImageCollection$select(baseIndex) %>% 
       ee$ImageCollection$median() #%>% 
       # ee$Image$multiply(10000) %>% 
       # ee$Image$toInt()

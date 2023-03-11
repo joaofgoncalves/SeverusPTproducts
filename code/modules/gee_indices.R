@@ -46,7 +46,7 @@ calc_EVI <- function(img){
 calc_NBRSWIR <- function(img){
   
   out <- ee$Image(img$expression(
-    '(SWIR2 - SWIR1 - 0.02) / (SWIR2 + SWIR1 + 0.1)', 
+    '-1*((SWIR2 - SWIR1 - 0.02) / (SWIR2 + SWIR1 + 0.1))', 
     list(
       'SWIR1' = img$select('SWIR1'),
       'SWIR2' = img$select('SWIR2')
@@ -60,7 +60,7 @@ calc_NBRSWIR <- function(img){
 }
 
 # Trigg, S., & Flasse, S. (2001). An evaluation of different
-# bi-spectral spaces for discriminating burnedshrub-savannah. International Journal 
+# bi-spectral spaces for discriminating burned shrub-savannah. International Journal 
 # of RemoteSensing, 22(13), 2641-2647. https://doi.org/10.1080/01431160110053185
 
 calc_MIRBI <- function(img){
@@ -85,7 +85,7 @@ calc_MIRBI <- function(img){
 calc_CSI <- function(img){
   
   out <- ee$Image(img$expression(
-    'NIR / SWIR', 
+    'NIR / SWIR2', 
     list(
       'NIR' = img$select('NIR'),
       'SWIR2' = img$select('SWIR2')
@@ -98,6 +98,28 @@ calc_CSI <- function(img){
   return(out)
 }
 
+
+# NBR+ plus adapted to other satellites
+# Alcaras, 2022. https://www.mdpi.com/2072-4292/14/7/1727
+
+calc_NBRP <- function(img){
+  
+  out <- ee$Image(img$expression(
+    # (B12 - B8A - B3 - B2) / (B12 + B8A + B3 + B2)
+    '(SWIR2 - NIR - GREEN - BLUE) / (SWIR2 + NIR + GREEN + BLUE)',
+    list(
+      'SWIR2' = img$select('SWIR2'),  
+      'NIR'   = img$select('NIR'),    
+      'BLUE'  = img$select('Blue'), 
+      'GREEN' = img$select('Green') 
+    ))
+  )
+  
+  out <- out$set("system:time_start", img$get("system:time_start"))
+  out <- out$rename("NBRP")
+  out <- out$copyProperties(img)
+  return(out)
+}
 
 ## ----------------------------------------------------------------------------------- ##
 ## SENTINEL-2 ----
