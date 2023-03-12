@@ -40,7 +40,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
   
   
   ## ----------------------------------------------------------------------- ##
-  ## Sentinel-2a/b mission
+  ## Sentinel-2a/b mission ----
   ## ----------------------------------------------------------------------- ##
   
   if (satCode == "S2MSI") {
@@ -72,12 +72,12 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
   }
 
   ## ----------------------------------------------------------------------- ##
-  ## MODIS missions
+  ## MODIS missions ----
   ## ----------------------------------------------------------------------- ##
   
   # Terra/MODIS mission ----------------------------------------------------- #
   
-  if (satCode == "MOD") {
+  else if (satCode == "MOD") {
     if (is.null(modisProduct)) {
       stop("A MODIS product must be defined")
     } else if (modisProduct == "MOD09A1") {
@@ -129,7 +129,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
 
   # Aqua/MODIS mission ---------------------------------------------------- #
   
-  if (satCode == "MYD") {
+  else if (satCode == "MYD") {
     if (is.null(modisProduct)) {
       stop("A MODIS product must be defined")
     } else if (modisProduct == "MYD09A1") {
@@ -182,7 +182,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
 
   # Combined Aqua/Terra --------------------------------------------------- #
   
-  if (satCode == "MCD") {
+  else if (satCode == "MCD") {
     if(modisProduct == "MCD43A4"){
       
       # MCD43A4.061 MODIS Nadir BRDF-Adjusted Reflectance Daily 500m
@@ -212,18 +212,17 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
   }
 
   ## ----------------------------------------------------------------------- ##
-  ## Landsat missions
+  ## Landsat missions ----
   ## ----------------------------------------------------------------------- ##
   
-  if (satCode == "L5TM") {
+  else if (satCode == "L5TM") {
     if (procLevel %in% c("L2A", "L2")) {
       
       # USGS Landsat 5 Level 2, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LT05/C02/T1_L2") %>% 
-        ee$ImageCollection$select(c("SR_B1","SR_B2","SR_B3",
-                                    "SR_B4","SR_B5","SR_B6",
-                                    "SR_B7","SR_CLOUD_QA",
-                                    "QA_PIXEL"),
+        ee$ImageCollection$select(c("SR_B1", "SR_B2", "SR_B3",
+                                    "SR_B4", "SR_B5", "SR_B7", 
+                                    "SR_CLOUD_QA", "QA_PIXEL"),
                                   # Renamed bands
                                   c("Blue", "Green", "Red",
                                     "NIR", "SWIR1", "SWIR2",
@@ -234,9 +233,9 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
       
       # USGS Landsat 5 Top of Atmosphere, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LT05/C02/T1_TOA") %>% 
-        ee$ImageCollection$select(c("B1","B2","B3",
-                                    "B4","B5","B6",
-                                    "B7","QA_PIXEL"),
+        ee$ImageCollection$select(c("B1", "B2", "B3",
+                                    "B4", "B5", "B7",
+                                    "QA_PIXEL"),
                                   # Renamed bands
                                   c("Blue", "Green", "Red",
                                     "NIR", "SWIR1", "SWIR2", 
@@ -248,15 +247,14 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
-  if (satCode == "L7ETM") {
+  else if (satCode == "L7ETM") {
     if (procLevel %in% c("L2A", "L2")) {
 
       # USGS Landsat 7 Level 2, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LE07/C02/T1_L2") %>% 
-        ee$ImageCollection$select(c("SR_B1","SR_B2","SR_B3",
-                                    "SR_B4","SR_B5","SR_B6",
-                                    "SR_B7","SR_CLOUD_QA",
-                                    "QA_PIXEL"),
+        ee$ImageCollection$select(c("SR_B1", "SR_B2", "SR_B3",
+                                    "SR_B4", "SR_B5", "SR_B7",
+                                    "SR_CLOUD_QA", "QA_PIXEL"),
                                   # Renamed bands
                                   c("Blue", "Green", "Red",
                                     "NIR", "SWIR1", "SWIR2",
@@ -267,9 +265,9 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
       
       # USGS Landsat 7 Tof of Atmosphere, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LE07/C02/T1_TOA") %>% 
-        ee$ImageCollection$select(c("B1","B2","B3",
-                                    "B4","B5","B6",
-                                    "B7","QA_PIXEL"),
+        ee$ImageCollection$select(c("B1", "B2", "B3",
+                                    "B4", "B5", "B7",
+                                    "QA_PIXEL"),
                                   # Renamed bands
                                   c("Blue", "Green", "Red",
                                     "NIR", "SWIR1", "SWIR2", 
@@ -281,18 +279,17 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
-  if (satCode == "L8OLI" || satCode == "L8TIRS") {
+  else if (satCode == "L8OLI") {
     if (procLevel %in% c("L2A", "L2")) {
       
       # USGS Landsat 8 Level 2, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LC08/C02/T1_L2") %>% 
-        ee$ImageCollection$select(c("SR_B1","SR_B2","SR_B3",
-                                    "SR_B4","SR_B5","SR_B6",
-                                    "SR_B7","SR_QA_AEROSOL",
-                                    "QA_PIXEL"),
+        ee$ImageCollection$select(c("SR_B1", "SR_B2", "SR_B3",
+                                    "SR_B4", "SR_B5", "SR_B6", "SR_B7",
+                                    "SR_QA_AEROSOL", "QA_PIXEL"),
                                   # Renamed bands
-                                  c("Blue", "Green", "Red",
-                                    "NIR", "SWIR1", "SWIR2",
+                                  c("Coastal","Blue", "Green", 
+                                    "Red", "NIR", "SWIR1", "SWIR2",
                                     "SR_QA_AEROSOL", "QA_PIXEL"))
       return(imCol)
       
@@ -304,7 +301,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
                                     "B4","B5","B6",
                                     "B7","QA_PIXEL"),
                                   # Renamed bands
-                                  c("Blue", "Green", "Red",
+                                  c("Coastal","Blue", "Green", "Red",
                                     "NIR", "SWIR1", "SWIR2", 
                                     "QA_PIXEL"))
       return(imCol)
@@ -314,18 +311,17 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
-  if (satCode == "L9OLI" || satCode == "L9TIRS") {
+  else if (satCode == "L9OLI") {
     if (procLevel %in% c("L2A", "L2")) {
       
       # USGS Landsat 9 Level 2, Collection 2, Tier 1
       imCol = ee$ImageCollection("LANDSAT/LC09/C02/T1_L2") %>% 
-        ee$ImageCollection$select(c("SR_B1","SR_B2","SR_B3",
-                                    "SR_B4","SR_B5","SR_B6",
-                                    "SR_B7","SR_QA_AEROSOL",
-                                    "QA_PIXEL"),
+        ee$ImageCollection$select(c("SR_B1", "SR_B2", "SR_B3",
+                                    "SR_B4", "SR_B5", "SR_B6", "SR_B7",
+                                    "SR_QA_AEROSOL", "QA_PIXEL"),
                                   # Renamed bands
-                                  c("Blue", "Green", "Red",
-                                    "NIR", "SWIR1", "SWIR2",
+                                  c("Coastal", "Blue", "Green", 
+                                    "Red", "NIR", "SWIR1", "SWIR2",
                                     "SR_QA_AEROSOL", "QA_PIXEL"))
       return(imCol)
       
@@ -334,11 +330,11 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
       # USGS Landsat 9 Collection 2 Tier 1 TOA Reflectance
       imCol = ee$ImageCollection("LANDSAT/LC09/C02/T1_TOA") %>% 
         ee$ImageCollection$select(c("B1","B2","B3",
-                                    "B4","B5","B6",
-                                    "B7","QA_PIXEL"),
+                                    "B4","B5","B6", "B7",
+                                    "QA_PIXEL"),
                                   # Renamed bands
-                                  c("Blue", "Green", "Red",
-                                    "NIR", "SWIR1", "SWIR2", 
+                                  c("Coastal", "Blue", "Green", 
+                                    "Red", "NIR", "SWIR1", "SWIR2", 
                                     "QA_PIXEL"))
       return(imCol)
 
@@ -347,7 +343,11 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
-  if (satCode == "LTH") {
-    stop("Not available yet!...")
+  else if (satCode == "LTH") {
+    stop("LTH is not yet available!")
+  }
+  
+  else{
+    stop("Satellite code not available or malformed!")
   }
 }
