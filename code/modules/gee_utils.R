@@ -146,9 +146,12 @@ downloadGEEdata <- function(geeTask, dataFormat="tif"){
     taskStatusList <- getGEEtaskStatus(geeTask)
     
     if(taskStatusList$state == "COMPLETED"){
+      # 
+      # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
+      #                   taskStatusList$description,"_",getDateString(),".",dataFormat)
       
       outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-                        taskStatusList$description,"_",getDateString(),".",dataFormat)
+                        taskStatusList$description,".",dataFormat)
       
       out <- try(ee_drive_to_local(task = geeTask, dsn = outFile, 
                                    overwrite = TRUE, consider = "last"))
@@ -161,14 +164,17 @@ downloadGEEdata <- function(geeTask, dataFormat="tif"){
     
   }else if(inherits(geeTask, "list")){
     
+    # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
+    #                   geeTask$description,"_",getDateString(),".",dataFormat)
+    
     outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-                      geeTask$description,"_",getDateString(),".",dataFormat)
+                      geeTask$description,".",dataFormat)
     
     out <- try(ee_drive_to_local(task = geeTask, dsn = outFile, 
                                  overwrite = TRUE, consider = "last"))
     
   }else{
-    stop("Non-supported object type in geeTask")
+    stop("Non-supported object type in geeTask for method downloadGEEdata.")
   }
   
   if(inherits(out,"try-error")){
@@ -184,24 +190,32 @@ getTaskFileName <- function(task){
   satCode           = getSatCode(task)
   baseIndex         = getBaseIndex(task)
   severityIndicator = getSeverityIndicator(task)
+  
   burntAreaDataset  = getBurntAreaDataset(task)
   referenceYear     = getReferenceYear(task)
   
-  #minFireSizeHa             = getMinFireSize(task)
   fixedPreFireWindowSize    = getPreFireRef(task)
   preFireWindowType         = getPreFireType(task)
   postFireWindowEndMonths   = getPostFireRef(task)
-  #postFireWindowDays        = getPostWindowDays(task)
-  
-  
+
   refPeriods = paste0(
     # Pre-fire ref period
     ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),padNumber(fixedPreFireWindowSize),
     # Post-fire ref period
     "P",padNumber(postFireWindowEndMonths))
   
-  prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
-                            burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
+  # prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
+  #                           burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
+  
+  prodName = getProductName(ProjectAccronym   = SPT_PROJ_ACRONYM, 
+                            SeverityIndicator = severityIndicator, 
+                            BaseIndex         = baseIndex, 
+                            SatCode           = satCode, 
+                            BurntAreaDataset  = burntAreaDataset, 
+                            ReferenceYear = referenceYear, 
+                            RefPeriods    = refPeriods, 
+                            addCalcDate   = FALSE, 
+                            VersionNumber = SPT_VERSION)
   
   return(prodName)
 }
@@ -245,14 +259,9 @@ ee_drive_to_local_mod <- function (task, dsn, overwrite = TRUE, consider = TRUE,
             "', drive = TRUE)", " to fix.")
   }
   
-  #gd_folder <- basename(ee$batch$Task$status(task)[["destination_uris"]])
-  
+
   gd_folder <- task$basename_uri
-  
-  #gd_ExportOptions <- task[["config"]][["fileExportOptions"]]
-  #gd_filename <- gd_ExportOptions[["driveDestination"]][["filenamePrefix"]]
   gd_filename <- task$filenamePrefix
-  
   count <- 1
   
   files_gd <- try(googledrive::drive_find(q = sprintf("'%s' in parents", 
@@ -370,9 +379,4 @@ ee_drive_to_local_mod <- function (task, dsn, overwrite = TRUE, consider = TRUE,
     filenames_local
   }
 }
-# 
-# ee_drive_to_local_mod(out, dsn="C:/Users/JG/Desktop/test.tif", overwrite = TRUE, consider = TRUE, 
-#                                    public = FALSE, metadata = FALSE, quiet = FALSE)
-
-
 
