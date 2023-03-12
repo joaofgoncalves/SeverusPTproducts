@@ -47,37 +47,13 @@ checkValues <- function(value, what, verbose=TRUE) {
   }
   
   # Validate other params with specific values/bounded
-  vals <- list(
-    satCode = c(
-      "S2MSI", "MOD", "MYD", "MCD", "L5TM", "L7ETM",
-      "L8OLI", "L8TIRS", "LTH"
-    ),
-    procLevel = c("L1", "L1C", "L2", "L2A",
-                  "NA","N/A",NA), # This may be undefined if MODIS is selected!
-    modisProduct = c(
-      "MOD09A1", "MOD13Q1", "MOD09GQ", "MOD09Q1", "MYD09A1",
-      "MYD09GQ", "MYD09Q1", "MYD13Q1", "MCD43A4",
-      "NA","N/A",NA # This may be undefined if S2/Landsat are selected!
-    ),
-    baseIndex = c(
-      "NBR", "NDVI", "EVI", "TCTB", "TCTG", "TCTW", "LST",
-      "LAI", "GPP", "NPP", "ALB", "FVC"
-    ),
-    severityIndicator = c("DELTA", "DLT", "RDELTA", "RDT", "S95"),
-    burntAreaDataset = c(
-      "ICNF", "EFFIS", "MCD64", "MICNF",
-      "FireCCI", "VIIRS"
-    ),
-    referenceYear = 2001:as.integer(format(Sys.Date(), "%Y")),
-    # preFireRef = c(),
-    preFireType = c("moving", "fixed", "m", "f", "mov", "fix")
-  )
+  #vals <- SPT_VALUES
   
-  if (!(what %in% names(vals))) {
+  if (!(what %in% names(SPT_VALUES))) {
     if(verbose) message("Parameter ",what," cannot be checked by method checkValues")
     return(TRUE)
   } else {
-    if (all(value %in% vals[[what]])){
+    if (all(value %in% SPT_VALUES[[what]])){
       return(TRUE)
     } else {
       return(FALSE)
