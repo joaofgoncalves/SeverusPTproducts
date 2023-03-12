@@ -43,6 +43,8 @@ calc_EVI <- function(img){
 # novel fire index-based burned area change detection approach using Landsat-8 OLI data,
 # European Journal of Remote Sensing, 53:1, 104-112, DOI: 10.1080/22797254.2020.1738900
 
+# NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
+
 calc_NBRSWIR <- function(img){
   
   out <- ee$Image(img$expression(
@@ -63,10 +65,12 @@ calc_NBRSWIR <- function(img){
 # bi-spectral spaces for discriminating burned shrub-savannah. International Journal 
 # of RemoteSensing, 22(13), 2641-2647. https://doi.org/10.1080/01431160110053185
 
+# NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
+
 calc_MIRBI <- function(img){
   
   out <- ee$Image(img$expression(
-    '10 * SWIR2 - 9.8 * SWIR1 + 2', 
+    '-1*(10 * SWIR2 - 9.8 * SWIR1 + 2)', 
     list(
       'SWIR1' = img$select('SWIR1'),
       'SWIR2' = img$select('SWIR2')
@@ -102,11 +106,13 @@ calc_CSI <- function(img){
 # NBR+ plus adapted to other satellites
 # Alcaras, 2022. https://www.mdpi.com/2072-4292/14/7/1727
 
+# NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
+
 calc_NBRP <- function(img){
   
   out <- ee$Image(img$expression(
     # (B12 - B8A - B3 - B2) / (B12 + B8A + B3 + B2)
-    '(SWIR2 - NIR - GREEN - BLUE) / (SWIR2 + NIR + GREEN + BLUE)',
+    '-1*((SWIR2 - NIR - GREEN - BLUE) / (SWIR2 + NIR + GREEN + BLUE))',
     list(
       'SWIR2' = img$select('SWIR2'),  
       'NIR'   = img$select('NIR'),    
@@ -125,12 +131,13 @@ calc_NBRP <- function(img){
 ## SENTINEL-2 ----
 ## ----------------------------------------------------------------------------------- ##
 
+# NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
 
 calc_NBRP_S2 <- function(img){
   
   out <- ee$Image(img$expression(
     # (B12 - B8A - B3 - B2) / (B12 + B8A + B3 + B2)
-    '(SWIR2 - RE4 - GREEN - BLUE) / (SWIR2 + RE4 + GREEN + BLUE)',
+    '-1*((SWIR2 - RE4 - GREEN - BLUE) / (SWIR2 + RE4 + GREEN + BLUE))',
     list(
       'SWIR2' = img$select('SWIR2'),  # B12
       'RE4'   = img$select('RE4'),    # B8A
