@@ -200,10 +200,21 @@ processGEEtask <- function(task, outFolder = "GEE", boundBox,
                       padNumber(fixedPreFireWindowSize),
                       # Post-fire ref period
                       "P",padNumber(postFireWindowEndMonths))
-
-  prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator,
-                             burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
   
+# 
+#   prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator,
+#                              burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
+#   
+  
+  prodName = getProductName(ProjectAccronym   = SPT_PROJ_ACRONYM, 
+                            SeverityIndicator = severityIndicator, 
+                            BaseIndex         = baseIndex, 
+                            SatCode           = satCode, 
+                            BurntAreaDataset  = burntAreaDataset, 
+                            ReferenceYear = referenceYear, 
+                            RefPeriods    = refPeriods, 
+                            addCalcDate   = TRUE, 
+                            VersionNumber = SPT_VERSION)
   
   if(burntAreaDataset=="ICNF"){
     fireDateFieldName = SPT_ICNF_DATE_FIELD

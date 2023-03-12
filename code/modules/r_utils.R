@@ -40,22 +40,42 @@ getCurrentDatetime <- function() {
 }
 
 
-getProductName <- function(ProjectAccronym, SatCode, BaseIndex, SeverityIndicator,
-                           BurntAreaDataset, ReferenceYear, RefPeriods, addCalcDate = FALSE) {
+getProductName <- function(ProjectAccronym, 
+                           SeverityIndicator, 
+                           BaseIndex, 
+                           SatCode, 
+                           BurntAreaDataset, 
+                           ReferenceYear, 
+                           RefPeriods, 
+                           addCalcDate = FALSE, 
+                           VersionNumber) {
   if (addCalcDate) {
     CalculationDate <- getDateString()
 
-    productName <- paste(ProjectAccronym, "_", SatCode, "_", BaseIndex, "_", SeverityIndicator, "_",
-      getBurntAreaDatasetCode(BurntAreaDataset), ReferenceYear, "_",
-      RefPeriods, "_", CalculationDate,
-      sep = ""
-    )
+    productName <- paste(
+      ProjectAccronym, "_", 
+      SeverityIndicator, "_", 
+      BaseIndex, "_",  
+      SatCode, "_",
+      getBurntAreaDatasetCode(BurntAreaDataset), 
+      ReferenceYear, "_",
+      RefPeriods, "_", 
+      CalculationDate, "_",
+      VersionNumber,
+      sep = "")
+    
   } else {
-    productName <- paste(ProjectAccronym, "_", SatCode, "_", BaseIndex, "_", SeverityIndicator, "_",
-      getBurntAreaDatasetCode(BurntAreaDataset), ReferenceYear, "_",
-      RefPeriods,
-      sep = ""
-    )
+    
+    productName <- paste(
+      ProjectAccronym, "_", 
+      SeverityIndicator, "_", 
+      BaseIndex, "_",  
+      SatCode, "_",
+      getBurntAreaDatasetCode(BurntAreaDataset), 
+      ReferenceYear, "_",
+      RefPeriods, "_", 
+      VersionNumber,
+      sep = "")
   }
 
   return(productName)
