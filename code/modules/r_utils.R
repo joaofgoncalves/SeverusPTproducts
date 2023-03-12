@@ -92,3 +92,31 @@ exportToMarkdown <- function(df, filename) {
 
   kableExtra::save_kable(ktable, file = filename)
 }
+
+
+file_dates <- function(filename, tdelta = 60) {
+  if(!file.exists(filename)) {
+    stop(paste0("File ", filename, " does not exist."))
+  }
+  else {
+    ctime <- file.info(filename)$ctime # file creation time
+    mtime <- file.info(filename)$mtime # file modification time
+    now <- Sys.time()
+    if(difftime(now,ctime,units = "mins") < tdelta || 
+       difftime(now,mtime,units="mins") < tdelta) {
+      return(TRUE)
+    } else {
+      return(FALSE)
+    }
+  }
+}
+
+create_file <- function(filename) {
+  if(file.exists(filename)){
+    file.remove(filename)
+  }
+  fileConn <- file(filename, open = "w")
+  writeLines(as.character(paste0(Sys.time(),"\n")), fileConn)
+  close(fileConn)
+}
+
