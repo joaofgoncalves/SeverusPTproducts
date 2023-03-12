@@ -114,7 +114,7 @@ getTaskStatus.task <- function(x, taskStep) {
 }
 
 getSpatialResolution.task <- function(x) {
-  if (x$satCode %in% c("LT5TM", "LT5ETM", "LT8OLI", "L9OLI", "LTH")) {
+  if (x$satCode %in% c("L5TM", "L7ETM", "L8OLI", "L9OLI", "LTH")) {
     spatialRes <- 30
   } else if (x$satCode %in% c("MOD", "MYD", "MCD")) {
     if (x$modisProduct %in% c("MOD13Q1", "MOD09GQ", "MOD09Q1", "MYD09GQ", "MYD09Q1", "MYD13Q1")) {
@@ -126,6 +126,9 @@ getSpatialResolution.task <- function(x) {
     }
   } else if (x$satCode == "S2MSI") {
     spatialRes <- 20
+  }
+  else{
+    stop("Satellite code not supported in getSpatialResolution")
   }
 
   return(spatialRes)
