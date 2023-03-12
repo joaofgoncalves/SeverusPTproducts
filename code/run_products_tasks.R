@@ -77,7 +77,7 @@ for(tidx in xs){
   # source("./CODE/modules/metadata.R")
   
 
-  # Read the main task table
+  # Read the main task table - update task list
   ttb <- readTaskTable()
   
   # Select the target task
@@ -326,13 +326,10 @@ for(tidx in xs){
   
   if(task$metadataTaskStatus != "METADATA COMPLETED"){
     
-    
     cat(green(bold(
       symbol$arrow_right, "Creating metadata...\n\n")))
     
-  
-    
-    # Generate metadata
+    # Generate metadata based  on the pre-defined template
     #
     #
     meta <- metaTableTemplate(list(
@@ -350,8 +347,10 @@ for(tidx in xs){
       BurntAreaDatasetURL  = getBurntAreaDataURL(task$burntAreaDataset),
       ReferenceYear        = task$referenceYear,
       MinFireSize          = paste(task$minFireSize,"hectares"),
-      SatCollectionData    = paste(task$satCode,getSatMissionName(task$satCode),sep=" - "),
-      SatProcLevel         = getProcessingLevels(task$procLevel),#"Surface reflectance (L2A)",
+      SatCollectionData    = paste(task$satCode," / ",getSatMissionName(task$satCode),
+                                   ifelse(task$satCode %in% SPT_VALUES$satCode_md, 
+                                          paste(" / Product:",task$modisProduct), ""), sep=""),
+      SatProcLevel         = getProcessingLevels(task$procLevel),
       #SatColVersion       =
       CloudMaskUsed        = "Yes",
       CloudMaskMethod      = "Pixel QA band: Cirrus, clouds and/or cloud shadows removed",
@@ -368,7 +367,8 @@ for(tidx in xs){
                                     "/ End:",task$postFireRef,"months",", i.e.,",
                                     paste(getPostWindowDays(task),collapse=" to "),
                                     "days after ignition date"),
-      VersionNumber         = SPT_VERSION
+      VersionNumber         = SPT_VERSION,
+      VersionFullNumber     = SPT_FULL_VERSION_NR
     ))
     
     # Export metadata to Markdown txt and JSON files
