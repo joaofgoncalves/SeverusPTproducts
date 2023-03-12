@@ -7,3 +7,6 @@
 /OUT/logs
 /temp
 /data
+/tests
+/_bkps_
+gee_last_init.log
