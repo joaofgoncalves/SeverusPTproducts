@@ -140,3 +140,15 @@ create_file <- function(filename) {
   close(fileConn)
 }
 
+
+
+download_and_unzip <- function(url, dest_file, extdir) {
+  
+  download.file(url, dest_file, mode = "wb")
+  
+  if (tools::file_ext(dest_file) == "zip") {
+    unzip(dest_file, exdir = extdir, overwrite = TRUE)
+  }
+}
+
+
