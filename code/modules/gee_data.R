@@ -12,7 +12,14 @@ getGEEburntAreaDataset <- function(baDataset, referenceYear, minFireSizeHa = 5) 
     aa_icnf <- ee$FeatureCollection(SPT_ICNF_GEE_ASSET)
 
     baData <- aa_icnf %>%
-      ee$FeatureCollection$filter(ee$Filter$eq(SPT_ICNF_YEAR_FIELD, referenceYear)) %>%
+      
+      #ee$FeatureCollection$filter(ee$Filter$eq(SPT_ICNF_YEAR_FIELD, referenceYear)) %>%
+      ee$FeatureCollection$filter(ee$Filter$Or(
+        ee$Filter$eq(SPT_ICNF_YEAR_FIELD, as.character(referenceYear)), 
+        ee$Filter$eq(SPT_ICNF_YEAR_FIELD, as.integer(referenceYear))
+        )
+      ) %>% 
+
       ee$FeatureCollection$filter(ee$Filter$gte(SPT_ICNF_AREA_FIELD, minFireSizeHa)) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(SPT_ICNF_DATE_FIELD, "")) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(SPT_ICNF_DATE_FIELD, NULL))
@@ -24,7 +31,14 @@ getGEEburntAreaDataset <- function(baDataset, referenceYear, minFireSizeHa = 5) 
     aa_effis <- ee$FeatureCollection(SPT_EFFIS_GEE_ASSET)
 
     baData <- aa_effis %>%
-      ee$FeatureCollection$filter(ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, referenceYear)) %>%
+      
+      #ee$FeatureCollection$filter(ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, referenceYear)) %>%
+      ee$FeatureCollection$filter(ee$Filter$Or(
+        ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, as.character(referenceYear)), 
+        ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, as.integer(referenceYear))
+        )
+      ) %>% 
+      
       ee$FeatureCollection$filter(ee$Filter$gte(SPT_EFFIS_AREA_FIELD, minFireSizeHa)) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(SPT_EFFIS_DATE_FIELD, "")) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(SPT_EFFIS_DATE_FIELD, NULL))
