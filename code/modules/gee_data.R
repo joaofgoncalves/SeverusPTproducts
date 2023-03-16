@@ -357,9 +357,9 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
-  else if (satCode == "LTH") {
-    stop("LTH is not yet available!")
-  }
+  # else if (satCode == "LTH") {
+  #   stop("LTH is not yet available!")
+  # }
   
   else{
     stop("Satellite code not available or malformed!")
