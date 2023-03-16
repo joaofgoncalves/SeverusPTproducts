@@ -365,3 +365,17 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     stop("Satellite code not available or malformed!")
   }
 }
+
+spt_etm_to_oli <- function(img){
+  
+  itcps = ee$Image$constant(c(0.0003, 0.0088, 0.0061, 0.0412, 0.0254, 0.0172))
+  slopes = ee$Image$constant(c(0.8474, 0.8483, 0.9047, 0.8462, 0.8937, 0.9071))
+  
+  out <- img$select(c('Blue', 'Green', 'Red', 'NIR', 'SWIR1', 'SWIR2')) %>% 
+    ee$Image$multiply(slopes) %>% 
+    ee$Image$add(itcps)
+  
+  return(out)
+}
+
+
