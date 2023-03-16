@@ -173,197 +173,102 @@ getScaleDataFun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 
 
 
-processGEEtask <- function(task, outFolder = "GEE", boundBox, 
+spt_process_gee_task <- function(task, outFolder = "GEE", boundBox, 
                            coordRefSys = 'EPSG:32629'){
   
   # Get run parameters
-  mainTaskStatus    = getTaskStatus(task,taskStep = "main")
+  mainTaskStatus    = spt_get_taskStatus(task,taskStep = "main")
   
-  satCode           = getSatCode(task)                 # Satellite code
-  procLevel         = getProcLevel(task)               # Data processing level L1, L2, ..
-  modisProduct      = getModisProduct(task)            # MODIS product name, eg MOD09A1
-  baseIndex         = getBaseIndex(task)               # Base index name, eg NBR
-  severityIndicator = getSeverityIndicator(task)       # Severity indicator name, eg, DELTA
+  satCode           = spt_sat_code(task)                 # Satellite code
+  procLevel         = spt_proc_level(task)               # Data processing level L1, L2, ..
+  modisProduct      = spt_modis_product(task)            # MODIS product name, eg MOD09A1
+  baseIndex         = spt_base_index(task)               # Base index name, eg NBR
+  severityIndicator = spt_severity_indicator(task)       # Severity indicator name, eg, DELTA
   
-  burntAreaDataset  = getBurntAreaDataset(task)        # Burned area dataset used in calculations eg, ICNF, EFFIS
-  referenceYear     = getReferenceYear(task)           # Reference year for calculations
+  burntAreaDataset  = spt_ba_dataset(task)        # Burned area dataset used in calculations eg, ICNF, EFFIS
+  referenceYear     = spt_reference_year(task)           # Reference year for calculations
 
-  minFireSizeHa          = getMinFireSize(task)        # Minimum size of the fire (hectares)
-  fixedPreFireWindowSize = getPreFireRef(task)      
-  preFireWindowType      = getPreFireType(task)
-  postFireWindowEndMonths= getPostFireRef(task)
-  postFireWindowDays     = getPostWindowDays(task)
+  minFireSizeHa          = spt_min_fire_size(task)        # Minimum size of the fire (hectares)
+  fixedPreFireWindowSize = spt_pre_fire_ref(task)      
+  preFireWindowType      = spt_pre_fire_type(task)
+  postFireWindowEndMonths= spt_post_fire_ref(task)
+  postFireWindowDays     = spt_post_window_days(task)
 
   
   refPeriods = paste0(# Pre-fire ref period
                       ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),
-                      padNumber(fixedPreFireWindowSize),
+                      spt_pad_number(fixedPreFireWindowSize),
                       # Post-fire ref period
-                      "P",padNumber(postFireWindowEndMonths))
+                      "P",spt_pad_number(postFireWindowEndMonths))
   
-# 
-#   prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator,
-#                              burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
-#   
-  
-  prodName = getProductName(ProjectAccronym   = SPT_PROJ_ACRONYM, 
-                            SeverityIndicator = severityIndicator, 
-                            BaseIndex         = baseIndex, 
-                            SatCode           = satCode, 
-                            BurntAreaDataset  = burntAreaDataset, 
-                            ReferenceYear = referenceYear, 
-                            RefPeriods    = refPeriods, 
-                            addCalcDate   = TRUE, 
-                            VersionNumber = SPT_VERSION)
+
+  prodName = spt_product_name(ProjectAccronym   = SPT_PROJ_ACRONYM, 
+                              SeverityIndicator = severityIndicator, 
+                              BaseIndex         = baseIndex, 
+                              SatCode           = satCode, 
+                              BurntAreaDataset  = burntAreaDataset, 
+                              ReferenceYear = referenceYear, 
+                              RefPeriods    = refPeriods, 
+                              addCalcDate   = TRUE, 
+                              VersionNumber = SPT_VERSION)
   
   if(burntAreaDataset=="ICNF"){
     fireDateFieldName = SPT_ICNF_DATE_FIELD
-  }
-  else if(burntAreaDataset=="EFFIS"){
+  } else if(burntAreaDataset=="EFFIS"){
     fireDateFieldName = SPT_EFFIS_DATE_FIELD
-  }
-  else{
+  } else{
     stop("Unsupported burnt area dataset name in burntAreaDataset!")
   }
   
-
-  cloudMaskFun = getCloudMaskFun(satCode, modisProduct)
-    
-  scaleDataFun = getScaleDataFun(satCode, procLevel, modisProduct)
-  
-  baseIndexFun = getSpecIndexFun(baseIndex, satCode, modisProduct)
-  
-  
-  # Cloud mask & scale data functions
-  #
-  # # SENTINEL-2
-  # if(satCode == "S2MSI"){
-  #   cloudMaskFun = maskClouds_S2
-  #   scaleDataFun = scaleData_S2
-  # }
-  # 
-  # # LANDSAT MISSIONS
-  # else if(satCode %in% c("L5TM", "L7ETM", "L8OLI", "L9OLI")){
-  #   
-  #   if(satCode == "L5TM"){
-  #     cloudMaskFun = maskClouds_LT5
-  #   }else if(satCode == "L7ETM"){
-  #     cloudMaskFun = maskClouds_LT7
-  #   }else if(satCode == "L8OLI"){
-  #     cloudMaskFun = maskClouds_LT8
-  #   }else if(satCode == "L9OLI"){
-  #     cloudMaskFun = maskClouds_LT9
-  #   }else{
-  #     stop("Invalid satCode value in processGEEtask function")
-  #   }
-  #   
-  #   if(procLevel %in% c("L1", "L1C")){
-  #     scaleDataFun = scaleData_LT_TOA
-  #   }else if(procLevel %in% c("L2", "L2A")){
-  #     scaleDataFun = scaleData_LT_SR
-  #   }else{
-  #     stop("Invalid procLevel value in processGEEtask function")
-  #   }
-  # }
-  # else{
-  #   stop("Unsupported satellite code in satCode!")
-  # }
-  #
-  #
-  # Spectral indices
-  # if(baseIndex == "NBR"){
-  #   baseIndexFun = calc_NBR
-  # }
-  # else if(baseIndex == "NDVI"){
-  #   baseIndexFun = calc_NDVI
-  # } 
-  # else if(baseIndex == "EVI"){
-  #   baseIndexFun = calc_EVI
-  # } 
-  # else if(baseIndex == "NBRSWIR"){
-  #   baseIndexFun = calc_NBRSWIR
-  # } 
-  # else if(baseIndex == "MIRBI"){
-  #   baseIndexFun = calc_MIRBI
-  # } 
-  # else if(baseIndex == "CSI"){
-  #   baseIndexFun = calc_CSI
-  # } 
-  # else if(baseIndex == "NBRP" & satCode == "S2MSI"){
-  #   baseIndexFun = calc_NBRP_S2
-  # }
-  # 
-  # ## ---- TASSELED CAPS TRANSFORMATIONS ---- ## 
-  # ##
-  # else if(baseIndex == "TCTB"){
-  #   if(satCode == "S2MSI"){
-  #     baseIndexFun = calc_TCTB_S2 
-  #   }
-  #   else if(satCode == "L5TM"){
-  #     baseIndexFun = calc_TCTB_L5
-  #   }
-  #   else if(satCode == "L7ETM"){
-  #     baseIndexFun = calc_TCTB_L7 
-  #   }
-  #   else if(satCode == "L8OLI"){
-  #     baseIndexFun = calc_TCTB_L8 
-  #   }
-  #   else if(satCode == "L9OLI"){
-  #     baseIndexFun = calc_TCTB_L8 
-  #   }
-  #   else{
-  #     stop("Unsupported satCode") 
-  #   }
-  # }
-  # else if(baseIndex == "TCTG"){
-  #   if(satCode == "S2MSI"){
-  #     baseIndexFun = calc_TCTG_S2 
-  #   }
-  #   else if(satCode == "L5TM"){
-  #     baseIndexFun = calc_TCTG_L5
-  #   }
-  #   else if(satCode == "L7ETM"){
-  #     baseIndexFun = calc_TCTG_L7 
-  #   }
-  #   else if(satCode == "L8OLI"){
-  #     baseIndexFun = calc_TCTG_L8 
-  #   }
-  #   else if(satCode == "L9OLI"){
-  #     baseIndexFun = calc_TCTG_L8 
-  #   }
-  #   else{
-  #     stop("Unsupported satCode") 
-  #   }
-  # }
-  # else if(baseIndex == "TCTW"){
-  #   if(satCode == "S2MSI"){
-  #     baseIndexFun = calc_TCTW_S2 
-  #   }
-  # }
-  # ## END TCT
-  # 
-  # else{
-  #   stop("Unsupported spectral index in baseIndex!")
-  # }
-  # 
-  # 
-  
-  
   # Get the spatial resolution of the data
-  spatialRes <- getSpatialResolution(task)
+  spatialRes <- spt_spatial_resolution(task)
   
-
   # Create the burned area feature collection  
-  baData = getGEEburntAreaDataset(burntAreaDataset, referenceYear, minFireSizeHa)
+  baData = spt_get_ba_dataset(burntAreaDataset, referenceYear, minFireSizeHa)
   
   ## Convert burned area polygons to a list to iterate more easily
   baList = ee$FeatureCollection$toList(baData, baData$size())
   
-  # Get the Image Collection object to handle in GEE
-  sits = getGEEsatImageCollection(satCode   = satCode, 
-                                  procLevel = procLevel,
-                                  modisProduct = modisProduct)
   
+  if(satCode != "LTH"){
+      
+    # Get the Image Collection object to handle in GEE
+    sits = spt_get_sat_imgcol(satCode    = satCode, 
+                            procLevel    = procLevel,
+                            modisProduct = modisProduct)
+    
+    # Get the cloud mask function
+    cloud_mask_fun = spt_cloud_mask_fun(satCode, modisProduct)
+    
+    # Get the scale data function
+    scale_data_fun = spt_scale_fun(satCode, procLevel, modisProduct)
+    
+    # Get the spectral index function
+    base_index_fun = spt_spectral_index_fun(baseIndex, satCode, modisProduct)
+    
+  }else{
+    
+    # Get inputs adjusted to the Landsat-5,7,8 Harmonized collection
+    
+    # LT5
+    lt5_sits           = spt_get_sat_imgcol(satCode   = "L5TM", procLevel = procLevel)
+    cloud_mask_fun_lt5 = spt_cloud_mask_fun("L5TM")
+    scale_data_fun_lt5 = spt_scale_fun("L5TM", procLevel)
+    base_index_fun_lt5 = spt_spectral_index_fun(baseIndex, "L5TM")
+    
+    # LT5
+    lt7_sits           = spt_get_sat_imgcol(satCode   = "L7ETM", procLevel = procLevel)
+    cloud_mask_fun_lt7 = spt_cloud_mask_fun("L7ETM")
+    scale_data_fun_lt7 = spt_scale_fun("L7ETM", procLevel)
+    base_index_fun_lt7 = spt_spectral_index_fun(baseIndex, "L7ETM")
+    
+    # LT5
+    lt8_sits           = spt_get_sat_imgcol(satCode   = "L8OLI",  procLevel = procLevel)
+    cloud_mask_fun_lt8 = spt_cloud_mask_fun("L8OLI")
+    scale_data_fun_lt8 = spt_scale_fun("L8OLI", procLevel)
+    base_index_fun_lt8 = spt_spectral_index_fun(baseIndex, "L8OLI")
+  }
+
   
   # Set the start and end of the post-fire window
   timeWindowStart = ee$Number(postFireWindowDays[1])
