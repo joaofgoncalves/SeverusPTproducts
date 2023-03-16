@@ -308,7 +308,7 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
       prefireDate_end = postfireDate_end$advance(-1, 'year')
     }
     
-    ### Interpolate images for Landsat-7/ETM
+    #### Interpolate images for Landsat-7/ETM ----
     
     if(satCode == "L7ETM"){
       
@@ -374,26 +374,26 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
       postFire_lt5 = lt5_sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
         ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(cloud_mask_fun_lt5) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt5) %>% 
         ee$ImageCollection$map(spt_etm_to_oli) %>% 
-        ee$ImageCollection$map(base_index_fun) 
+        ee$ImageCollection$map(base_index_fun_lt5) 
       
       postFire_lt7 = lt7_sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
         ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(cloud_mask_fun_lt7) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt7) %>% 
         ee$ImageCollection$map(spt_lt7_interpolate) %>% 
         ee$ImageCollection$map(spt_etm_to_oli) %>% 
-        ee$ImageCollection$map(base_index_fun) 
+        ee$ImageCollection$map(base_index_fun_lt7) 
       
       postFire_lt8 = lt8_sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
         ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(base_index_fun) 
+        ee$ImageCollection$map(cloud_mask_fun_lt8) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt8) %>% 
+        ee$ImageCollection$map(base_index_fun_lt8) 
       
       #postFire_combn = ee$ImageCollection(postFire_lt5)$merge(ee$ImageCollection(postFire_lt7))$merge(ee$ImageCollection(postFire_lt8))
       
