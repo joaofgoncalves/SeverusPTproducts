@@ -39,6 +39,9 @@ spt_current_date_time <- function() {
   return(datetime_str)
 }
 
+spt_current_year <- function() {
+  return(format(Sys.time(), "%Y"))
+}
 
 spt_product_name <- function(ProjectAccronym, 
                            SeverityIndicator, 
