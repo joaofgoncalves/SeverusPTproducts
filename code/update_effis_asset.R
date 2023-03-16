@@ -10,7 +10,7 @@ ee_Initialize(user = "joaofgo@gmail.com", gcs = TRUE)
 
 url <- "https://maps.wild-fire.eu/effis?service=WFS&request=getfeature&typename=ms:modis.ba.poly&version=1.1.0&outputformat=SHAPEZIP"
 
-download_and_unzip(url, "./temp/effis_data.zip", "./temp")
+spt_download_unzip(url, "./temp/effis_data.zip", "./temp")
 
 
 aa <- read_sf("./temp/modis.ba.poly.shp")
@@ -24,10 +24,10 @@ aapt <- aa %>%
   mutate(area_ht = as.numeric(st_area(.)/10000))
 
 
-dir.create(paste("./data/vector/EFFIS",getDateString(),sep="_"))
+dir.create(paste("./data/vector/EFFIS",spt_ymd_date(),sep="_"))
 
-shpFile <- paste("./data/vector/EFFIS_",getDateString(),
-                 "/EFFIS_",getDateString(),".shp",sep="")
+shpFile <- paste("./data/vector/EFFIS_",spt_ymd_date(),
+                 "/EFFIS_",spt_ymd_date(),".shp",sep="")
 
 write_sf(aapt, shpFile)
 aapt_ <- read_sf(shpFile)

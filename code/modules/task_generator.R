@@ -1,6 +1,6 @@
 
 
-statusList <-function(){
+spt_status_list <-function(){
   
   return(c(
     "NOT COMPLETED",
@@ -35,7 +35,7 @@ statusList <-function(){
   )
 }
 
-checkValues <- function(value, what, verbose=TRUE) {
+spt_check_values <- function(value, what, verbose=TRUE) {
   
   # Validate numeric values
   if(what %in% c("preFireRef", "postFireRef", "minFireSize")){
@@ -50,7 +50,7 @@ checkValues <- function(value, what, verbose=TRUE) {
   #vals <- SPT_VALUES
   
   if (!(what %in% names(SPT_VALUES))) {
-    if(verbose) message("Parameter ",what," cannot be checked by method checkValues")
+    if(verbose) message("Parameter ",what," cannot be checked by method spt_check_values")
     return(TRUE)
   } else {
     if (all(value %in% SPT_VALUES[[what]])){
@@ -61,7 +61,7 @@ checkValues <- function(value, what, verbose=TRUE) {
   }
 }
 
-makeTasksTable <- function(n){
+spt_make_tasks_table <- function(n){
   
   taskTable <- data.frame(
     
@@ -106,7 +106,7 @@ makeTasksTable <- function(n){
 }
 
 
-generateTasks <- function(taskTable = NULL, satCode, procLevel, modisProduct, 
+spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduct, 
                           baseIndex, severityIndicator, burntAreaDataset,
                           referenceYear, preFireRef, preFireType, 
                           postFireRef, minFireSize){
@@ -118,11 +118,11 @@ generateTasks <- function(taskTable = NULL, satCode, procLevel, modisProduct,
   for(nm in names(params)){
     
     if(inherits(params[[nm]],"call")){
-      if(!checkValues(eval(params[[nm]]), nm)){
+      if(!spt_check_values(eval(params[[nm]]), nm)){
         stop("The ",nm," value is invalid. Check function call parameters.")
       }
     }else{
-      if(!checkValues(params[[nm]], nm)){
+      if(!spt_check_values(params[[nm]], nm)){
         stop("The ",nm," value is invalid. Check function call parameters.")
       }
     }
@@ -140,7 +140,7 @@ generateTasks <- function(taskTable = NULL, satCode, procLevel, modisProduct,
   
   # Generate a new task table 
   nr <- nrow(taskCombns)
-  newTaskTable <- makeTasksTable(nr)
+  newTaskTable <- spt_make_tasks_table(nr)
   
   if(is.null(taskTable)){
     taskID_start <- 1
@@ -202,7 +202,7 @@ generateTasks <- function(taskTable = NULL, satCode, procLevel, modisProduct,
   
 }
 
-readTaskTable <- function(){
+spt_read_tasks_table <- function(){
   
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
@@ -220,7 +220,7 @@ readTaskTable <- function(){
   
 }
 
-writeTaskTable <- function(taskTable){
+spt_write_tasks_table <- function(taskTable){
   
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",

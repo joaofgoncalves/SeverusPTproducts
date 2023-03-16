@@ -5,7 +5,7 @@
 
 
 # Works with L1 and L2!!
-maskClouds_S2 <- function(img){
+spt_mask_clouds_s2 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA60")
@@ -31,7 +31,7 @@ scaleData_S2 <- function(img){
 
 
 # Works with L1 and L2!!
-maskClouds_LT5 <- function(img){
+spt_mask_clouds_lt5 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA_PIXEL")
@@ -47,7 +47,7 @@ maskClouds_LT5 <- function(img){
   return(img$updateMask(mask_clo$And(mask_sha)))
 }
 
-maskClouds_LT7 <- function(img){
+spt_mask_clouds_lt7 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA_PIXEL")
@@ -64,7 +64,7 @@ maskClouds_LT7 <- function(img){
 }
 
 # Works with L1 and L2!!
-maskClouds_LT8 <- function(img){
+spt_mask_clouds_lt8 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA_PIXEL")
@@ -80,7 +80,7 @@ maskClouds_LT8 <- function(img){
   return(img$updateMask(mask_cir$And(mask_clo)$And(mask_sha)))
 }
 
-maskClouds_LT9 <- function(img){
+spt_mask_clouds_lt9 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA_PIXEL")
@@ -96,7 +96,6 @@ maskClouds_LT9 <- function(img){
   return(img$updateMask(mask_cir$And(mask_clo)$And(mask_sha)))
 }
 
-scaleData_LT_SR <- function(img){
 spt_scale_lt_tm_sr <- function(img){
   
   opticalBands = img$select(c("Blue", "Green", 
@@ -113,7 +112,7 @@ spt_scale_lt_oli_sr <- function(img){
   return(img$addBands(opticalBands, NULL, TRUE));
 }
 
-scaleData_LT_TOA <- function(img){
+spt_scale_lt_toa <- function(img){
   return(ee$Image(img$multiply(1)))
 }
 
@@ -126,7 +125,7 @@ spt_lt7_interpolate <- function(img){
 ## ----------------------------------------------------------------------------------- ##
 
 
-bitwiseExtract <- function(value, fromBit, toBit = NULL) {
+spt_bitwise_extract <- function(value, fromBit, toBit = NULL) {
   
   if (is.null(toBit)) {
     toBit <- fromBit
@@ -138,13 +137,13 @@ bitwiseExtract <- function(value, fromBit, toBit = NULL) {
   return(value$rightShift(fromBit)$bitwiseAnd(mask))
 }
 
-maskClouds_MOD09A1 <- function(image) {
+spt_mask_clouds_mod09a1 <- function(image) {
   
   qa <- image$select("StateQA")
   
-  cloudState <- bitwiseExtract(qa, 0, 1)
-  cloudShadowState <- bitwiseExtract(qa, 2)
-  cirrusState <- bitwiseExtract(qa, 8, 9)
+  cloudState <- spt_bitwise_extract(qa, 0, 1)
+  cloudShadowState <- spt_bitwise_extract(qa, 2)
+  cirrusState <- spt_bitwise_extract(qa, 8, 9)
   
   cloud  <- cloudState$eq(0)
   shadow <- cloudShadowState$eq(0)
@@ -155,11 +154,11 @@ maskClouds_MOD09A1 <- function(image) {
   return(maskedImage)
 }
 
-maskClouds_MOD13Q1 <- function(image) {
+spt_mask_clouds_mod13q1 <- function(image) {
   
   qa <- image$select("SummaryQA")
   
-  goodQualityVI <- bitwiseExtract(qa, 0, 1)
+  goodQualityVI <- spt_bitwise_extract(qa, 0, 1)
   mask  <- goodQualityVI$eq(0)
   
   maskedImage <- image$updateMask(mask)
@@ -167,7 +166,7 @@ maskClouds_MOD13Q1 <- function(image) {
   return(maskedImage)
 }
 
-scaleData_MODIS <- function(img){
+spt_scale_mod <- function(img){
   return(ee$Image(img$multiply(0.0001)))
 }
 

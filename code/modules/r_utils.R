@@ -4,7 +4,7 @@
 ## ----------------------------------------------------------------------------------- ##
 
 
-numPeriodsFromToday <- function(date, ndays) {
+spt_periods_to_today <- function(date, ndays) {
   today <- Sys.Date()
   d <- as.Date(date)
   timeDiff <- as.numeric(difftime(today, d, units = "days"))
@@ -13,12 +13,12 @@ numPeriodsFromToday <- function(date, ndays) {
 }
 
 
-padNumber <- function(x, width = 3){
+spt_pad_number <- function(x, width = 3){
   stringr::str_pad(x, width = width, side = "left", pad = 0)
 } 
 
 
-getDateString <- function() {
+spt_ymd_date <- function() {
   date <- Sys.Date()
   year <- format(date, "%Y")
   month <- format(date, "%m")
@@ -33,14 +33,14 @@ getDateString <- function() {
 }
 
 
-getCurrentDatetime <- function() {
+spt_current_date_time <- function() {
   current_time <- Sys.time()
   datetime_str <- format(current_time, "%Y-%m-%d %H:%M:%S")
   return(datetime_str)
 }
 
 
-getProductName <- function(ProjectAccronym, 
+spt_product_name <- function(ProjectAccronym, 
                            SeverityIndicator, 
                            BaseIndex, 
                            SatCode, 
@@ -50,14 +50,14 @@ getProductName <- function(ProjectAccronym,
                            addCalcDate = FALSE, 
                            VersionNumber) {
   if (addCalcDate) {
-    CalculationDate <- getDateString()
+    CalculationDate <- spt_ymd_date()
 
     productName <- paste(
       ProjectAccronym, "_", 
       SeverityIndicator, "_", 
       BaseIndex, "_",  
       SatCode, "_",
-      getBurntAreaDatasetCode(BurntAreaDataset), 
+      spt_ba_dataset_code(BurntAreaDataset), 
       ReferenceYear, "_",
       RefPeriods, "_", 
       CalculationDate, "_",
@@ -71,7 +71,7 @@ getProductName <- function(ProjectAccronym,
       SeverityIndicator, "_", 
       BaseIndex, "_",  
       SatCode, "_",
-      getBurntAreaDatasetCode(BurntAreaDataset), 
+      spt_ba_dataset_code(BurntAreaDataset), 
       ReferenceYear, "_",
       RefPeriods, "_", 
       VersionNumber,
@@ -82,7 +82,7 @@ getProductName <- function(ProjectAccronym,
 }
 
 
-backupFile <- function(targetFile) {
+spt_backup_file <- function(targetFile) {
   # Get the file name and extension
   file_ext <- tools::file_ext(targetFile)
   file_name <- tools::file_path_sans_ext(targetFile)
@@ -95,7 +95,7 @@ backupFile <- function(targetFile) {
 }
 
 
-dataframeToMarkdown <- function(df) {
+spt_df_to_md <- function(df) {
   knitr::kable(df,
     format = "markdown",
     col.names = colnames(df), align = "l"
@@ -103,14 +103,14 @@ dataframeToMarkdown <- function(df) {
 }
 
 
-exportToMarkdown <- function(df, filename) {
+spt_export_to_md <- function(df, filename) {
   # Create a pretty table
   ktable <- spt_df_to_md(df)
   kableExtra::save_kable(ktable, file = filename)
 }
 
 
-file_dates <- function(filename, tdelta = 60) {
+spt_file_dates <- function(filename, tdelta = 60) {
   if(!file.exists(filename)) {
     stop(paste0("File ", filename, " does not exist."))
   }
@@ -127,7 +127,7 @@ file_dates <- function(filename, tdelta = 60) {
   }
 }
 
-create_file <- function(filename) {
+spt_create_file <- function(filename) {
   if(file.exists(filename)){
     file.remove(filename)
   }
@@ -138,7 +138,7 @@ create_file <- function(filename) {
 
 
 
-download_and_unzip <- function(url, dest_file, extdir) {
+spt_download_unzip <- function(url, dest_file, extdir) {
   
   download.file(url, dest_file, mode = "wb")
   

@@ -7,7 +7,7 @@
 ## TASK MANAGEMENT FUNCTIONS ----
 ## ----------------------------------------------------------------------------------- ##
 
-getGEEtaskStatus <- function(geeTask){
+spt_gee_task_status <- function(geeTask){
   
   # Check task Status and convert back to a R list object
   out <- ee_utils_py_to_r(ee$batch$Task$status(geeTask))
@@ -27,11 +27,11 @@ getGEEtaskStatus <- function(geeTask){
 } 
 
 
-updateGEEtaskStatus <- function(geeTask, task, taskTable=NULL){
+spt_update_gee_task <- function(geeTask, task, taskTable=NULL){
   
 
   if(is.null(taskTable)){
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
   
   # Acquire a lock over the file
@@ -42,7 +42,7 @@ updateGEEtaskStatus <- function(geeTask, task, taskTable=NULL){
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
   
-  taskStatusList <- try(getGEEtaskStatus(geeTask))
+  taskStatusList <- try(spt_gee_task_status(geeTask))
   
   if(inherits(taskStatusList,"try-error")){
     
@@ -74,7 +74,7 @@ updateGEEtaskStatus <- function(geeTask, task, taskTable=NULL){
   }
   
   out <- try({
-    writeTaskTable(taskTable)
+    spt_write_tasks_table(taskTable)
     filelock::unlock(lck)
   })
   
@@ -97,8 +97,8 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
   # use a while loop to check the status every n seconds
   repeat{
     
-    # call the getGEEtaskStatus function and store the result in the status variable
-    geeStatus <- getGEEtaskStatus(geeTaskObj)
+    # call the spt_gee_task_status function and store the result in the status variable
+    geeStatus <- spt_gee_task_status(geeTaskObj)
     
     status <- geeStatus$state
     
@@ -114,7 +114,7 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
           "| approx. run time:",mins,"mins",round(secs),"seconds\n")
     }
     
-    if(status %in% c("COMPLETED", "FAILED", "CANCELLED")){
+    if(status %in% c("COMPLETED", "FAILED", "CANCELLED", "CANCEL_REQUESTED")){
       break
     }else{
       Sys.sleep(sleep)
@@ -129,7 +129,7 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
     if(status=="FAILED"){
       if(verbose) warning("GEE Process ID: ",geeStatus$id," failed")
     }
-    if(status=="CANCELLED"){
+    if(status %in% c("CANCELLED","CANCEL_REQUESTED")){
       if(verbose) warning("GEE Process ID: ",geeStatus$id," cancelled")
     }
   }
@@ -137,18 +137,18 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
 }
 
 
-downloadGEEdata <- function(geeTask, dataFormat="tif"){
+spt_download_gdrive <- function(geeTask, dataFormat="tif"){
   
   # Use a ee.batch.Task / python.builtin.object
   
   if(inherits(geeTask,"ee.batch.Task")){
     
-    taskStatusList <- getGEEtaskStatus(geeTask)
+    taskStatusList <- spt_gee_task_status(geeTask)
     
     if(taskStatusList$state == "COMPLETED"){
       # 
       # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-      #                   taskStatusList$description,"_",getDateString(),".",dataFormat)
+      #                   taskStatusList$description,"_",spt_ymd_date(),".",dataFormat)
       
       outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
                         taskStatusList$description,".",dataFormat)
@@ -165,7 +165,7 @@ downloadGEEdata <- function(geeTask, dataFormat="tif"){
   }else if(inherits(geeTask, "list")){
     
     # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-    #                   geeTask$description,"_",getDateString(),".",dataFormat)
+    #                   geeTask$description,"_",spt_ymd_date(),".",dataFormat)
     
     outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
                       geeTask$description,".",dataFormat)
@@ -174,7 +174,7 @@ downloadGEEdata <- function(geeTask, dataFormat="tif"){
                                  overwrite = TRUE, consider = "last"))
     
   }else{
-    stop("Non-supported object type in geeTask for method downloadGEEdata.")
+    stop("Non-supported object type in geeTask for method spt_download_gdrive.")
   }
   
   if(inherits(out,"try-error")){
@@ -185,29 +185,29 @@ downloadGEEdata <- function(geeTask, dataFormat="tif"){
 }
 
 
-getTaskFileName <- function(task){
+spt_task_filename <- function(task){
   
-  satCode           = getSatCode(task)
-  baseIndex         = getBaseIndex(task)
-  severityIndicator = getSeverityIndicator(task)
+  satCode           = spt_sat_code(task)
+  baseIndex         = spt_base_index(task)
+  severityIndicator = spt_severity_indicator(task)
   
-  burntAreaDataset  = getBurntAreaDataset(task)
-  referenceYear     = getReferenceYear(task)
+  burntAreaDataset  = spt_ba_dataset(task)
+  referenceYear     = spt_reference_year(task)
   
-  fixedPreFireWindowSize    = getPreFireRef(task)
-  preFireWindowType         = getPreFireType(task)
-  postFireWindowEndMonths   = getPostFireRef(task)
+  fixedPreFireWindowSize    = spt_pre_fire_ref(task)
+  preFireWindowType         = spt_pre_fire_type(task)
+  postFireWindowEndMonths   = spt_post_fire_ref(task)
 
   refPeriods = paste0(
     # Pre-fire ref period
-    ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),padNumber(fixedPreFireWindowSize),
+    ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),spt_pad_number(fixedPreFireWindowSize),
     # Post-fire ref period
-    "P",padNumber(postFireWindowEndMonths))
+    "P",spt_pad_number(postFireWindowEndMonths))
   
-  # prodName = getProductName(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
+  # prodName = spt_product_name(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
   #                           burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
   
-  prodName = getProductName(ProjectAccronym   = SPT_PROJ_ACRONYM, 
+  prodName = spt_product_name(ProjectAccronym   = SPT_PROJ_ACRONYM, 
                             SeverityIndicator = severityIndicator, 
                             BaseIndex         = baseIndex, 
                             SatCode           = satCode, 
@@ -221,23 +221,23 @@ getTaskFileName <- function(task){
 }
 
 
-saveGEEstatusList <- function(task, geeStatusList){
+spt_save_gee_status_list <- function(task, geeStatusList){
   
   saveRDS(geeStatusList, paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-                                padNumber(task$taskID),"-UID_",
+                                spt_pad_number(task$taskID),"-UID_",
                                 substr(task$taskUID,1,8),".rds"))
   
   write.csv(geeStatusList, paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-                                  padNumber(task$taskID),"-UID_",
+                                  spt_pad_number(task$taskID),"-UID_",
                                   substr(task$taskUID,1,8),".csv"), row.names = FALSE)
   
 }
 
 
-readGEEstatusList <- function(task){
+spt_read_gee_status_list <- function(task){
   
   geeStatusList <- readRDS(paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-                                padNumber(task$taskID),"-UID_",
+                                spt_pad_number(task$taskID),"-UID_",
                                 substr(task$taskUID,1,8),".rds"))
   return(geeStatusList)
 }

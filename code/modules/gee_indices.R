@@ -1,11 +1,11 @@
 
 
 ## ----------------------------------------------------------------------------------- ##
-## ALL SATELLITE MISSIONS ----
+## ALL SATELLITE MISSIONS / GENERIC INDICES ----
 ## ----------------------------------------------------------------------------------- ##
 
 
-calc_NDVI <- function(img) {
+spt_calc_ndvi <- function(img) {
   out <- ee$Image$normalizedDifference(img, c('NIR', 'Red'))
   out <- out$set("system:time_start", img$get("system:time_start"))
   out <- out$rename('NDVI')
@@ -14,7 +14,7 @@ calc_NDVI <- function(img) {
 }
 
 
-calc_NBR <- function(img) {
+spt_calc_nbr <- function(img) {
   out <- ee$Image$normalizedDifference(img, c('NIR', 'SWIR2'))
   out <- out$set("system:time_start", img$get("system:time_start"))
   out <- out$rename('NBR')
@@ -23,7 +23,7 @@ calc_NBR <- function(img) {
 }
 
 
-calc_EVI <- function(img){
+spt_calc_evi <- function(img){
   out <- ee$Image(img$expression(
     '2.5 * ((NIR - Red) / (NIR + 6 * Red - 7.5 * Blue + 1))', 
     list(
@@ -45,7 +45,7 @@ calc_EVI <- function(img){
 
 # NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
 
-calc_NBRSWIR <- function(img){
+spt_calc_nbrswir <- function(img){
   
   out <- ee$Image(img$expression(
     '-1*((SWIR2 - SWIR1 - 0.02) / (SWIR2 + SWIR1 + 0.1))', 
@@ -67,7 +67,7 @@ calc_NBRSWIR <- function(img){
 
 # NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
 
-calc_MIRBI <- function(img){
+spt_calc_mirbi <- function(img){
   
   out <- ee$Image(img$expression(
     '-1*(10 * SWIR2 - 9.8 * SWIR1 + 2)', 
@@ -86,7 +86,7 @@ calc_MIRBI <- function(img){
 # Char Soil Index
 # Smith et al. 2007
 
-calc_CSI <- function(img){
+spt_calc_csi <- function(img){
   
   out <- ee$Image(img$expression(
     'NIR / SWIR2', 
@@ -108,7 +108,7 @@ calc_CSI <- function(img){
 
 # NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
 
-calc_NBRP <- function(img){
+spt_calc_nbrp <- function(img){
   
   out <- ee$Image(img$expression(
     # (B12 - B8A - B3 - B2) / (B12 + B8A + B3 + B2)
@@ -133,7 +133,7 @@ calc_NBRP <- function(img){
 
 # NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY
 
-calc_NBRP_S2 <- function(img){
+spt_calc_nbrp_s2 <- function(img){
   
   out <- ee$Image(img$expression(
     # (B12 - B8A - B3 - B2) / (B12 + B8A + B3 + B2)
@@ -153,7 +153,7 @@ calc_NBRP_S2 <- function(img){
 }
 
 
-calc_TCTB_S2 <- function(img){
+spt_calc_tctb_s2 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.351) + (GREEN * 0.3813) + (RED * 0.3437) + (NIR * 0.7196) + (SWIR1 * 0.2396) + (SWIR2 * 0.1949)', 
@@ -173,7 +173,7 @@ calc_TCTB_S2 <- function(img){
   return(out)
 }
 
-calc_TCTG_S2 <- function(img){
+spt_calc_tctg_s2 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * -0.3599) + (GREEN * -0.3533) + (RED * -0.4734) + (NIR * 0.6633) + (SWIR1 * 0.0087) + (SWIR2 * -0.2856)', 
@@ -193,7 +193,7 @@ calc_TCTG_S2 <- function(img){
   return(out)
 }
 
-calc_TCTW_S2 <- function(img){
+spt_calc_tctw_s2 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.2578) + (GREEN * 0.2305) + (RED * 0.0883) + (NIR * 0.1071) + (SWIR1 * -0.7611) + (SWIR2 * -0.5308)', 
@@ -219,7 +219,7 @@ calc_TCTW_S2 <- function(img){
 
 ## Landsat-5 ----
 
-calc_TCTB_L5 <- function(img){
+spt_calc_tctb_l5 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.2043) + (GREEN * 0.4158) + (RED * 0.5524) + (NIR * 0.5741) + (SWIR1 * 0.3124) + (SWIR2 * 0.2303)',
@@ -239,7 +239,7 @@ calc_TCTB_L5 <- function(img){
   return(out)
 }
 
-calc_TCTG_L5 <- function(img){
+spt_calc_tctg_l5 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * -0.1603) + (GREEN * -0.2819) + (RED * -0.4934) + (NIR * 0.7940) + (SWIR1 * -0.0002) + (SWIR2 * -0.1446)',
@@ -259,7 +259,7 @@ calc_TCTG_L5 <- function(img){
   return(out)
 }
 
-calc_TCTW_L5 <- function(img){
+spt_calc_tctw_l5 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.0315) + (GREEN * 0.2021) + (RED * 0.3102) + (NIR * 0.1594) + (SWIR1 * -0.6806) + (SWIR2 * -0.6109)',
@@ -282,7 +282,7 @@ calc_TCTW_L5 <- function(img){
 
 ## Landsat-7 ----
 
-calc_TCTB_L7 <- function(img){
+spt_calc_tctb_l7 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.3561) + (GREEN * 0.3972) + (RED * 0.3904) + (NIR * 0.6966) + (SWIR1 * 0.2286) + (SWIR2 * 0.1596)', 
@@ -302,7 +302,7 @@ calc_TCTB_L7 <- function(img){
   return(out)
 }
 
-calc_TCTG_L7 <- function(img){
+spt_calc_tctg_l7 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * -0.3344) + (GREEN * -0.3544) + (RED * -0.4556) + (NIR * 0.6966) + (SWIR1 * -0.0242) + (SWIR2 * -0.2630)',
@@ -322,7 +322,7 @@ calc_TCTG_L7 <- function(img){
   return(out)
 }
 
-calc_TCTW_L7 <- function(img){
+spt_calc_tctw_l7 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.2626) + (GREEN * 0.2141) + (RED * 0.0926) + (NIR * 0.0656) + (SWIR1 * -0.7629) + (SWIR2 * -0.5388)',
@@ -346,7 +346,7 @@ calc_TCTW_L7 <- function(img){
 ## Landsat-8/9 ----
 
 
-calc_TCTB_L8 <- function(img){
+spt_calc_tctb_l8 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.3029) + (GREEN * 0.2786) + (RED * 0.4733) + (NIR * 0.5599) + (SWIR1 * 0.508) + (SWIR2 * 0.1872)',
@@ -367,7 +367,7 @@ calc_TCTB_L8 <- function(img){
   return(out)
 }
 
-calc_TCTG_L8 <- function(img){
+spt_calc_tctg_l8 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * -0.2941) + (GREEN * -0.243) + (RED * -0.5424) + (NIR * 0.7276) + (SWIR1 * 0.0713) + (SWIR2 * -0.1608)',
@@ -388,7 +388,7 @@ calc_TCTG_L8 <- function(img){
   return(out)
 }
 
-calc_TCTW_L8 <- function(img){
+spt_calc_tctw_l8 <- function(img){
   
   out <- ee$Image(img$expression(
     '(BLUE * 0.1511) + (GREEN * 0.1973) + (RED * 0.3283) + (NIR * 0.3407) + (SWIR1 * -0.7117) + (SWIR2 * -0.4559)',
@@ -416,7 +416,7 @@ calc_TCTW_L8 <- function(img){
 
 ## MOD09A1 ----
 
-calc_TCTB_MOD09A1 <- function(img){
+spt_calc_tctb_mod09a1 <- function(img){
   
   out <- ee$Image(img$expression(
     '(0.4395 * RED) + (0.5945 * NIR) + (0.2460 * BLUE) + (0.3918 * GREEN) + (0.3506 * NIR2) + (0.2136 * SWIR1) + (0.2678 * SWIR2)',
@@ -437,7 +437,7 @@ calc_TCTB_MOD09A1 <- function(img){
   return(out)
 }
 
-calc_TCTG_MOD09A1 <- function(img){
+spt_calc_tctg_mod09a1 <- function(img){
   
   out <- ee$Image(img$expression(
     '(-0.4064 * RED) + (0.5129 * NIR) + (-0.2744 * BLUE) + (-0.2893 * GREEN) + (0.4882 * NIR2) + (-0.0036 * SWIR1) + (-0.4169 * SWIR2)',
@@ -458,7 +458,7 @@ calc_TCTG_MOD09A1 <- function(img){
   return(out)
 }
 
-calc_TCTW_MOD09A1 <- function(img){
+spt_calc_tctw_mod09a1 <- function(img){
   
   out <- ee$Image(img$expression(
     '(0.1147 * RED) + (0.2489 * NIR) + (0.2408 * BLUE) + (0.3132 * GREEN) + (-0.3122 * NIR2) + (-0.6416 * SWIR1) + (-0.5087 * SWIR2) ',

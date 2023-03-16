@@ -1,13 +1,14 @@
 
 
-## ----------------------------------------------------------------------------------- ##
-## Make datasets ----
-## ----------------------------------------------------------------------------------- ##
+# ----------------------------------------------------------------------------------- #
+# Make datasets ----
+# ----------------------------------------------------------------------------------- #
 
 # Burned area datasets
 
 
-getGEEburntAreaDataset <- function(baDataset, referenceYear, minFireSizeHa = 5) {
+spt_get_ba_dataset <- function(baDataset, referenceYear, minFireSizeHa = 5) {
+  
   if (baDataset == "ICNF") {
     aa_icnf <- ee$FeatureCollection(SPT_ICNF_GEE_ASSET)
 
@@ -49,7 +50,7 @@ getGEEburntAreaDataset <- function(baDataset, referenceYear, minFireSizeHa = 5) 
 
 
 
-getGEEsatImageCollection <- function(satCode = "S2MSI",
+spt_get_sat_imgcol <- function(satCode = "S2MSI",
                                      procLevel = "L2A", modisProduct = NULL) {
   
   
@@ -229,6 +230,8 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
   ## Landsat missions ----
   ## ----------------------------------------------------------------------- ##
   
+  ### Landsat-5/TM ----
+  
   else if (satCode == "L5TM") {
     if (procLevel %in% c("L2A", "L2")) {
       
@@ -261,6 +264,8 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
+  
+  ### Landsat-7/ETM ----
   else if (satCode == "L7ETM") {
     if (procLevel %in% c("L2A", "L2")) {
 
@@ -293,6 +298,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
+  ### Landsat-8/OLI ----
   else if (satCode == "L8OLI") {
     if (procLevel %in% c("L2A", "L2")) {
       
@@ -325,6 +331,7 @@ getGEEsatImageCollection <- function(satCode = "S2MSI",
     }
   }
 
+  ### Landsat-9/OLI ----
   else if (satCode == "L9OLI") {
     if (procLevel %in% c("L2A", "L2")) {
       

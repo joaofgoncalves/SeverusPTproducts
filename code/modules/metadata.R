@@ -1,6 +1,6 @@
 
 
-getBurntAreaDatasetCode <- function(baDataset) {
+spt_ba_dataset_code <- function(baDataset) {
   baCodes <- list(
     ICNF    = "I",
     EFFIS   = "E",
@@ -13,14 +13,14 @@ getBurntAreaDatasetCode <- function(baDataset) {
   return(baCodes[[baDataset]])
 }
 
-exportMetaToJSON <- function(x, outFilePath) {
+spt_export_meta_to_json <- function(x, outFilePath) {
   # Export the data.frame to a prettified JSON file
   json_text <- jsonlite::toJSON(x, pretty = TRUE)
   cat(json_text, file = outFilePath)
 }
 
 
-metaTableTemplate <- function(metaList) {
+spt_fill_meta_template <- function(metaList) {
   metadf <- SPT_META_TABLE
   nms <- names(metaList)
 
@@ -37,7 +37,8 @@ metaTableTemplate <- function(metaList) {
 }
 
 
-updateMetaTaskStatus <- function(task, state, taskTable = NULL) {
+spt_update_meta_task <- function(task, state, taskTable = NULL) {
+  
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(
     SPT_TASK_TABLE_DIR, "/",
@@ -46,7 +47,7 @@ updateMetaTaskStatus <- function(task, state, taskTable = NULL) {
   ), timeout = 30000)
 
   if (is.null(taskTable)) {
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
 
   if (is.null(lck)) {
@@ -58,7 +59,7 @@ updateMetaTaskStatus <- function(task, state, taskTable = NULL) {
   taskTable[idx, "metadataTaskStatus"] <- state
 
   out <- try({
-    writeTaskTable(taskTable)
+    spt_write_tasks_table(taskTable)
     filelock::unlock(lck)
   })
 
@@ -70,7 +71,7 @@ updateMetaTaskStatus <- function(task, state, taskTable = NULL) {
 }
 
 
-getSpectralIndexName <- function(spiAcronym) {
+spt_spec_index_fullname <- function(spiAcronym) {
   spiNames <- list(
     NBR     = "Normalized Burn Ratio",
     NDVI    = "Normalized Difference Vegetation Index",
@@ -94,7 +95,7 @@ getSpectralIndexName <- function(spiAcronym) {
 }
 
 
-getSpecIndFormula <- function(spiAcronym, satCode) {
+spt_spec_index_formula <- function(spiAcronym, satCode) {
   
   spiForms <- list(
     
@@ -149,7 +150,7 @@ getSpecIndFormula <- function(spiAcronym, satCode) {
 }
 
 
-getSatMissionName <- function(satCode) {
+spt_sat_mission_fullname <- function(satCode) {
   satNames <- list(
     S2MSI  = "Sentinel-2a/b/MSI",
     MOD    = "Terra/MODIS",
@@ -168,7 +169,7 @@ getSatMissionName <- function(satCode) {
 }
 
 
-getSeverityIndicatorForm <- function(spi, si) {
+spt_severity_indicator_form <- function(spi, si) {
   if (si %in% c("DELTA", "DLT")) {
     return(paste(si, " = ", spi, "_prefire - ", spi, "_postfire", sep = ""))
   } 
@@ -184,7 +185,7 @@ getSeverityIndicatorForm <- function(spi, si) {
 }
 
 
-getBurntAreaDataURL <- function(baDataset) {
+spt_ba_data_url <- function(baDataset) {
   if (baDataset == "EFFIS") {
     baDataURL <- "https://effis.jrc.ec.europa.eu/applications/data-and-services"
   } else if (baDataset == "ICNF") {
@@ -196,7 +197,7 @@ getBurntAreaDataURL <- function(baDataset) {
   return(baDataURL)
 }
 
-getProcessingLevels <- function(procLevel) {
+spt_proc_levels <- function(procLevel) {
   if (procLevel %in% c("L1C", "L1")) {
     return("Level L1/L1C: Top-of-the-atmosphere reflectance (TOAR)")
   } else if (procLevel %in% c("L2A", "L2")) {

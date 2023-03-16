@@ -1,7 +1,7 @@
 
 
 
-updatePostProcTaskStatus <- function(task, state, taskTable=NULL){
+spt_update_post_task <- function(task, state, taskTable=NULL){
   
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
@@ -9,7 +9,7 @@ updatePostProcTaskStatus <- function(task, state, taskTable=NULL){
                                ".lock"), timeout = 30000)
   
   if(is.null(taskTable)){
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
   
   if(is.null(lck))
@@ -20,7 +20,7 @@ updatePostProcTaskStatus <- function(task, state, taskTable=NULL){
   taskTable[idx, "postProcTaskStatus"] <- state
   
   out <- try({
-    writeTaskTable(taskTable)
+    spt_write_tasks_table(taskTable)
     filelock::unlock(lck)
   })
   
@@ -33,7 +33,7 @@ updatePostProcTaskStatus <- function(task, state, taskTable=NULL){
 }
 
 
-rasterZerosToNA <- function(rstPath, writeRast=TRUE, ...) {
+spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, ...) {
   
   # Read the raster file
   rst <- rast(rstPath)
@@ -48,7 +48,8 @@ rasterZerosToNA <- function(rstPath, writeRast=TRUE, ...) {
   return(rast(rstPath))
 }
 
-projPTTM06 <- function(x, writeData=TRUE, outPath=NULL, ...) {
+
+spt_project_to_pttm06 <- function(x, writeData=TRUE, outPath=NULL, ...) {
   
   if(is.character(x)){
     filePath <- x

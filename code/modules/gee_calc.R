@@ -1,6 +1,6 @@
 
 
-getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
+spt_spectral_index_fun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
   
   if((baseIndex %in% c("TCTB","TCTG","TCTW","NBRP")) && is.null(satCode)){
     stop("The spectral index is specific to a satellite which has not been defined. Check satCode")
@@ -15,52 +15,52 @@ getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
   indexFunctions <- list(
     
     # General indices
-    NBR     = calc_NBR,
-    NDVI    = calc_NDVI,
-    EVI     = calc_EVI,
-    NBRSWIR = calc_NBRSWIR,
-    MIRBI   = calc_MIRBI,
-    CSI     = calc_CSI,
+    NBR     = spt_calc_nbr,
+    NDVI    = spt_calc_ndvi,
+    EVI     = spt_calc_evi,
+    NBRSWIR = spt_calc_nbrswir,
+    MIRBI   = spt_calc_mirbi,
+    CSI     = spt_calc_csi,
     
     # Satellite specific indices
     NBRP = list(
-      S2MSI = calc_NBRP_S2,
-      L5TM  = calc_NBRP,
-      L7ETM = calc_NBRP,
-      L8OLI = calc_NBRP,
-      L9OLI = calc_NBRP,
-      MOD   = calc_NBRP,
-      MYD   = calc_NBRP
+      S2MSI = spt_calc_nbrp_s2,
+      L5TM  = spt_calc_nbrp,
+      L7ETM = spt_calc_nbrp,
+      L8OLI = spt_calc_nbrp,
+      L9OLI = spt_calc_nbrp,
+      MOD   = spt_calc_nbrp,
+      MYD   = spt_calc_nbrp
     ),
     
     TCTB = list(
-      S2MSI = calc_TCTB_S2,
-      L5TM  = calc_TCTB_L5,
-      L7ETM = calc_TCTB_L7,
-      L8OLI = calc_TCTB_L8,
-      L9OLI = calc_TCTB_L8,
-      MOD   = calc_TCTB_MOD09A1,
-      MYD   = calc_TCTB_MOD09A1
+      S2MSI = spt_calc_tctb_s2,
+      L5TM  = spt_calc_tctb_l5,
+      L7ETM = spt_calc_tctb_l7,
+      L8OLI = spt_calc_tctb_l8,
+      L9OLI = spt_calc_tctb_l8,
+      MOD   = spt_calc_tctb_mod09a1,
+      MYD   = spt_calc_tctb_mod09a1
     ),
     
     TCTG = list(
-      S2MSI = calc_TCTG_S2,
-      L5TM  = calc_TCTG_L5,
-      L7ETM = calc_TCTG_L7,
-      L8OLI = calc_TCTG_L8,
-      L9OLI = calc_TCTG_L8,
-      MOD   = calc_TCTG_MOD09A1,
-      MYD   = calc_TCTG_MOD09A1
+      S2MSI = spt_calc_tctg_s2,
+      L5TM  = spt_calc_tctg_l5,
+      L7ETM = spt_calc_tctg_l7,
+      L8OLI = spt_calc_tctg_l8,
+      L9OLI = spt_calc_tctg_l8,
+      MOD   = spt_calc_tctg_mod09a1,
+      MYD   = spt_calc_tctg_mod09a1
     ),
     
     TCTW = list(
-      S2MSI = calc_TCTW_S2,
-      L5TM  = calc_TCTW_L5,
-      L7ETM = calc_TCTW_L7,
-      L8OLI = calc_TCTW_L8,
-      L9OLI = calc_TCTW_L8,
-      MOD   = calc_TCTW_MOD09A1,
-      MYD   = calc_TCTW_MOD09A1
+      S2MSI = spt_calc_tctw_s2,
+      L5TM  = spt_calc_tctw_l5,
+      L7ETM = spt_calc_tctw_l7,
+      L8OLI = spt_calc_tctw_l8,
+      L9OLI = spt_calc_tctw_l8,
+      MOD   = spt_calc_tctw_mod09a1,
+      MYD   = spt_calc_tctw_mod09a1
     )
   )
   
@@ -72,7 +72,7 @@ getSpecIndexFun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
 }
 
 
-getCloudMaskFun <- function(satCode, modisProduct=NULL){
+spt_cloud_mask_fun <- function(satCode, modisProduct=NULL){
   
   
   if((satCode %in% c("MOD","MYD")) && is.null(modisProduct)){
@@ -81,20 +81,19 @@ getCloudMaskFun <- function(satCode, modisProduct=NULL){
   
   maskFuns <- list(
     
-    S2MSI = maskClouds_S2,
-    
-    L5TM  = maskClouds_LT5,
-    L7ETM = maskClouds_LT7,
-    L8OLI = maskClouds_LT8,
-    L9OLI = maskClouds_LT9,
+    S2MSI = spt_mask_clouds_s2,
+    L5TM  = spt_mask_clouds_lt5,
+    L7ETM = spt_mask_clouds_lt7,
+    L8OLI = spt_mask_clouds_lt8,
+    L9OLI = spt_mask_clouds_lt9,
     
     MOD   = list(
-      MOD09A1 = maskClouds_MOD09A1,
-      MOD13Q1 = maskClouds_MOD13Q1
+      MOD09A1 = spt_mask_clouds_mod09a1,
+      MOD13Q1 = spt_mask_clouds_mod13q1
     ),
     MYD   = list(
-      MYD09A1 = maskClouds_MOD09A1,
-      MYD13Q1 = maskClouds_MOD13Q1
+      MYD09A1 = spt_mask_clouds_mod09a1,
+      MYD13Q1 = spt_mask_clouds_mod13q1
     )
   )
   
@@ -106,7 +105,7 @@ getCloudMaskFun <- function(satCode, modisProduct=NULL){
 }
 
 
-getScaleDataFun <- function(satCode, procLevel=NULL, modisProduct=NULL){
+spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
   
   
   if((satCode %in% c("MOD","MYD")) && is.null(modisProduct)){
@@ -122,41 +121,41 @@ getScaleDataFun <- function(satCode, procLevel=NULL, modisProduct=NULL){
     S2MSI = scaleData_S2,
     
     L5TM  = list(
-      L1  = scaleData_LT_TOA,
-      L1C = scaleData_LT_TOA,
-      L2  = scaleData_LT_SR,
-      L2A = scaleData_LT_SR
+      L1  = spt_scale_lt_toa,
+      L1C = spt_scale_lt_toa,
+      L2  = spt_scale_lt_tm_sr,
+      L2A = spt_scale_lt_tm_sr
     ),
     
     L7ETM = list(
-      L1  = scaleData_LT_TOA,
-      L1C = scaleData_LT_TOA,
-      L2  = scaleData_LT_SR,
-      L2A = scaleData_LT_SR
+      L1  = spt_scale_lt_toa,
+      L1C = spt_scale_lt_toa,
+      L2  = spt_scale_lt_tm_sr,
+      L2A = spt_scale_lt_tm_sr
     ),
     
     L8OLI = list(
-      L1  = scaleData_LT_TOA,
-      L1C = scaleData_LT_TOA,
-      L2  = scaleData_LT_SR,
-      L2A = scaleData_LT_SR
+      L1  = spt_scale_lt_toa,
+      L1C = spt_scale_lt_toa,
+      L2  = spt_scale_lt_oli_sr,
+      L2A = spt_scale_lt_oli_sr
     ),
     
     L9OLI = list(
-      L1  = scaleData_LT_TOA,
-      L1C = scaleData_LT_TOA,
-      L2  = scaleData_LT_SR,
-      L2A = scaleData_LT_SR
+      L1  = spt_scale_lt_toa,
+      L1C = spt_scale_lt_toa,
+      L2  = spt_scale_lt_oli_sr,
+      L2A = spt_scale_lt_oli_sr
     ),
     
     MOD   = list(
-      MOD09A1 = scaleData_MODIS,
-      MOD13Q1 = scaleData_MODIS
+      MOD09A1 = spt_scale_mod,
+      MOD13Q1 = spt_scale_mod
     ),
     
     MYD   = list(
-      MYD09A1 = scaleData_MODIS,
-      MYD13Q1 = scaleData_MODIS
+      MYD09A1 = spt_scale_mod,
+      MYD13Q1 = spt_scale_mod
     )
   )
   
@@ -467,7 +466,7 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
       
     }
     else{
-      stop("Wrong value in severityIndicator for method processGEEtask")
+      stop("Wrong value in severityIndicator for method spt_process_gee_task")
     }
       
     imColClip = ee$ImageCollection(list(imgDiffClip))

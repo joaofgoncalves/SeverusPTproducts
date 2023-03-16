@@ -1,10 +1,15 @@
 
 #' Get a single task by its identifiers
 
-# `%>%` <- magrittr::`%>%`
 
-getTask <- function(taskTable = NULL, taskID = NULL, taskUID = NULL, geeTaskID = NULL,
-                    geeTaskCode = NULL, postProcTaskID = NULL, closingTaskID = NULL) {
+spt_get_task <- function(taskTable      = NULL, 
+                         taskID         = NULL, 
+                         taskUID        = NULL, 
+                         geeTaskID      = NULL,
+                         geeTaskCode    = NULL, 
+                         postProcTaskID = NULL, 
+                         closingTaskID  = NULL) {
+  
   if (is.null(taskID) && is.null(taskUID) && is.null(geeTaskID) &&
     is.null(geeTaskCode) && is.null(postProcTaskID) && is.null(metadataTaskID) &&
     is.null(closingTaskID)) {
@@ -12,7 +17,7 @@ getTask <- function(taskTable = NULL, taskID = NULL, taskUID = NULL, geeTaskID =
   }
 
   if (is.null(taskTable)) {
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
 
   if (!is.null(taskID)) {
@@ -42,63 +47,63 @@ getTask <- function(taskTable = NULL, taskID = NULL, taskUID = NULL, geeTaskID =
 #' Define the generic methods to access task parameters
 
 
-getSatCode <- function(x) UseMethod("getSatCode", x)
+spt_sat_code <- function(x) UseMethod("spt_sat_code", x)
 
-getBaseIndex <- function(x) UseMethod("getBaseIndex", x)
+spt_base_index <- function(x) UseMethod("spt_base_index", x)
 
-getSeverityIndicator <- function(x) UseMethod("getSeverityIndicator", x)
+spt_severity_indicator <- function(x) UseMethod("spt_severity_indicator", x)
 
-getBurntAreaDataset <- function(x) UseMethod("getBurntAreaDataset", x)
+spt_ba_dataset <- function(x) UseMethod("spt_ba_dataset", x)
 
-getReferenceYear <- function(x) UseMethod("getReferenceYear", x)
+spt_reference_year <- function(x) UseMethod("spt_reference_year", x)
 
-getPreFireRef <- function(x) UseMethod("getPreFireRef", x)
+spt_pre_fire_ref <- function(x) UseMethod("spt_pre_fire_ref", x)
 
-getPreFireType <- function(x) UseMethod("getPreFireType", x)
+spt_pre_fire_type <- function(x) UseMethod("spt_pre_fire_type", x)
 
-getPostFireRef <- function(x) UseMethod("getPostFireRef", x)
+spt_post_fire_ref <- function(x) UseMethod("spt_post_fire_ref", x)
 
-getTaskStatus <- function(x, ...) UseMethod("getTaskStatus", x)
+spt_get_taskStatus <- function(x, ...) UseMethod("spt_get_taskStatus", x)
 
-getPostWindowDays <- function(x, ...) UseMethod("getPostWindowDays", x)
+spt_post_window_days <- function(x, ...) UseMethod("spt_post_window_days", x)
 
-getMinFireSize <- function(x) UseMethod("getMinFireSize", x)
+spt_min_fire_size <- function(x) UseMethod("spt_min_fire_size", x)
 
-getFileName <- function(x) UseMethod("getFileName", x)
+spt_file_name <- function(x) UseMethod("spt_file_name", x)
 
-getProcLevel <- function(x) UseMethod("getProcLevel", x)
+spt_proc_level <- function(x) UseMethod("spt_proc_level", x)
 
-getModisProduct <- function(x) UseMethod("getModisProduct", x)
+spt_modis_product <- function(x) UseMethod("spt_modis_product", x)
 
-getSpatialResolution <- function(x) UseMethod("getSpatialResolution", x)
+spt_spatial_resolution <- function(x) UseMethod("spt_spatial_resolution", x)
 
 #' Define the get functions to access task parameters
 
 
-getSatCode.task <- function(x) as.character(x$satCode)
+spt_sat_code.task <- function(x) as.character(x$satCode)
 
-getBaseIndex.task <- function(x) as.character(x$baseIndex)
+spt_base_index.task <- function(x) as.character(x$baseIndex)
 
-getSeverityIndicator.task <- function(x) as.character(x$severityIndicator)
+spt_severity_indicator.task <- function(x) as.character(x$severityIndicator)
 
-getBurntAreaDataset.task <- function(x) as.character(x$burntAreaDataset)
+spt_ba_dataset.task <- function(x) as.character(x$burntAreaDataset)
 
-getReferenceYear.task <- function(x) as.integer(x$referenceYear)
+spt_reference_year.task <- function(x) as.integer(x$referenceYear)
 
-getPreFireRef.task <- function(x) as.integer(x$preFireRef)
+spt_pre_fire_ref.task <- function(x) as.integer(x$preFireRef)
 
-getPreFireType.task <- function(x) as.character(x$preFireType)
+spt_pre_fire_type.task <- function(x) as.character(x$preFireType)
 
-getPostFireRef.task <- function(x) as.integer(x$postFireRef)
+spt_post_fire_ref.task <- function(x) as.integer(x$postFireRef)
 
-getMinFireSize.task <- function(x) as.double(x$minFireSize)
+spt_min_fire_size.task <- function(x) as.double(x$minFireSize)
 
-getProcLevel.task <- function(x) as.character(x$procLevel)
+spt_proc_level.task <- function(x) as.character(x$procLevel)
 
-getModisProduct.task <- function(x) as.character(x$modisProduct)
+spt_modis_product.task <- function(x) as.character(x$modisProduct)
 
 
-getTaskStatus.task <- function(x, taskStep) {
+spt_get_taskStatus.task <- function(x, taskStep) {
   if (taskStep == "main") {
     return(as.character(x$mainStatus))
   }
@@ -113,42 +118,42 @@ getTaskStatus.task <- function(x, taskStep) {
   }
 }
 
-getSpatialResolution.task <- function(x) {
-  if (x$satCode %in% c("L5TM", "L7ETM", "L8OLI", "L9OLI", "LTH")) {
+spt_spatial_resolution.task <- function(x) {
+  if (x$satCode %in% SPT_VALUES$satCode_lt) {
     spatialRes <- 30
-  } else if (x$satCode %in% c("MOD", "MYD", "MCD")) {
-    if (x$modisProduct %in% c("MOD13Q1", "MOD09GQ", "MOD09Q1", "MYD09GQ", "MYD09Q1", "MYD13Q1")) {
+  } else if (x$satCode %in% SPT_VALUES$satCode_md) {
+    if (x$modisProduct %in% SPT_VALUES$modisProduct[-c(10:12)]) {
       spatialRes <- 250
     } else if (x$modisProduct %in% c("MOD09A1", "MYD09A1", "MCD43A4")) {
       spatialRes <- 500
     } else {
       stop("Cannot find spatial resolution - unsupported MODIS product")
     }
-  } else if (x$satCode == "S2MSI") {
+  } else if (x$satCode == SPT_VALUES$satCode_s2) {
     spatialRes <- 20
   }
   else{
-    stop("Satellite code not supported in getSpatialResolution")
+    stop("Satellite code not supported in spt_spatial_resolution")
   }
 
   return(spatialRes)
 }
 
-getPostWindowDays.task <- function(x) {
+spt_post_window_days.task <- function(x) {
   return(c(
-    (getPostFireRef(x) - getPreFireRef(x)) * 30 + 1,
-    getPostFireRef(x) * 30
+    (spt_post_fire_ref(x) - spt_pre_fire_ref(x)) * 30 + 1,
+    spt_post_fire_ref(x) * 30
   ))
 }
 
-taskToDataframe <- function(task) {
+spt_task_to_dataframe <- function(task) {
   data.frame(
     taskParam = colnames(task),
     taskValue = as.character(task[1, ])
   )
 }
 
-updateClosingTaskStatus <- function(task, state, taskTable = NULL) {
+spt_update_closing_task <- function(task, state, taskTable = NULL) {
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(
     SPT_TASK_TABLE_DIR, "/",
@@ -157,7 +162,7 @@ updateClosingTaskStatus <- function(task, state, taskTable = NULL) {
   ), timeout = 30000)
 
   if (is.null(taskTable)) {
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
 
   if (is.null(lck)) {
@@ -168,7 +173,7 @@ updateClosingTaskStatus <- function(task, state, taskTable = NULL) {
   taskTable[idx, "closingTaskStatus"] <- state
 
   out <- try({
-    writeTaskTable(taskTable)
+    spt_write_tasks_table(taskTable)
     filelock::unlock(lck)
   })
 
@@ -179,7 +184,7 @@ updateClosingTaskStatus <- function(task, state, taskTable = NULL) {
   }
 }
 
-updateMainTaskStatus <- function(task, state, taskTable = NULL) {
+spt_update_main_task <- function(task, state, taskTable = NULL) {
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(
     SPT_TASK_TABLE_DIR, "/",
@@ -188,7 +193,7 @@ updateMainTaskStatus <- function(task, state, taskTable = NULL) {
   ), timeout = 30000)
 
   if (is.null(taskTable)) {
-    taskTable <- readTaskTable()
+    taskTable <- spt_read_tasks_table()
   }
 
   if (is.null(lck)) {
@@ -199,7 +204,7 @@ updateMainTaskStatus <- function(task, state, taskTable = NULL) {
   taskTable[idx, "mainStatus"] <- state
 
   out <- try({
-    writeTaskTable(taskTable)
+    spt_write_tasks_table(taskTable)
     filelock::unlock(lck)
   })
 
@@ -209,3 +214,37 @@ updateMainTaskStatus <- function(task, state, taskTable = NULL) {
     return(TRUE)
   }
 }
+
+
+spt_rm_uncompleted_tasks <- function(taskTable = NULL) {
+  # Acquire a lock over the file
+  lck <- filelock::lock(paste0(
+    SPT_TASK_TABLE_DIR, "/",
+    SPT_TASK_TABLE_BASENAME,
+    ".lock"
+  ), timeout = 30000)
+  
+  if (is.null(taskTable)) {
+    taskTable <- spt_read_tasks_table()
+  }
+  
+  if (is.null(lck)) {
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  }
+  
+  idx <- taskTable$mainStatus == "COMPLETED"
+  taskTable <- taskTable[idx, ]
+  
+  out <- try({
+    spt_write_tasks_table(taskTable)
+    filelock::unlock(lck)
+  })
+  
+  if (inherits(out, "try-error")) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+
