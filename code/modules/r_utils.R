@@ -112,7 +112,8 @@ spt_export_to_md <- function(df, filename) {
 
 spt_file_dates <- function(filename, tdelta = 60) {
   if(!file.exists(filename)) {
-    stop(paste0("File ", filename, " does not exist."))
+    return(FALSE)
+    #stop(paste0("File ", filename, " does not exist."))
   }
   else {
     ctime <- file.info(filename)$ctime # file creation time
