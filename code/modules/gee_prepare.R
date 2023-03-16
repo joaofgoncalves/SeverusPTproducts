@@ -97,6 +97,15 @@ maskClouds_LT9 <- function(img){
 }
 
 scaleData_LT_SR <- function(img){
+spt_scale_lt_tm_sr <- function(img){
+  
+  opticalBands = img$select(c("Blue", "Green", 
+                              "Red", "NIR", "SWIR1", "SWIR2"))$multiply(0.0000275)$add(-0.2)
+  
+  return(img$addBands(opticalBands, NULL, TRUE));
+}
+
+spt_scale_lt_oli_sr <- function(img){
   
   opticalBands = img$select(c("Coastal","Blue", "Green", 
                               "Red", "NIR", "SWIR1", "SWIR2"))$multiply(0.0000275)$add(-0.2)
