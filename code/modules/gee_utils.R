@@ -87,7 +87,7 @@ updateGEEtaskStatus <- function(geeTask, task, taskTable=NULL){
 }
 
 
-checkGEEtaskCompletion <- function(geeTask, sleep=30, verbose=FALSE){
+spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
   
   
   # initialize the status variable
@@ -118,7 +118,7 @@ checkGEEtaskCompletion <- function(geeTask, sleep=30, verbose=FALSE){
       break
     }else{
       Sys.sleep(sleep)
-      if(verbose) cat("\014")
+      #if(verbose) cat("\014")
     }
   }
   
