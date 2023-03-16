@@ -171,7 +171,14 @@ getSatMissionName <- function(satCode) {
 getSeverityIndicatorForm <- function(spi, si) {
   if (si %in% c("DELTA", "DLT")) {
     return(paste(si, " = ", spi, "_prefire - ", spi, "_postfire", sep = ""))
-  } else {
+  } 
+  else if (si %in% c("RBR")) {
+    return(paste(si, " = (", spi, "_prefire - ", spi, "_postfire",") / (", spi, "_prefire + 1.001)", sep = ""))
+  }
+  else if (si %in% c("RDELTA", "RDT")) {
+    return(paste(si, " = (", spi, "_prefire - ", spi, "_postfire) / (sqrt(abs(",spi,"_prefire))", sep = ""))
+  }
+  else {
     return("N/A")
   }
 }
