@@ -309,29 +309,123 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
       prefireDate_end = postfireDate_end$advance(-1, 'year')
     }
     
-    # Pre-fire reference image
-    preFire = sits %>% 
-      ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
-      ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-      ee$ImageCollection$map(cloudMaskFun) %>% 
-      ee$ImageCollection$map(scaleDataFun) %>% 
-      ee$ImageCollection$map(baseIndexFun) %>% 
-      #ee$ImageCollection$select(baseIndex) %>% 
-      ee$ImageCollection$median() #%>% 
-      # ee$Image$multiply(10000) %>% 
-      # ee$Image$toInt()
+    ### Interpolate images for Landsat-7/ETM
     
-    # Post-fire reference image
-    postFire = sits %>% 
-      ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
-      ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-      ee$ImageCollection$map(cloudMaskFun) %>% 
-      ee$ImageCollection$map(scaleDataFun) %>% 
-      ee$ImageCollection$map(baseIndexFun) %>% 
-      #ee$ImageCollection$select(baseIndex) %>% 
-      ee$ImageCollection$median() #%>% 
-      # ee$Image$multiply(10000) %>% 
-      # ee$Image$toInt()
+    if(satCode == "L7ETM"){
+      
+      # Pre-fire reference image
+      preFire = sits %>% 
+        ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+        ee$ImageCollection$map(base_index_fun) %>% 
+        ee$ImageCollection$median()
+      
+      # Post-fire reference image
+      postFire = sits %>% 
+        ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+        ee$ImageCollection$map(base_index_fun) %>% 
+        ee$ImageCollection$median()
+      
+    }else if(satCode == "LTH"){
+      
+      #### LTH Pre-fire reference image ----
+      
+      preFire_lt5 = lt5_sits %>% 
+        ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun_lt5) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt5) %>% 
+        ee$ImageCollection$map(spt_etm_to_oli) %>% 
+        ee$ImageCollection$map(base_index_fun_lt5) 
+      
+      preFire_lt7 = lt7_sits %>% 
+        ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun_lt7) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt7) %>% 
+        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+        ee$ImageCollection$map(spt_etm_to_oli) %>% 
+        ee$ImageCollection$map(base_index_fun_lt7) 
+      
+      preFire_lt8 = lt8_sits %>% 
+        ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun_lt8) %>% 
+        ee$ImageCollection$map(scale_data_fun_lt8) %>% 
+        ee$ImageCollection$map(base_index_fun_lt8) 
+      
+      #preFire_combn = ee$ImageCollection(preFire_lt5)$merge(ee$ImageCollection(preFire_lt7))$merge(ee$ImageCollection(preFire_lt8))
+      
+      preFire_combn = ee$ImageCollection$merge(preFire_lt5, preFire_lt7) %>% 
+                      ee$ImageCollection$merge(preFire_lt8)
+      
+      preFire = preFire_combn %>% 
+        ee$ImageCollection$median()
+      
+      
+      #### LTH Post-fire reference image ----
+      
+      postFire_lt5 = lt5_sits %>% 
+        ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(spt_etm_to_oli) %>% 
+        ee$ImageCollection$map(base_index_fun) 
+      
+      postFire_lt7 = lt7_sits %>% 
+        ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+        ee$ImageCollection$map(spt_etm_to_oli) %>% 
+        ee$ImageCollection$map(base_index_fun) 
+      
+      postFire_lt8 = lt8_sits %>% 
+        ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(base_index_fun) 
+      
+      #postFire_combn = ee$ImageCollection(postFire_lt5)$merge(ee$ImageCollection(postFire_lt7))$merge(ee$ImageCollection(postFire_lt8))
+      
+      postFire_combn = ee$ImageCollection$merge(postFire_lt5, postFire_lt7) %>% 
+                       ee$ImageCollection$merge(postFire_lt8)
+      
+      postFire = postFire_combn %>% 
+        ee$ImageCollection$median()
+      
+      
+    }else{
+      
+      # Pre-fire reference image
+      preFire = sits %>% 
+        ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(base_index_fun) %>% 
+        ee$ImageCollection$median()
+      
+      # Post-fire reference image
+      postFire = sits %>% 
+        ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+        ee$ImageCollection$map(cloud_mask_fun) %>% 
+        ee$ImageCollection$map(scale_data_fun) %>% 
+        ee$ImageCollection$map(base_index_fun) %>% 
+        ee$ImageCollection$median()
+    }
+    
     
     if(severityIndicator %in% c("DELTA", "DLT")){
       # Calculate delta
