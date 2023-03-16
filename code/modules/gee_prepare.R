@@ -108,6 +108,9 @@ scaleData_LT_TOA <- function(img){
   return(ee$Image(img$multiply(1)))
 }
 
+spt_lt7_interpolate <- function(img){
+  return(ee$Image$focal_mean(img, 1, 'square', 'pixels', 8))
+}
 
 ## ----------------------------------------------------------------------------------- ##
 ## MODIS/Terra/Aqua ----
