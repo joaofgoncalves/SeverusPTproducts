@@ -105,11 +105,7 @@ dataframeToMarkdown <- function(df) {
 
 exportToMarkdown <- function(df, filename) {
   # Create a pretty table
-  ktable <- knitr::kable(df,
-    format = "markdown",
-    col.names = colnames(df), align = "l"
-  )
-
+  ktable <- spt_df_to_md(df)
   kableExtra::save_kable(ktable, file = filename)
 }
 
