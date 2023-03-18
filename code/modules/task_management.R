@@ -146,6 +146,48 @@ spt_post_window_days.task <- function(x) {
   ))
 }
 
+
+spt_task_filename <- function(task, projectAccronym, versionNumber){
+  
+  satCode           = spt_sat_code(task)
+  baseIndex         = spt_base_index(task)
+  severityIndicator = spt_severity_indicator(task)
+  
+  burntAreaDataset  = spt_ba_dataset(task)
+  referenceYear     = spt_reference_year(task)
+  
+  fixedPreFireWindowSize    = spt_pre_fire_ref(task)
+  preFireWindowType         = spt_pre_fire_type(task)
+  postFireWindowEndMonths   = spt_post_fire_ref(task)
+  
+  refPeriods = paste0(
+    # Pre-fire ref period
+    ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),spt_pad_number(fixedPreFireWindowSize),
+    # Post-fire ref period
+    "P",spt_pad_number(postFireWindowEndMonths))
+  
+  # prodName = spt_product_name(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
+  #                           burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
+  
+  prodName = spt_product_name(ProjectAccronym = projectAccronym, 
+                              SeverityIndicator = severityIndicator, 
+                              BaseIndex         = baseIndex, 
+                              SatCode           = satCode, 
+                              BurntAreaDataset  = burntAreaDataset, 
+                              ReferenceYear     = referenceYear, 
+                              RefPeriods        = refPeriods, 
+                              addCalcDate       = FALSE, 
+                              VersionNumber     = versionNumber)
+  
+  return(prodName)
+}
+
+
+## ------------------------------------------------------------------------------------- ##
+## TRASNFORM FUNCTIONS ----
+## ------------------------------------------------------------------------------------- ##
+
+
 spt_task_to_dataframe <- function(task) {
   data.frame(
     taskParam = colnames(task),
@@ -153,16 +195,162 @@ spt_task_to_dataframe <- function(task) {
   )
 }
 
-spt_update_closing_task <- function(task, state, taskTable = NULL) {
+
+## ------------------------------------------------------------------------------------- ##
+## UPDATE SUB-TASKS STATUS ----
+## ------------------------------------------------------------------------------------- ##
+
+
+spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
+  
   # Acquire a lock over the file
-  lck <- filelock::lock(paste0(
-    SPT_TASK_TABLE_DIR, "/",
-    SPT_TASK_TABLE_BASENAME,
-    ".lock"
-  ), timeout = 30000)
+  #lck <- filelock::lock(lockfilePath, timeout = 30000)
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+  
+  if(is.null(taskTable)){
+    taskTable <- spt_read_tasks_table(taskTablePath)
+  }
+  
+  if(is.null(lck))
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  
+  taskStatusList <- try(spt_gee_task_status(geeTask))
+  
+  if(inherits(taskStatusList,"try-error")){
+    
+    return(FALSE)
+    
+  }else{
+    
+    if(taskStatusList$state %in% c("RUNNING","READY")){
+      geeTaskStatus <- "GEE PROCESSING"
+    }
+    else if(taskStatusList$state == "FAILED"){
+      geeTaskStatus <- "GEE PROCESSING ERROR"
+    }
+    else if(taskStatusList$state == "COMPLETED"){
+      geeTaskStatus <- "GEE COMPLETED"
+    }
+    else if(taskStatusList$state == "CANCELLED"){
+      geeTaskStatus <- "GEE CANCELLED"
+    }
+    else{
+      geeTaskStatus <- "GEE STATUS UNKNOWN"
+    }
+    
+    idx <- taskTable$taskUID == task$taskUID
+    taskTable[idx, "geeTaskCode"]   <- taskStatusList$id
+    taskTable[idx, "geeTaskStatus"] <- geeTaskStatus
+    taskTable[idx, "fileName"]      <- taskStatusList$description
+    
+  }
+  
+  out <- try({
+    spt_write_tasks_table(taskTable, taskTablePath)
+    filelock::unlock(lck)
+  })
+  
+  if(inherits(out,"try-error")){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }
+  
+}
+
+
+spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
+  
+  # # Acquire a lock over the file
+  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
+  #                              SPT_TASK_TABLE_BASENAME,
+  #                              ".lock"), timeout = 30000)
+  #lck <- filelock::lock(filelockPath, timeout = 30000)
+  
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+  
+  if(is.null(taskTable)){
+    taskTable <- spt_read_tasks_table(taskTablePath)
+  }
+  
+  if(is.null(lck))
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  
+  
+  idx <- taskTable$taskUID == task$taskUID
+  taskTable[idx, "postProcTaskStatus"] <- state
+  
+  out <- try({
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+    
+    filelock::unlock(lck)
+  })
+  
+  if(inherits(out,"try-error")){
+    return(FALSE)
+  }else{
+    return(TRUE)
+  }
+  
+}
+
+
+spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
+  
+  # Acquire a lock over the file
+  # lck <- filelock::lock(paste0(
+  #   SPT_TASK_TABLE_DIR, "/",
+  #   SPT_TASK_TABLE_BASENAME,
+  #   ".lock"
+  # ), timeout = 30000)
+  #lck <- filelock::lock(lockfilePath, timeout = 30000)
+  
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+  
+  if (is.null(taskTable)) {
+    taskTable <- spt_read_tasks_table(taskTablePath)
+  }
+  
+  if (is.null(lck)) {
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  }
+  
+  
+  idx <- taskTable$taskUID == task$taskUID
+  taskTable[idx, "metadataTaskStatus"] <- state
+  
+  out <- try({
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+    
+    filelock::unlock(lck)
+  })
+  
+  if (inherits(out, "try-error")) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+
+
+spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath) {
+  # Acquire a lock over the file
+  # lck <- filelock::lock(paste0(
+  #   SPT_TASK_TABLE_DIR, "/",
+  #   SPT_TASK_TABLE_BASENAME,
+  #   ".lock"
+  # ), timeout = 30000)
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
 
   if (is.null(taskTable)) {
-    taskTable <- spt_read_tasks_table()
+    taskTable <- spt_read_tasks_table(taskTablePath)
   }
 
   if (is.null(lck)) {
