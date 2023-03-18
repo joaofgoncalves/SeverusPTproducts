@@ -9,10 +9,17 @@ library(knitr)
 library(kableExtra)
 library(crayon)
 library(clisymbols)
+# library(foreach)
+# library(doParallel)
 
 # Global variables
 
-SPT_PROJ_ACRONYM <- "SPT"
+
+## ---- PARAMETERS TO CHANGE ---- 
+
+SPT_PROJ_COORD_SYSTEM_CODE <<- "EPSG:32629"
+
+SPT_GDRIVE_FOLDER <<- "GEE"
 
 SPT_TASK_TABLE_FILENAME <<- "SPT_MainTaskTable.csv"
 SPT_TASK_TABLE_BASENAME <<- "SPT_MainTaskTable"
@@ -32,6 +39,11 @@ SPT_ICNF_AREA_FIELD <<- "area_ht"
 
 SPT_GEE_TASK_PATH <<- "./out/gee_tasks"
 SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products"
+
+
+## ---- DO NOT CHANGE THIS PART FROM HERE ---- 
+
+SPT_PROJ_ACRONYM <- "SPT"
 
 SPT_META_TEMPLATE <<- "./data/tables/SPT_meta_template.xlsx"
 SPT_META_TABLE <- readxl::read_excel(SPT_META_TEMPLATE)
