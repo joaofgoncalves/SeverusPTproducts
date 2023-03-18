@@ -27,7 +27,10 @@ SPT_TASK_TABLE_FORMAT   <<- "csv"
 SPT_TASK_TABLE_DIR      <<- "./code/task_table"
 SPT_TASK_TABLE_PATH     <<- "./code/task_table/SPT_MainTaskTable.csv"
 
-SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
+#SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
+SPT_EFFIS_HIST_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_hist"
+SPT_EFFIS_CURR_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_current"
+
 SPT_EFFIS_YEAR_FIELD <<- "year"
 SPT_EFFIS_DATE_FIELD <<- "FIREDATE"
 SPT_EFFIS_AREA_FIELD <<- "area_ht"
