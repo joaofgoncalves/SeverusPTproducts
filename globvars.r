@@ -24,8 +24,8 @@ SPT_GDRIVE_FOLDER <<- "GEE"
 SPT_TASK_TABLE_FILENAME <<- "SPT_MainTaskTable.csv"
 SPT_TASK_TABLE_BASENAME <<- "SPT_MainTaskTable"
 SPT_TASK_TABLE_FORMAT   <<- "csv"
-SPT_TASK_TABLE_DIR      <<- "./DATA/TABLES"
-SPT_TASK_TABLE_PATH     <<- "./DATA/TABLES/SPT_MainTaskTable.csv"
+SPT_TASK_TABLE_DIR      <<- "./code/task_table"
+SPT_TASK_TABLE_PATH     <<- "./code/task_table/SPT_MainTaskTable.csv"
 
 SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
 SPT_EFFIS_YEAR_FIELD <<- "year"
@@ -45,7 +45,7 @@ SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products"
 
 SPT_PROJ_ACRONYM <- "SPT"
 
-SPT_META_TEMPLATE <<- "./data/tables/SPT_meta_template.xlsx"
+SPT_META_TEMPLATE <<- "./code/meta_template/SPT_meta_template.xlsx"
 SPT_META_TABLE <- readxl::read_excel(SPT_META_TEMPLATE)
 SPT_META_TABLE[is.na(SPT_META_TABLE[,"Value"]), 2] <- ""
 SPT_META_TABLE <<- SPT_META_TABLE
