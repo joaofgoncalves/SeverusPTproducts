@@ -154,6 +154,9 @@ for(tidx in xs){
       
     } else if(task$burntAreaDataset == "EFFIS"){
       
+      #SPT_EFFIS_HIST_GEE_ASSET
+      #SPT_EFFIS_CURR_GEE_ASSET
+      
       baAsset   = SPT_EFFIS_GEE_ASSET 
       dateField = SPT_EFFIS_DATE_FIELD
       yearField = SPT_EFFIS_YEAR_FIELD
