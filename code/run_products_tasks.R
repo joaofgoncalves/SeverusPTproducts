@@ -5,8 +5,7 @@
 ## --------------------------------------------------------------------------- ##
 
 
-# library(foreach)
-# library(doParallel)
+
 # library(doFuture)
 # library(progressr)
 
@@ -22,9 +21,13 @@ source("./CODE/modules/gee_prepare.R")
 source("./CODE/modules/post_proc.R")
 source("./CODE/modules/metadata.R")
 
-# 
-# cl <- makeCluster(4)
-# registerDoParallel(cl)
+# library(foreach)
+# library(doParallel)
+# if(!exists("cl")){
+#   cl <- makeCluster(3)
+#   registerDoParallel(cl)
+# }
+
 
 
 if(!spt_file_dates("gee_last_init.log", tdelta = 10)){
@@ -41,9 +44,8 @@ if(!spt_file_dates("gee_last_init.log", tdelta = 10)){
 }
 
 
-
-# CAOP + buffer 5km
-ptbox = ee$Geometry$Polygon(c(c(
+SPT_BOUND_BOX_POLYGON <<- ee$Geometry$Polygon(c(c(
+  # CAOP + buffer 5km
   c(-9.59969546814, 42.20058580090),
   c(-9.55585216180, 36.92056016040),
   c(-6.31411752273, 36.89149009860),
@@ -52,10 +54,10 @@ ptbox = ee$Geometry$Polygon(c(c(
 
 logToFile <- FALSE
 
-xs = 1:nrow(spt_read_tasks_table())
+xs = 1:nrow(spt_read_tasks_table(SPT_TASK_TABLE_PATH))
 
 
-#foreach(i = xs) %do% {
+#foreach(i = xs) %dopar% {
 for(tidx in xs){
     
   # tidx = i
@@ -63,8 +65,7 @@ for(tidx in xs){
   # setwd("C:/MyFiles/R-dev/SeverusPT_Products")
   # 
   # source("globvars.r")
-  # #ee_Initialize()
-  # 
+  # ee_Initialize("joaofgo@gmail.com", gcs = TRUE, drive=TRUE)
   # 
   # source("./CODE/modules/r_utils.R")
   # source("./CODE/modules/task_generator.R")
@@ -73,17 +74,22 @@ for(tidx in xs){
   # source("./CODE/modules/gee_indices.R")
   # source("./CODE/modules/gee_utils.R")
   # source("./CODE/modules/gee_calc.R")
+  # source("./CODE/modules/gee_prepare.R")
   # source("./CODE/modules/post_proc.R")
   # source("./CODE/modules/metadata.R")
   
 
   # Read the main task table - update task list
-  ttb <- spt_read_tasks_table()
+  ttb <- spt_read_tasks_table(SPT_TASK_TABLE_PATH)
   
   # Select the target task
-  task <- spt_get_task(ttb, taskUID = ttb$taskUID[tidx])
-    # Generate the task filename
-  taskFn <- spt_task_filename(task)
+  task <- spt_get_task(ttb, taskUID = ttb$taskUID[tidx],
+                       taskTablePath = SPT_TASK_TABLE_PATH)
+  
+  # Generate the task filename
+  taskFn <- spt_task_filename(task            = task,
+                              projectAccronym = SPT_PROJ_ACRONYM, 
+                              versionNumber   = SPT_VERSION)
   
   
   cat(blue("\n-----------------------------------------------------------------------\n"))
@@ -131,13 +137,41 @@ for(tidx in xs){
     cat(green(bold(
       symbol$arrow_right, "Processing Google Earth Engine task...\n\n")))
     
-    # Process task in GEE
+    
+    ### Process task in GEE ----
     #
     #
-    geeTaskObj <- spt_process_gee_task(task, 
-                                       outFolder   = "GEE", 
-                                       boundBox    = ptbox, 
-                                       coordRefSys = "EPSG:32629")
+    
+    # Get the field names in the ba dataset used 
+    # Retrieve this metadata from global variables
+    #
+    if(task$burntAreaDataset == "ICNF"){
+      
+      baAsset   = SPT_ICNF_GEE_ASSET 
+      dateField = SPT_ICNF_DATE_FIELD
+      yearField = SPT_ICNF_YEAR_FIELD
+      areaField = SPT_ICNF_AREA_FIELD
+      
+    } else if(task$burntAreaDataset == "EFFIS"){
+      
+      baAsset   = SPT_EFFIS_GEE_ASSET 
+      dateField = SPT_EFFIS_DATE_FIELD
+      yearField = SPT_EFFIS_YEAR_FIELD
+      areaField = SPT_EFFIS_AREA_FIELD
+      
+    } else{
+      stop("Unsupported burnt area dataset name in burntAreaDataset!")
+    }
+    
+    
+    geeTaskObj <- spt_process_gee_task(task        = task, 
+                                       outFolder   = SPT_GDRIVE_FOLDER, 
+                                       boundBox    = SPT_BOUND_BOX_POLYGON, 
+                                       coordRefSys = SPT_PROJ_COORD_SYSTEM_CODE,
+                                       baGEEasset  = baAsset,
+                                       dateField   = dateField,
+                                       yearField   = yearField, 
+                                       areaField   = areaField)
     
     # Get the GEE task status in the server
     taskStatusList <- spt_gee_task_status(geeTaskObj)
@@ -147,10 +181,16 @@ for(tidx in xs){
     
     # Wait for a couple of seconds and then update the taskTable status for GEE
     Sys.sleep(time = 30)
-    spt_update_gee_task(geeTaskObj, task, taskTable=NULL)
+    
+    spt_update_gee_task(geeTaskObj, task, taskTable = NULL, 
+                        taskTablePath = SPT_TASK_TABLE_PATH)
+    
+                        # lockfilePath = paste0(SPT_TASK_TABLE_DIR, "/",
+                        #                       SPT_TASK_TABLE_BASENAME, ".lock")
     
     # Refresh the target task status by re-loading it
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx]) 
+    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                         taskTablePath = SPT_TASK_TABLE_PATH) 
     
     cat(green(bold(
       symbol$arrow_right, "Checking GEE task completion ...\n\n")))
@@ -160,7 +200,6 @@ for(tidx in xs){
     geeProcCheck <- spt_check_gee_task(geeTaskObj, verbose = TRUE)
     
     # Save the GEE status object
-    
     cat(green(bold(
       symbol$arrow_right, "Saving GEE task list object...\n\n")))
     
@@ -168,15 +207,22 @@ for(tidx in xs){
     geeStatusList <- spt_gee_task_status(geeTaskObj)
     
     # Save the GEE Status List object
-    spt_save_gee_status_list(task, geeStatusList)
+    spt_save_gee_status_list(task          = task, 
+                             geeStatusList = geeStatusList, 
+                             geeTaskPath   = SPT_GEE_TASK_PATH)
 
     
     if(geeProcCheck$state=="FAILED"){
       
       # Update the taskTable status for GEE
-      spt_update_gee_task(geeTaskObj, task)
+      spt_update_gee_task(geeTaskObj, task,
+                          taskTablePath = SPT_TASK_TABLE_PATH)
+                          # lockfilePath = paste0(SPT_TASK_TABLE_DIR, "/",
+                          #                       SPT_TASK_TABLE_BASENAME, ".lock")
+                          
       # Refresh the target task status by re-loading it
-      task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
       
       stop(symbol$cross,"GEE Process ID: ", geeProcCheck$id, " failed")
     }
@@ -185,10 +231,14 @@ for(tidx in xs){
       symbol$arrow_right, "Update GEE task final status...\n\n")))
     
     # Update the taskTable status for GEE
-    spt_update_gee_task(geeTaskObj, task)
+    spt_update_gee_task(geeTaskObj, task,
+                        taskTablePath = SPT_TASK_TABLE_PATH)
+                        # lockfilePath = paste0(SPT_TASK_TABLE_DIR, "/",
+                        #                       SPT_TASK_TABLE_BASENAME, ".lock")
     
     # Refresh the target task status by re-loading it
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                         taskTablePath = SPT_TASK_TABLE_PATH)
     
     cat("\n---- TASK UPDATE ----\n\n")
     taskMd <- spt_df_to_md(spt_task_to_dataframe(task))
@@ -199,7 +249,6 @@ for(tidx in xs){
     
     cat(green(bold(
       symbol$tick, "GEE sub-task completed! Skipping to the next...\n\n")))
-    
     
   }
   
@@ -216,9 +265,13 @@ for(tidx in xs){
     
     
     # Update the taskTable status for post-processing
-    spt_update_post_task(task, state="POST PROCESSING")
+    spt_update_post_task(task, state="POST PROCESSING", 
+                         taskTablePath = SPT_TASK_TABLE_PATH)
+                         #filelockPath = paste0(SPT_TASK_TABLE_DIR, "/", SPT_TASK_TABLE_BASENAME, ".lock")
+    
     # Refresh the target task status by re-loading it
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                         taskTablePath = SPT_TASK_TABLE_PATH)
     
     cat(green(bold(
       symbol$arrow_right, "Downloading data from Google Drive folder...\n\n")))
@@ -227,7 +280,10 @@ for(tidx in xs){
     # Download data from Google Drive folder
     #
     #
-    outFilePath <- try(spt_download_gdrive(geeTaskObj))
+    outFilePath <- try(spt_download_gdrive(geeTask   = geeTaskObj, 
+                                           outFolder = SPT_GEE_PRODUCTS_PATH))
+    
+    ### --- RECOVERY MODE OF DATA DOWNLOAD !!! --- ####
     
     if(inherits(outFilePath,"try-error")){
       
@@ -235,16 +291,19 @@ for(tidx in xs){
         symbol$cross,"Unable to download data for GEE task:", spt_gee_task_status(geeTaskObj)$id,"\n")))
       
       
-      ### RECOVERY OF DATA DOWNLOAD !!! ####
+      
       cat(yellow(bold(
         symbol$warning,"Trying to recover data from GEE Task List\n\n")))
       
-      geeStatusList <- spt_read_gee_status_list(task)
+      geeStatusList <- spt_read_gee_status_list(task = task, 
+                                                geeTaskPath = SPT_GEE_TASK_PATH)
       
       # Download data from GDrive
       #
       #
-      outFilePath <- try(spt_download_gdrive(geeStatusList))
+      # outFilePath <- try(spt_download_gdrive(geeStatusList))
+      outFilePath <- try(spt_download_gdrive(geeTask   = geeTaskObj, 
+                                             outFolder = SPT_GEE_PRODUCTS_PATH))
       
       if(inherits(outFilePath, "try-error")){
         
@@ -291,18 +350,26 @@ for(tidx in xs){
     if(inherits(r0,"try-error") || inherits(r1,"try-error")){
       
       # Update the taskTable status for post-processing
-      spt_update_post_task(task, state="POST PROCESSING ERROR")
+      spt_update_post_task(task, state="POST PROCESSING ERROR", 
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+                           #filelockPath = paste0(SPT_TASK_TABLE_DIR, "/", SPT_TASK_TABLE_BASENAME, ".lock"))
+      
       # Refresh the target task status by re-loading it
-      task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
       
       stop("An error occurred while performing post-processing tasks!")
       
     }else{
       
       # Update the taskTable status for post-processing
-      spt_update_post_task(task, state="POST COMPLETED")
+      spt_update_post_task(task, state="POST COMPLETED", 
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+                           #filelockPath = paste0(SPT_TASK_TABLE_DIR, "/", SPT_TASK_TABLE_BASENAME, ".lock"))
+      
       # Refresh the target task status by re-loading it
-      task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
     }
     
     cat("\n---- TASK UPDATE ----\n\n")
@@ -332,44 +399,47 @@ for(tidx in xs){
     # Generate metadata based  on the pre-defined template
     #
     #
-    meta <- spt_fill_meta_template(list(
-      ProductType          = "Observed/historical severity",
-      ProductName          = paste("Fire/burn severity / Indicator:",
-                                   task$severityIndicator,task$baseIndex,
-                                   "/",task$preFireType,"window",task$preFireRef,"months composite"),
-      SpatialResolution    = paste(res(r0)[1], "meters"),
-      TemporalResolution   = paste(task$preFireRef,"months composite"),
-      CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
-      CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
-      CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
-                                   "/ rgee-version:",packageVersion("rgee")),
-      BurntAreaDataset     = task$burntAreaDataset,
-      BurntAreaDatasetURL  = spt_ba_data_url(task$burntAreaDataset),
-      ReferenceYear        = task$referenceYear,
-      MinFireSize          = paste(task$minFireSize,"hectares"),
-      SatCollectionData    = paste(task$satCode," / ",spt_sat_mission_fullname(task$satCode),
-                                   ifelse(task$satCode %in% SPT_VALUES$satCode_md, 
-                                          paste(" / Product:",task$modisProduct), ""), sep=""),
-      SatProcLevel         = spt_proc_levels(task$procLevel),
-      #SatColVersion       =
-      CloudMaskUsed        = "Yes",
-      CloudMaskMethod      = "Pixel QA band: Cirrus, clouds and/or cloud shadows removed",
-      BaseIndex            = paste(task$baseIndex, spt_spec_index_fullname(task$baseIndex),sep=" - "),
-      BaseIndexFormula     = spt_spec_index_formula(task$baseIndex, task$satCode),
-      SeverityIndicator    = task$severityIndicator,
-      SeverityIndicatorForm = spt_severity_indicator_form(task$baseIndex, task$severityIndicator),
-      CompAggMeasure        = "Median",
-      PreFireType           = paste(task$preFireType, "/ considers the year before fire, i.e., homologous year"),
-      PreFireRefPeriod      = paste(task$preFireRef,"months"),
-      PostFireType          = "moving",
-      PostFireRefPeriod     = paste("Start post-fire window:",
-                                    task$postFireRef-task$preFireRef,"months",
-                                    "/ End:",task$postFireRef,"months",", i.e.,",
-                                    paste(spt_post_window_days(task),collapse=" to "),
-                                    "days after ignition date"),
-      VersionNumber         = SPT_VERSION,
-      VersionFullNumber     = SPT_FULL_VERSION_NR
-    ))
+    meta <- spt_fill_meta_template(
+      metaTemplate = SPT_META_TABLE,
+      metaList = list(
+        ProductType          = "Observed/historical severity",
+        ProductName          = paste("Fire/burn severity / Indicator:",
+                                     task$severityIndicator,task$baseIndex,
+                                     "/",task$preFireType,"window",task$preFireRef,"months composite"),
+        SpatialResolution    = paste(res(r0)[1], "meters"),
+        TemporalResolution   = paste(task$preFireRef,"months composite"),
+        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
+        CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
+        CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
+                                     "/ rgee-version:",packageVersion("rgee")),
+        BurntAreaDataset     = task$burntAreaDataset,
+        BurntAreaDatasetURL  = spt_ba_data_url(task$burntAreaDataset),
+        ReferenceYear        = task$referenceYear,
+        MinFireSize          = paste(task$minFireSize,"hectares"),
+        SatCollectionData    = paste(task$satCode," / ",spt_sat_mission_fullname(task$satCode),
+                                     ifelse(task$satCode %in% SPT_VALUES$satCode_md, 
+                                            paste(" / Product:",task$modisProduct), ""), sep=""),
+        SatProcLevel         = spt_proc_levels(task$procLevel),
+        #SatColVersion       =
+        CloudMaskUsed        = "Yes",
+        CloudMaskMethod      = "Pixel QA band: Cirrus, clouds and/or cloud shadows removed",
+        BaseIndex            = paste(task$baseIndex, spt_spec_index_fullname(task$baseIndex),sep=" - "),
+        BaseIndexFormula     = spt_spec_index_formula(task$baseIndex, task$satCode),
+        SeverityIndicator    = task$severityIndicator,
+        SeverityIndicatorForm = spt_severity_indicator_form(task$baseIndex, task$severityIndicator),
+        CompAggMeasure        = "Median",
+        PreFireType           = paste(task$preFireType, "/ considers the year before fire, i.e., homologous year"),
+        PreFireRefPeriod      = paste(task$preFireRef,"months"),
+        PostFireType          = "moving",
+        PostFireRefPeriod     = paste("Start post-fire window:",
+                                      task$postFireRef-task$preFireRef,"months",
+                                      "/ End:",task$postFireRef,"months",", i.e.,",
+                                      paste(spt_post_window_days(task),collapse=" to "),
+                                      "days after ignition date"),
+        VersionNumber         = SPT_VERSION,
+        VersionFullNumber     = SPT_FULL_VERSION_NR
+      )
+    )
     
     # Export metadata to Markdown txt and JSON files
     out <- try({
@@ -382,18 +452,27 @@ for(tidx in xs){
     
     
     if(inherits(out,"try-error")){
+      
       # Update the taskTable status for post-processing
-      spt_update_meta_task(task, state = "METADATA PROCESSING ERROR")
+      spt_update_meta_task(task, state = "METADATA PROCESSING ERROR", 
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+                           #lockfilePath = paste0(SPT_TASK_TABLE_DIR, "/", SPT_TASK_TABLE_BASENAME, ".lock"))
+      
       # Refresh the target task status by re-loading it
-      task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
       
       stop("An error occurred while performing metadata tasks!")
       
     }else{
       # Update the taskTable status for post-processing
-      spt_update_meta_task(task, state = "METADATA COMPLETED")
+      spt_update_meta_task(task, state = "METADATA COMPLETED", 
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+                           #lockfilePath = paste0(SPT_TASK_TABLE_DIR, "/", SPT_TASK_TABLE_BASENAME, ".lock"))
+      
       # Refresh the target task status by re-loading it
-      task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
     }
     
     cat("\n---- TASK UPDATE ----\n\n")
@@ -419,8 +498,11 @@ for(tidx in xs){
     cat(green(bold(
       symbol$arrow_right, "Performing closing tasks...\n\n")))
     
-    spt_update_closing_task(task, "CLOSING COMPLETED")
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+    spt_update_closing_task(task, "CLOSING COMPLETED", 
+                            taskTablePath = SPT_TASK_TABLE_PATH)
+    
+    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                         taskTablePath = SPT_TASK_TABLE_PATH)
     
   }else{
     
@@ -435,8 +517,11 @@ for(tidx in xs){
     task$metadataTaskStatus == "METADATA COMPLETED" &&
     task$closingTaskStatus  == "CLOSING COMPLETED"){
     
-    spt_update_main_task(task, "COMPLETED")
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx])
+    spt_update_main_task(task, "COMPLETED", 
+                         taskTablePath = SPT_TASK_TABLE_PATH)
+    
+    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                         taskTablePath = SPT_TASK_TABLE_PATH)
     
   }
   
@@ -457,6 +542,7 @@ for(tidx in xs){
   cat(green(bold(symbol$check, "TASK COMPLETED\n")))
   cat(green(bold("-----------------------------------------------------------------------\n\n")))
   
+  TRUE
 }
 
 
