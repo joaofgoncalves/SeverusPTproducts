@@ -416,22 +416,50 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
     }else{
       
       # Pre-fire reference image
-      preFire = sits %>% 
+      preFiltCol = sits %>% 
         ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry())
       
       # Post-fire reference image
-      postFire = sits %>% 
+      postFiltCol = sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry()) 
+      
+      preFiltColSize  = ee$Number(preFiltCol$size())
+      postFiltColSize = ee$Number(postFiltCol$size())
+      
+      preFire = ee$Image(ee$Algorithms$If(
+        
+        #ee$Filter$Or(preFiltColSize$eq(0), postFiltColSize$eq(0)),
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        
+        #ee$Number(preFiltColSize$add(postFiltColSize))$eq(0),
+        
+        ee$Image$constant(0),
+        
+        preFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
+      
+      
+      postFire = ee$Image(ee$Algorithms$If( 
+        
+        #ee$Filter$Or(preFiltColSize$eq(0), postFiltColSize$eq(0)),
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        
+        #ee$Number(preFiltColSize$add(postFiltColSize))$eq(0),
+        
+        ee$Image$constant(0),
+        
+        postFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
     }
     
     
