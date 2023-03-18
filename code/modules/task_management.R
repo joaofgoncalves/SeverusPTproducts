@@ -1,4 +1,10 @@
 
+
+## ------------------------------------------------------------------------------------- ##
+## GET TASKS AND THEIR PROPERTIES ----
+## ------------------------------------------------------------------------------------- ##
+
+
 #' Get a single task by its identifiers
 
 
@@ -8,7 +14,8 @@ spt_get_task <- function(taskTable      = NULL,
                          geeTaskID      = NULL,
                          geeTaskCode    = NULL, 
                          postProcTaskID = NULL, 
-                         closingTaskID  = NULL) {
+                         closingTaskID  = NULL,
+                         taskTablePath) {
   
   if (is.null(taskID) && is.null(taskUID) && is.null(geeTaskID) &&
     is.null(geeTaskCode) && is.null(postProcTaskID) && is.null(metadataTaskID) &&
@@ -17,7 +24,7 @@ spt_get_task <- function(taskTable      = NULL,
   }
 
   if (is.null(taskTable)) {
-    taskTable <- spt_read_tasks_table()
+    taskTable <- spt_read_tasks_table(taskTablePath)
   }
 
   if (!is.null(taskID)) {
@@ -118,19 +125,33 @@ spt_get_taskStatus.task <- function(x, taskStep) {
   }
 }
 
+
+## ------------------------------------------------------------------------------------- ##
+## OTHER PROPERTIES ----
+## ------------------------------------------------------------------------------------- ##
+
+
 spt_spatial_resolution.task <- function(x) {
-  if (x$satCode %in% SPT_VALUES$satCode_lt) {
+  if (x$satCode %in% c("L5TM", "L7ETM", "L8OLI", "L8TIRS", "LTH")) {
+    
     spatialRes <- 30
-  } else if (x$satCode %in% SPT_VALUES$satCode_md) {
-    if (x$modisProduct %in% SPT_VALUES$modisProduct[-c(10:12)]) {
+    
+  } else if (x$satCode %in% c("MOD", "MYD", "MCD")) {
+    if (x$modisProduct %in% c("MOD13Q1", "MOD09GQ", "MOD09Q1", 
+                              "MYD09GQ", "MYD09Q1", "MYD13Q1")) {
       spatialRes <- 250
+      
     } else if (x$modisProduct %in% c("MOD09A1", "MYD09A1", "MCD43A4")) {
+      
       spatialRes <- 500
+      
     } else {
       stop("Cannot find spatial resolution - unsupported MODIS product")
     }
-  } else if (x$satCode == SPT_VALUES$satCode_s2) {
+  } else if (x$satCode == "S2MSI") {
+    
     spatialRes <- 20
+    
   }
   else{
     stop("Satellite code not supported in spt_spatial_resolution")
@@ -361,7 +382,9 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
   taskTable[idx, "closingTaskStatus"] <- state
 
   out <- try({
-    spt_write_tasks_table(taskTable)
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+    
     filelock::unlock(lck)
   })
 
@@ -372,16 +395,18 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
   }
 }
 
-spt_update_main_task <- function(task, state, taskTable = NULL) {
+spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
-  lck <- filelock::lock(paste0(
-    SPT_TASK_TABLE_DIR, "/",
-    SPT_TASK_TABLE_BASENAME,
-    ".lock"
-  ), timeout = 30000)
+  # lck <- filelock::lock(paste0(
+  #   SPT_TASK_TABLE_DIR, "/",
+  #   SPT_TASK_TABLE_BASENAME,
+  #   ".lock"
+  # ), timeout = 30000)
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
 
   if (is.null(taskTable)) {
-    taskTable <- spt_read_tasks_table()
+    taskTable <- spt_read_tasks_table(taskTablePath)
   }
 
   if (is.null(lck)) {
@@ -392,7 +417,9 @@ spt_update_main_task <- function(task, state, taskTable = NULL) {
   taskTable[idx, "mainStatus"] <- state
 
   out <- try({
-    spt_write_tasks_table(taskTable)
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+    
     filelock::unlock(lck)
   })
 
@@ -404,16 +431,18 @@ spt_update_main_task <- function(task, state, taskTable = NULL) {
 }
 
 
-spt_rm_uncompleted_tasks <- function(taskTable = NULL) {
+spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
-  lck <- filelock::lock(paste0(
-    SPT_TASK_TABLE_DIR, "/",
-    SPT_TASK_TABLE_BASENAME,
-    ".lock"
-  ), timeout = 30000)
+  # lck <- filelock::lock(paste0(
+  #   SPT_TASK_TABLE_DIR, "/",
+  #   SPT_TASK_TABLE_BASENAME,
+  #   ".lock"
+  # ), timeout = 30000)
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
   
   if (is.null(taskTable)) {
-    taskTable <- spt_read_tasks_table()
+    taskTable <- spt_read_tasks_table(taskTablePath)
   }
   
   if (is.null(lck)) {
@@ -424,7 +453,9 @@ spt_rm_uncompleted_tasks <- function(taskTable = NULL) {
   taskTable <- taskTable[idx, ]
   
   out <- try({
-    spt_write_tasks_table(taskTable)
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+    
     filelock::unlock(lck)
   })
   

@@ -7,42 +7,43 @@
 # Burned area datasets
 
 
-spt_get_ba_dataset <- function(baDataset, referenceYear, minFireSizeHa = 5) {
+spt_get_ba_dataset <- function(baDataset, baGEEasset, referenceYear, minFireSizeHa = 5, 
+                               dateField, yearField, areaField) {
   
   if (baDataset == "ICNF") {
-    aa_icnf <- ee$FeatureCollection(SPT_ICNF_GEE_ASSET)
+    aa_icnf <- ee$FeatureCollection(baGEEasset)
 
     baData <- aa_icnf %>%
       
       #ee$FeatureCollection$filter(ee$Filter$eq(SPT_ICNF_YEAR_FIELD, referenceYear)) %>%
       ee$FeatureCollection$filter(ee$Filter$Or(
-        ee$Filter$eq(SPT_ICNF_YEAR_FIELD, as.character(referenceYear)), 
-        ee$Filter$eq(SPT_ICNF_YEAR_FIELD, as.integer(referenceYear))
+        ee$Filter$eq(yearField, as.character(referenceYear)), 
+        ee$Filter$eq(yearField, as.integer(referenceYear))
         )
       ) %>% 
 
-      ee$FeatureCollection$filter(ee$Filter$gte(SPT_ICNF_AREA_FIELD, minFireSizeHa)) %>%
-      ee$FeatureCollection$filter(ee$Filter$neq(SPT_ICNF_DATE_FIELD, "")) %>%
-      ee$FeatureCollection$filter(ee$Filter$neq(SPT_ICNF_DATE_FIELD, NULL))
+      ee$FeatureCollection$filter(ee$Filter$gte(areaField, minFireSizeHa)) %>%
+      ee$FeatureCollection$filter(ee$Filter$neq(dateField, "")) %>%
+      ee$FeatureCollection$filter(ee$Filter$neq(dateField, NULL))
 
     return(baData)
   }
 
   if (baDataset == "EFFIS") {
-    aa_effis <- ee$FeatureCollection(SPT_EFFIS_GEE_ASSET)
+    aa_effis <- ee$FeatureCollection(baGEEasset)
 
     baData <- aa_effis %>%
       
       #ee$FeatureCollection$filter(ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, referenceYear)) %>%
       ee$FeatureCollection$filter(ee$Filter$Or(
-        ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, as.character(referenceYear)), 
-        ee$Filter$eq(SPT_EFFIS_YEAR_FIELD, as.integer(referenceYear))
+        ee$Filter$eq(yearField, as.character(referenceYear)), 
+        ee$Filter$eq(yearField, as.integer(referenceYear))
         )
       ) %>% 
       
-      ee$FeatureCollection$filter(ee$Filter$gte(SPT_EFFIS_AREA_FIELD, minFireSizeHa)) %>%
-      ee$FeatureCollection$filter(ee$Filter$neq(SPT_EFFIS_DATE_FIELD, "")) %>%
-      ee$FeatureCollection$filter(ee$Filter$neq(SPT_EFFIS_DATE_FIELD, NULL))
+      ee$FeatureCollection$filter(ee$Filter$gte(areaField, minFireSizeHa)) %>%
+      ee$FeatureCollection$filter(ee$Filter$neq(dateField, "")) %>%
+      ee$FeatureCollection$filter(ee$Filter$neq(dateField, NULL))
 
     return(baData)
   }

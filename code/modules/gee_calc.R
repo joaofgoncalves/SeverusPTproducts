@@ -172,8 +172,8 @@ spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 
 
 
-spt_process_gee_task <- function(task, outFolder = "GEE", boundBox, 
-                           coordRefSys = 'EPSG:32629'){
+spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset, 
+                                 dateField, yearField, areaField, outFolder){
   
   # Get run parameters
   mainTaskStatus    = spt_get_taskStatus(task,taskStep = "main")
@@ -184,7 +184,7 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
   baseIndex         = spt_base_index(task)               # Base index name, eg NBR
   severityIndicator = spt_severity_indicator(task)       # Severity indicator name, eg, DELTA
   
-  burntAreaDataset  = spt_ba_dataset(task)        # Burned area dataset used in calculations eg, ICNF, EFFIS
+  burntAreaDataset  = spt_ba_dataset(task)               # Burned area dataset used in calculations eg, ICNF, EFFIS
   referenceYear     = spt_reference_year(task)           # Reference year for calculations
 
   minFireSizeHa          = spt_min_fire_size(task)        # Minimum size of the fire (hectares)
@@ -211,19 +211,26 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
                               addCalcDate   = TRUE, 
                               VersionNumber = SPT_VERSION)
   
-  if(burntAreaDataset=="ICNF"){
-    fireDateFieldName = SPT_ICNF_DATE_FIELD
-  } else if(burntAreaDataset=="EFFIS"){
-    fireDateFieldName = SPT_EFFIS_DATE_FIELD
-  } else{
-    stop("Unsupported burnt area dataset name in burntAreaDataset!")
-  }
+  # if(burntAreaDataset=="ICNF"){
+  #   dateField = SPT_ICNF_DATE_FIELD
+  # } else if(burntAreaDataset=="EFFIS"){
+  #   dateField = SPT_EFFIS_DATE_FIELD
+  # } else{
+  #   stop("Unsupported burnt area dataset name in burntAreaDataset!")
+  # }
   
   # Get the spatial resolution of the data
   spatialRes <- spt_spatial_resolution(task)
   
   # Create the burned area feature collection  
-  baData = spt_get_ba_dataset(burntAreaDataset, referenceYear, minFireSizeHa)
+  baData = spt_get_ba_dataset(
+    baDataset     = burntAreaDataset, 
+    baGEEasset    = baGEEasset, 
+    referenceYear = referenceYear, 
+    minFireSizeHa = minFireSizeHa, 
+    dateField     = dateField, 
+    yearField     = yearField, 
+    areaField     = areaField)
   
   ## Convert burned area polygons to a list to iterate more easily
   baList = ee$FeatureCollection$toList(baData, baData$size())
@@ -250,19 +257,19 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
     # Get inputs adjusted to the Landsat-5,7,8 Harmonized collection
     
     # LT5
-    lt5_sits           = spt_get_sat_imgcol(satCode   = "L5TM", procLevel = procLevel)
+    lt5_sits           = spt_get_sat_imgcol(satCode = "L5TM", procLevel = procLevel)
     cloud_mask_fun_lt5 = spt_cloud_mask_fun("L5TM")
     scale_data_fun_lt5 = spt_scale_fun("L5TM", procLevel)
     base_index_fun_lt5 = spt_spectral_index_fun(baseIndex, "L5TM")
     
     # LT5
-    lt7_sits           = spt_get_sat_imgcol(satCode   = "L7ETM", procLevel = procLevel)
+    lt7_sits           = spt_get_sat_imgcol(satCode = "L7ETM", procLevel = procLevel)
     cloud_mask_fun_lt7 = spt_cloud_mask_fun("L7ETM")
     scale_data_fun_lt7 = spt_scale_fun("L7ETM", procLevel)
     base_index_fun_lt7 = spt_spectral_index_fun(baseIndex, "L7ETM")
     
     # LT5
-    lt8_sits           = spt_get_sat_imgcol(satCode   = "L8OLI",  procLevel = procLevel)
+    lt8_sits           = spt_get_sat_imgcol(satCode = "L8OLI",  procLevel = procLevel)
     cloud_mask_fun_lt8 = spt_cloud_mask_fun("L8OLI")
     scale_data_fun_lt8 = spt_scale_fun("L8OLI", procLevel)
     base_index_fun_lt8 = spt_spectral_index_fun(baseIndex, "L8OLI")
@@ -284,7 +291,7 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
     
     # Extract the date as string
     # Fire ignition date
-    dt = ee$String(selFeat$get(fireDateFieldName))
+    dt = ee$String(selFeat$get(dateField))
 
     fd = ee$Date(dt$slice(0, 11)$trim())
     
@@ -360,13 +367,14 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
         ee$ImageCollection$map(scale_data_fun_lt8) %>% 
         ee$ImageCollection$map(base_index_fun_lt8) 
       
-      #preFire_combn = ee$ImageCollection(preFire_lt5)$merge(ee$ImageCollection(preFire_lt7))$merge(ee$ImageCollection(preFire_lt8))
+      #preFire_combn = ee$ImageCollection(preFire_lt5)$merge(ee$ImageCollection(preFire_lt7))
+      #$merge(ee$ImageCollection(preFire_lt8))
       
       preFire_combn = ee$ImageCollection$merge(preFire_lt5, preFire_lt7) %>% 
                       ee$ImageCollection$merge(preFire_lt8)
       
       preFire = preFire_combn %>% 
-        ee$ImageCollection$median()
+                ee$ImageCollection$median()
       
       
       #### LTH Post-fire reference image ----
@@ -395,13 +403,14 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
         ee$ImageCollection$map(scale_data_fun_lt8) %>% 
         ee$ImageCollection$map(base_index_fun_lt8) 
       
-      #postFire_combn = ee$ImageCollection(postFire_lt5)$merge(ee$ImageCollection(postFire_lt7))$merge(ee$ImageCollection(postFire_lt8))
+      #postFire_combn = ee$ImageCollection(postFire_lt5)$merge(ee$ImageCollection(postFire_lt7))
+      #$merge(ee$ImageCollection(postFire_lt8))
       
       postFire_combn = ee$ImageCollection$merge(postFire_lt5, postFire_lt7) %>% 
                        ee$ImageCollection$merge(postFire_lt8)
       
       postFire = postFire_combn %>% 
-        ee$ImageCollection$median()
+                 ee$ImageCollection$median()
       
       
     }else{
@@ -484,12 +493,14 @@ spt_process_gee_task <- function(task, outFolder = "GEE", boundBox,
   # Default image to start the accumulation
   imgFirst = ee$List(list(ee$Image$constant(0)$rename(severityIndicator)$toInt()));
   
+  # Iterate through each fire polygon
   accumRaster = baList$iterate(ee_utils_pyfunc(accumulate), imgFirst);
   
+  # Clip data
   accumRasterClip = ee$Image(ee$List(accumRaster)$get(0))$clipToCollection(baData);
   
-  
-  # Move results from Earth Engine to Drive
+  ### Process the GEE task to google drive
+
   geeProcTask = ee_image_to_drive(
     image       = accumRasterClip, 
     description = prodName,

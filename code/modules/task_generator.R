@@ -1,6 +1,6 @@
 
 
-spt_status_list <-function(){
+spt_status_list <- function(){
   
   return(c(
     "NOT COMPLETED",
@@ -202,17 +202,22 @@ spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduc
   
 }
 
-spt_read_tasks_table <- function(){
+
+spt_read_tasks_table <- function(taskTablePath){
   
   # Acquire a lock over the file
-  lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-                               SPT_TASK_TABLE_BASENAME,
+  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
+  #                              SPT_TASK_TABLE_BASENAME,
+  #                              ".lock"), timeout = 30000)
+  
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
+  
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
   
-  
-  tb <- read.csv(SPT_TASK_TABLE_PATH)
+  #tb <- read.csv(SPT_TASK_TABLE_PATH)
+  tb <- read.csv(taskTablePath)
   
   filelock::unlock(lck)
   
@@ -220,18 +225,21 @@ spt_read_tasks_table <- function(){
   
 }
 
-spt_write_tasks_table <- function(taskTable){
+spt_write_tasks_table <- function(taskTable, taskTablePath){
   
   # Acquire a lock over the file
-  lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-                        SPT_TASK_TABLE_BASENAME,
-                        ".lock"), timeout = 30000)
+  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
+  #                       SPT_TASK_TABLE_BASENAME,
+  #                       ".lock"), timeout = 30000)
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+  
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
   
   # After getting the lock write the file
   write.csv(taskTable, 
-            file      = SPT_TASK_TABLE_PATH,
+            file      = taskTablePath,
             row.names = FALSE)
   
   # Unlock to the file to make it available 
