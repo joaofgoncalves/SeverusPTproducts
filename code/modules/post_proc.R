@@ -1,38 +1,6 @@
 
 
 
-spt_update_post_task <- function(task, state, taskTable=NULL){
-  
-  # Acquire a lock over the file
-  lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-                               SPT_TASK_TABLE_BASENAME,
-                               ".lock"), timeout = 30000)
-  
-  if(is.null(taskTable)){
-    taskTable <- spt_read_tasks_table()
-  }
-  
-  if(is.null(lck))
-    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
-  
-  
-  idx <- taskTable$taskUID == task$taskUID
-  taskTable[idx, "postProcTaskStatus"] <- state
-  
-  out <- try({
-    spt_write_tasks_table(taskTable)
-    filelock::unlock(lck)
-  })
-  
-  if(inherits(out,"try-error")){
-    return(FALSE)
-  }else{
-    return(TRUE)
-  }
-  
-}
-
-
 spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, ...) {
   
   # Read the raster file
