@@ -83,12 +83,6 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
     taskStatusList <- spt_gee_task_status(geeTask)
     
     if(taskStatusList$state == "COMPLETED"){
-      # 
-      # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-      #                   taskStatusList$description,"_",spt_ymd_date(),".",dataFormat)
-      # 
-      # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-      #                   taskStatusList$description,".",dataFormat)
       
       outFile <- paste0(outFolder,"/",taskStatusList$description,".",dataFormat)
       
@@ -102,10 +96,7 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
   # Use a GEE status list instead 
     
   }else if(inherits(geeTask, "list")){
-    
-    # outFile <- paste0(SPT_GEE_PRODUCTS_PATH,"/",
-    #                   geeTask$description,"_",spt_ymd_date(),".",dataFormat)
-    
+
     outFile <- paste0(outFolder,"/",geeTask$description,".",dataFormat)
     
     out <- try(ee_drive_to_local(task = geeTask, dsn = outFile, 
@@ -128,15 +119,6 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
 
 spt_save_gee_status_list <- function(task, geeStatusList, geeTaskPath){
   
-  # saveRDS(geeStatusList, paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-  #                               spt_pad_number(task$taskID),"-UID_",
-  #                               substr(task$taskUID,1,8),".rds"))
-  # 
-  # write.csv(geeStatusList, paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-  #                                 spt_pad_number(task$taskID),"-UID_",
-  #                                 substr(task$taskUID,1,8),".csv"), row.names = FALSE)
-  # 
-  
   saveRDS(geeStatusList, paste0(geeTaskPath,"/geeStatusList_TaskID_",
                                 spt_pad_number(task$taskID),"-UID_",
                                 substr(task$taskUID,1,8),".rds"))
@@ -149,10 +131,6 @@ spt_save_gee_status_list <- function(task, geeStatusList, geeTaskPath){
 
 
 spt_read_gee_status_list <- function(task, geeTaskPath){
-  
-  # geeStatusList <- readRDS(paste0(SPT_GEE_TASK_PATH,"/geeStatusList_TaskID_",
-  #                               spt_pad_number(task$taskID),"-UID_",
-  #                               substr(task$taskUID,1,8),".rds"))
   
   geeStatusList <- readRDS(paste0(geeTaskPath,"/geeStatusList_TaskID_",
                                   spt_pad_number(task$taskID),"-UID_",

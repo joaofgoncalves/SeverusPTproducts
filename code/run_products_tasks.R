@@ -545,7 +545,6 @@ for(tidx in xs){
   cat(green(bold(symbol$check, "TASK COMPLETED\n")))
   cat(green(bold("-----------------------------------------------------------------------\n\n")))
   
-  TRUE
 }
 
 

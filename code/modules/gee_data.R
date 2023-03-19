@@ -14,14 +14,10 @@ spt_get_ba_dataset <- function(baDataset, baGEEasset, referenceYear, minFireSize
     aa_icnf <- ee$FeatureCollection(baGEEasset)
 
     baData <- aa_icnf %>%
-      
-      #ee$FeatureCollection$filter(ee$Filter$eq(SPT_ICNF_YEAR_FIELD, referenceYear)) %>%
       ee$FeatureCollection$filter(ee$Filter$Or(
         ee$Filter$eq(yearField, as.character(referenceYear)), 
         ee$Filter$eq(yearField, as.integer(referenceYear))
-        )
-      ) %>% 
-
+        )) %>% 
       ee$FeatureCollection$filter(ee$Filter$gte(areaField, minFireSizeHa)) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(dateField, "")) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(dateField, NULL))
@@ -38,9 +34,7 @@ spt_get_ba_dataset <- function(baDataset, baGEEasset, referenceYear, minFireSize
       ee$FeatureCollection$filter(ee$Filter$Or(
         ee$Filter$eq(yearField, as.character(referenceYear)), 
         ee$Filter$eq(yearField, as.integer(referenceYear))
-        )
-      ) %>% 
-      
+        )) %>% 
       ee$FeatureCollection$filter(ee$Filter$gte(areaField, minFireSizeHa)) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(dateField, "")) %>%
       ee$FeatureCollection$filter(ee$Filter$neq(dateField, NULL))
@@ -364,11 +358,6 @@ spt_get_sat_imgcol <- function(satCode = "S2MSI",
       stop("Landsat-9: Processing level value in procLevel is not supported")
     }
   }
-
-  # else if (satCode == "LTH") {
-  #   stop("LTH is not yet available!")
-  # }
-  
   else{
     stop("Satellite code not available or malformed!")
   }

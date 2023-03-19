@@ -187,9 +187,6 @@ spt_task_filename <- function(task, projectAccronym, versionNumber){
     # Post-fire ref period
     "P",spt_pad_number(postFireWindowEndMonths))
   
-  # prodName = spt_product_name(SPT_PROJ_ACRONYM, satCode, baseIndex, severityIndicator, 
-  #                           burntAreaDataset, referenceYear, refPeriods, addCalcDate=FALSE)
-  
   prodName = spt_product_name(ProjectAccronym = projectAccronym, 
                               SeverityIndicator = severityIndicator, 
                               BaseIndex         = baseIndex, 
@@ -225,7 +222,6 @@ spt_task_to_dataframe <- function(task) {
 spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
   
   # Acquire a lock over the file
-  #lck <- filelock::lock(lockfilePath, timeout = 30000)
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   
@@ -282,13 +278,7 @@ spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
 
 
 spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
-  
-  # # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-  #                              SPT_TASK_TABLE_BASENAME,
-  #                              ".lock"), timeout = 30000)
-  #lck <- filelock::lock(filelockPath, timeout = 30000)
-  
+  # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   
@@ -320,15 +310,7 @@ spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
 
 
 spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
-  
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(
-  #   SPT_TASK_TABLE_DIR, "/",
-  #   SPT_TASK_TABLE_BASENAME,
-  #   ".lock"
-  # ), timeout = 30000)
-  #lck <- filelock::lock(lockfilePath, timeout = 30000)
-  
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   
@@ -362,11 +344,6 @@ spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
 
 spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(
-  #   SPT_TASK_TABLE_DIR, "/",
-  #   SPT_TASK_TABLE_BASENAME,
-  #   ".lock"
-  # ), timeout = 30000)
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
 
@@ -397,11 +374,6 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
 
 spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(
-  #   SPT_TASK_TABLE_DIR, "/",
-  #   SPT_TASK_TABLE_BASENAME,
-  #   ".lock"
-  # ), timeout = 30000)
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
 
@@ -433,11 +405,6 @@ spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
 
 spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(
-  #   SPT_TASK_TABLE_DIR, "/",
-  #   SPT_TASK_TABLE_BASENAME,
-  #   ".lock"
-  # ), timeout = 30000)
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   

@@ -36,7 +36,6 @@ spt_mask_clouds_lt5 <- function(img){
   # Select quality layer
   qa <- img$select("QA_PIXEL")
   
-  #cirrusBitMask      <- ee$Number(1 %<<% 2) # 1 << 2
   cloudBitMask       <- ee$Number(1 %<<% 3)  # 1 << 3
   cloudShadowBitMask <- ee$Number(1 %<<% 4) # 1 << 4
   
@@ -51,8 +50,7 @@ spt_mask_clouds_lt7 <- function(img){
   
   # Select quality layer
   qa <- img$select("QA_PIXEL")
-  
-  #cirrusBitMask      <- ee$Number(1 %<<% 2) # 1 << 2
+
   cloudBitMask       <- ee$Number(1 %<<% 3)  # 1 << 3
   cloudShadowBitMask <- ee$Number(1 %<<% 4) # 1 << 4
   

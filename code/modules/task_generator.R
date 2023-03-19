@@ -206,10 +206,6 @@ spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduc
 spt_read_tasks_table <- function(taskTablePath){
   
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-  #                              SPT_TASK_TABLE_BASENAME,
-  #                              ".lock"), timeout = 30000)
-  
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   
@@ -228,9 +224,6 @@ spt_read_tasks_table <- function(taskTablePath){
 spt_write_tasks_table <- function(taskTable, taskTablePath){
   
   # Acquire a lock over the file
-  # lck <- filelock::lock(paste0(SPT_TASK_TABLE_DIR, "/",
-  #                       SPT_TASK_TABLE_BASENAME,
-  #                       ".lock"), timeout = 30000)
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
   
