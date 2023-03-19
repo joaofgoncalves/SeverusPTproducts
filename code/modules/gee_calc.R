@@ -211,14 +211,6 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
                               addCalcDate   = TRUE, 
                               VersionNumber = SPT_VERSION)
   
-  # if(burntAreaDataset=="ICNF"){
-  #   dateField = SPT_ICNF_DATE_FIELD
-  # } else if(burntAreaDataset=="EFFIS"){
-  #   dateField = SPT_EFFIS_DATE_FIELD
-  # } else{
-  #   stop("Unsupported burnt area dataset name in burntAreaDataset!")
-  # }
-  
   # Get the spatial resolution of the data
   spatialRes <- spt_spatial_resolution(task)
   
@@ -319,25 +311,64 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
     
     if(satCode == "L7ETM"){
       
+      # # Pre-fire reference image
+      # preFire = sits %>% 
+      #   ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
+      #   ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+      #   ee$ImageCollection$map(cloud_mask_fun) %>% 
+      #   ee$ImageCollection$map(scale_data_fun) %>% 
+      #   ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+      #   ee$ImageCollection$map(base_index_fun) %>% 
+      #   ee$ImageCollection$median()
+      # 
+      # # Post-fire reference image
+      # postFire = sits %>% 
+      #   ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
+      #   ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
+      #   ee$ImageCollection$map(cloud_mask_fun) %>% 
+      #   ee$ImageCollection$map(scale_data_fun) %>% 
+      #   ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+      #   ee$ImageCollection$map(base_index_fun) %>% 
+      #   ee$ImageCollection$median()
+      
       # Pre-fire reference image
-      preFire = sits %>% 
+      preFiltCol = sits %>% 
         ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry())
       
       # Post-fire reference image
-      postFire = sits %>% 
+      postFiltCol = sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(spt_lt7_interpolate) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry()) 
+      
+      preFiltColSize  = ee$Number(preFiltCol$size())
+      postFiltColSize = ee$Number(postFiltCol$size())
+      
+      preFire = ee$Image(ee$Algorithms$If(
+        
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        ee$Image$constant(0),
+        preFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
+      
+      
+      postFire = ee$Image(ee$Algorithms$If( 
+        
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        ee$Image$constant(0),
+        postFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(spt_lt7_interpolate) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
+      
       
     }else if(satCode == "LTH"){
       
@@ -367,14 +398,21 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
         ee$ImageCollection$map(scale_data_fun_lt8) %>% 
         ee$ImageCollection$map(base_index_fun_lt8) 
       
-      #preFire_combn = ee$ImageCollection(preFire_lt5)$merge(ee$ImageCollection(preFire_lt7))
-      #$merge(ee$ImageCollection(preFire_lt8))
-      
       preFire_combn = ee$ImageCollection$merge(preFire_lt5, preFire_lt7) %>% 
                       ee$ImageCollection$merge(preFire_lt8)
       
-      preFire = preFire_combn %>% 
-                ee$ImageCollection$median()
+      # 
+      # preFire = preFire_combn %>% 
+      #           ee$ImageCollection$median()
+      
+      preFire = ee$Image(ee$Algorithms$If(
+        
+        ee$Number(preFire_combn$size())$eq(0),
+        ee$Image$constant(0),
+        preFire_combn %>% 
+          ee$ImageCollection$median()
+      ))
+      
       
       
       #### LTH Post-fire reference image ----
@@ -403,35 +441,57 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
         ee$ImageCollection$map(scale_data_fun_lt8) %>% 
         ee$ImageCollection$map(base_index_fun_lt8) 
       
-      #postFire_combn = ee$ImageCollection(postFire_lt5)$merge(ee$ImageCollection(postFire_lt7))
-      #$merge(ee$ImageCollection(postFire_lt8))
-      
       postFire_combn = ee$ImageCollection$merge(postFire_lt5, postFire_lt7) %>% 
                        ee$ImageCollection$merge(postFire_lt8)
       
-      postFire = postFire_combn %>% 
-                 ee$ImageCollection$median()
+      # postFire = postFire_combn %>% 
+      #            ee$ImageCollection$median()
       
+      postFire = ee$Image(ee$Algorithms$If(
+        
+        ee$Number(postFire_combn$size())$eq(0),
+        ee$Image$constant(0),
+        postFire_combn %>% 
+          ee$ImageCollection$median()
+      ))
       
     }else{
       
       # Pre-fire reference image
-      preFire = sits %>% 
+      preFiltCol = sits %>% 
         ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry())
       
       # Post-fire reference image
-      postFire = sits %>% 
+      postFiltCol = sits %>% 
         ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
-        ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-        ee$ImageCollection$map(cloud_mask_fun) %>% 
-        ee$ImageCollection$map(scale_data_fun) %>% 
-        ee$ImageCollection$map(base_index_fun) %>% 
-        ee$ImageCollection$median()
+        ee$ImageCollection$filterBounds(selFeat$geometry()) 
+      
+      preFiltColSize  = ee$Number(preFiltCol$size())
+      postFiltColSize = ee$Number(postFiltCol$size())
+      
+      preFire = ee$Image(ee$Algorithms$If(
+        
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        ee$Image$constant(0),
+        preFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
+      
+      
+      postFire = ee$Image(ee$Algorithms$If( 
+        
+        preFiltColSize$eq(0)$Or(postFiltColSize$eq(0)),
+        ee$Image$constant(0),
+        postFiltCol %>% 
+          ee$ImageCollection$map(cloud_mask_fun) %>% 
+          ee$ImageCollection$map(scale_data_fun) %>% 
+          ee$ImageCollection$map(base_index_fun) %>% 
+          ee$ImageCollection$median()
+      ))
     }
     
     
