@@ -514,20 +514,23 @@ for(tidx in xs){
   
   }
   
-  # Close the task! Fully completed status
-  if(task$geeTaskStatus     == "GEE COMPLETED" &&
-    task$postProcTaskStatus == "POST COMPLETED" &&
-    task$metadataTaskStatus == "METADATA COMPLETED" &&
-    task$closingTaskStatus  == "CLOSING COMPLETED"){
+  if(task$mainStatus != "COMPLETED"){
     
-    spt_update_main_task(task, "COMPLETED", 
-                         taskTablePath = SPT_TASK_TABLE_PATH)
-    
-    task <- spt_get_task(taskUID = ttb$taskUID[tidx],
-                         taskTablePath = SPT_TASK_TABLE_PATH)
-    
+    # Close the task! Fully completed status
+    if(task$geeTaskStatus     == "GEE COMPLETED" &&
+      task$postProcTaskStatus == "POST COMPLETED" &&
+      task$metadataTaskStatus == "METADATA COMPLETED" &&
+      task$closingTaskStatus  == "CLOSING COMPLETED"){
+      
+      spt_update_main_task(task, "COMPLETED", 
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+      
+      task <- spt_get_task(taskUID = ttb$taskUID[tidx],
+                           taskTablePath = SPT_TASK_TABLE_PATH)
+      
+    }
   }
-  
+
   # Save task metadata
   spt_export_to_md(spt_task_to_dataframe(task), paste0(outFilePath,".task.txt"))
   
