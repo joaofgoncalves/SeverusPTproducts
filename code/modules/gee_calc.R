@@ -311,26 +311,6 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
     
     if(satCode == "L7ETM"){
       
-      # # Pre-fire reference image
-      # preFire = sits %>% 
-      #   ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
-      #   ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-      #   ee$ImageCollection$map(cloud_mask_fun) %>% 
-      #   ee$ImageCollection$map(scale_data_fun) %>% 
-      #   ee$ImageCollection$map(spt_lt7_interpolate) %>% 
-      #   ee$ImageCollection$map(base_index_fun) %>% 
-      #   ee$ImageCollection$median()
-      # 
-      # # Post-fire reference image
-      # postFire = sits %>% 
-      #   ee$ImageCollection$filterDate(postfireDate_sta, postfireDate_end) %>% 
-      #   ee$ImageCollection$filterBounds(selFeat$geometry()) %>% 
-      #   ee$ImageCollection$map(cloud_mask_fun) %>% 
-      #   ee$ImageCollection$map(scale_data_fun) %>% 
-      #   ee$ImageCollection$map(spt_lt7_interpolate) %>% 
-      #   ee$ImageCollection$map(base_index_fun) %>% 
-      #   ee$ImageCollection$median()
-      
       # Pre-fire reference image
       preFiltCol = sits %>% 
         ee$ImageCollection$filterDate(prefireDate_sta, prefireDate_end) %>% 
@@ -401,10 +381,6 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
       preFire_combn = ee$ImageCollection$merge(preFire_lt5, preFire_lt7) %>% 
                       ee$ImageCollection$merge(preFire_lt8)
       
-      # 
-      # preFire = preFire_combn %>% 
-      #           ee$ImageCollection$median()
-      
       preFire = ee$Image(ee$Algorithms$If(
         
         ee$Number(preFire_combn$size())$eq(0),
@@ -443,9 +419,6 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
       
       postFire_combn = ee$ImageCollection$merge(postFire_lt5, postFire_lt7) %>% 
                        ee$ImageCollection$merge(postFire_lt8)
-      
-      # postFire = postFire_combn %>% 
-      #            ee$ImageCollection$median()
       
       postFire = ee$Image(ee$Algorithms$If(
         
