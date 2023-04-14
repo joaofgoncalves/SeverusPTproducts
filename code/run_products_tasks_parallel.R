@@ -5,6 +5,7 @@
 ## --------------------------------------------------------------------------- ##
 
 setwd("C:/MyFiles/R-dev/SeverusPT_Products")
+#setwd("C:/Users/JG/Desktop/Projects/SeverusPT_Products")
 
 
 source("globvars.r")
@@ -159,7 +160,14 @@ repeat{
       stop("Unsupported burnt area dataset name in burntAreaDataset!")
     }
     
+    cat(green(bold(
+      symbol$arrow_right, "Start GEE task ...\n\n")))
     
+    spt_start_gee_task(task, taskTable = NULL, 
+                       taskTablePath = SPT_TASK_TABLE_PATH)
+    
+    
+    # Run the GEE task
     geeTaskObj <- spt_process_gee_task(task        = task, 
                                        outFolder   = SPT_GDRIVE_FOLDER, 
                                        boundBox    = SPT_BOUND_BOX_POLYGON, 
