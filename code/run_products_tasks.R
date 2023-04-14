@@ -35,7 +35,7 @@ if(!spt_file_dates("gee_last_init.log", tdelta = 10)){
   cat("\nRefreshing previous GEE initialization at:",
       readr::read_lines("gee_last_init.log",n_max = 1),"\n\n")
   
-  ee_Initialize("joaofgo@gmail.com", gcs = TRUE, drive=TRUE)
+  ee_Initialize(gcs = TRUE, drive=TRUE)
   spt_create_file("gee_last_init.log")
   
 }else{
@@ -127,6 +127,14 @@ for(tidx in xs){
   }
   
   
+  ## TODO: Add two operational mode called: "SEQUENTIAL"and "PARALLEL" (multiple jobs)
+  
+  ## If "PARALLEL" check any of the jobs and if any part of it has been started 
+  ## just skip the whole job
+  
+  ## If "SEQUENTIAL" then allow to follow the normal sequence of jobs which can eventually be
+  ## used to run parts that were not completed
+   
   ## --------------------------------------------------------------------------- ##
   ## 1. GEE CLOUD PROCESSING STAGE ----
   ## --------------------------------------------------------------------------- ##
@@ -153,6 +161,9 @@ for(tidx in xs){
       areaField = SPT_ICNF_AREA_FIELD
       
     } else if(task$burntAreaDataset == "EFFIS"){
+      
+      ## TODO: Add different operational modes for EFFIS? Historical data vs current
+      
       
       #SPT_EFFIS_HIST_GEE_ASSET
       #SPT_EFFIS_CURR_GEE_ASSET
