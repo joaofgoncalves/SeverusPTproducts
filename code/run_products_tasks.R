@@ -422,7 +422,7 @@ for(tidx in xs){
                                      "/",task$preFireType,"window",task$preFireRef,"months composite"),
         SpatialResolution    = paste(res(r0)[1], "meters"),
         TemporalResolution   = paste(task$preFireRef,"months composite"),
-        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
+        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763) / Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)",
         CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
         CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
                                      "/ rgee-version:",packageVersion("rgee")),
