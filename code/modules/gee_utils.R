@@ -4,6 +4,34 @@
 ## TASK MANAGEMENT FUNCTIONS ----
 ## ----------------------------------------------------------------------------------- ##
 
+
+#' Retrieve the status of a Google Earth Engine (GEE) task and convert it to an R list object
+#'
+#' This function retrieves the status of a GEE task and converts it to an R list object.
+#'
+#' @param geeTask The GEE task object.
+#' @return A list containing the task status and additional parameters for the download function.
+#'
+#' @details
+#' The function checks the status of the GEE task using \code{ee$batch$Task$status(geeTask)} and converts
+#' the result from Python to an R list object using the \code{ee_utils_py_to_r} function. It then adds
+#' extra parameters to the output list, such as the file export options, filename prefix, and file format,
+#' which are needed for the download function but cannot be stored directly from the GEE task object.
+#' 
+#' If the task has finished and the \code{"destination_uris"} field exists in the output list, the function
+#' retrieves the basename of the URI for the Google Drive file and stores it as \code{basename_uri}.
+#'
+#' @seealso
+#' \code{\link{ee_utils_py_to_r}}, \code{\link{basename}}
+#'
+#' @examples
+#' # Assuming 'geeTask' is a valid GEE task object
+#' spt_gee_task_status(geeTask)
+#'
+#' @importFrom ee.batch.Task
+#' @importFrom utils::basename
+#'
+
 spt_gee_task_status <- function(geeTask){
   
   # Check task Status and convert back to a R list object
@@ -23,6 +51,37 @@ spt_gee_task_status <- function(geeTask){
   return(out)
 } 
 
+
+#' Check the status of a Google Earth Engine (GEE) task and wait until completion
+#'
+#' This function checks the status of a GEE task at regular intervals and waits until the 
+#' task is completed, failed, or cancelled.
+#'
+#' @param geeTask The GEE task object.
+#' @param sleep The number of seconds to sleep between status checks (default is 60 seconds).
+#' @param verbose If TRUE, verbose output will be printed during the status check (default 
+#' is FALSE).
+#' 
+#' @return The final status of the GEE task as a list.
+#'
+#' @details
+#' The function initializes the `status` variable as "RUNNING" and starts a timer. It then 
+#' enters a `repeat` loop
+#' where it calls the `spt_gee_task_status` function to retrieve the current status of the GEE 
+#' task. The loop continues until the task status is one of "COMPLETED", "FAILED", "CANCELLED", 
+#' or "CANCEL_REQUESTED". During each iteration, the function calculates the time difference and 
+#' prints the GEE process ID, task status, and approximate run time if `verbose` is set to TRUE.
+#'
+#' Once the loop is exited, the function checks the final status and prints appropriate 
+#' messages if `verbose` is TRUE. It then returns the final status of the GEE task as a list.
+#'
+#' @seealso
+#' \code{\link{spt_gee_task_status}}
+#'
+#' @examples
+#' # Assuming 'geeTask' is a valid GEE task object
+#' spt_check_gee_task(geeTask)
+#'
 
 spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
   
@@ -74,6 +133,32 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
 }
 
 
+#' Download a Google Earth Engine (GEE) task result from Google Drive
+#'
+#' This function downloads a GEE task result from Google Drive to a local folder.
+#'
+#' @param geeTask The GEE task object or GEE status list.
+#' @param outFolder The output folder to save the downloaded file.
+#' @param dataFormat The format of the downloaded file (default is "tif").
+#' @return The path to the downloaded file if successful, NULL otherwise.
+#'
+#' @details
+#' The function first checks the status of the GEE task using the \code{spt_gee_task_status} 
+#' function. If the task is in the "COMPLETED" state, it proceeds to download the result from Google 
+#' Drive to the specified \code{outFolder}. The downloaded file is named based on the task description 
+#' and the specified \code{dataFormat}.
+#'
+#' If the input \code{geeTask} is a GEE task object of class \code{"ee.batch.Task"}, the 
+#' function calls \code{ee_drive_to_local} the task has already been completed
+#' and calls \code{ee_drive_to_local} directly.
+#'
+#' The function returns the path to the downloaded file if the download is successful. Otherwise, 
+#' it returns NULL.
+#'
+#' @seealso
+#' \code{\link{spt_gee_task_status}}, \code{\link{ee_drive_to_local}}
+#'
+
 spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
   
   # Use a ee.batch.Task / python.builtin.object
@@ -114,8 +199,20 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
 }
 
 
-
-
+#' Save a Google Earth Engine (GEE) status list to disk.
+#'
+#' This function saves a GEE status list to disk as RDS and CSV files.
+#'
+#' @param task The GEE task object.
+#' @param geeStatusList The GEE status list to be saved.
+#' @param geeTaskPath The path to the GEE task folder where the files will be saved.
+#'
+#' 
+#' @details
+#' The function saves the GEE status list to disk in two formats: RDS and CSV. It uses the \code{saveRDS} 
+#' function to save the status list as an RDS file, and \code{write.csv} to save it as a CSV file. 
+#' The files are named based on the task ID andtask UID to ensure uniqueness.
+#'
 
 spt_save_gee_status_list <- function(task, geeStatusList, geeTaskPath){
   
@@ -129,6 +226,20 @@ spt_save_gee_status_list <- function(task, geeStatusList, geeTaskPath){
   
 }
 
+#' Read a Google Earth Engine (GEE) status list from disk.
+#'
+#' This function reads a GEE status list from disk in RDS format.
+#'
+#' @param task The GEE task object.
+#' @param geeTaskPath The path to the GEE task folder where the status list is stored.
+#' @return The GEE status list read from disk.
+#'
+#' @details
+#' The function reads the GEE status list from disk using the \code{readRDS} function. It assumes 
+#' that the status list was previously saved in the specified \code{geeTaskPath} using the 
+#' \code{spt_save_gee_status_list} function.
+#'
+#'
 
 spt_read_gee_status_list <- function(task, geeTaskPath){
   
@@ -139,7 +250,41 @@ spt_read_gee_status_list <- function(task, geeTaskPath){
 }
 
 
-
+#' Modified function to download files from Google Drive to local storage.
+#'
+#' This function downloads files from Google Drive to the local storage.
+#'
+#' @param task The GEE task object.
+#' @param dsn The destination file path where the files will be downloaded. If not specified, a 
+#' temporary directory will be used.
+#' @param overwrite Logical indicating whether to overwrite existing files with the same name. 
+#' Default is \code{TRUE}.
+#' @param consider Logical or character indicating how to handle multiple files with the same 
+#' name in Google Drive.
+#'                 If \code{TRUE}, it prompts the user to select one file. If \code{"last"}, 
+#'                 it selects the most recent file.
+#'                 If \code{"all"}, it downloads all files. Default is \code{TRUE}.
+#' @param public Logical indicating whether to make the downloaded files publicly accessible. 
+#' Default is \code{FALSE}.
+#' @param metadata Logical indicating whether to include metadata information in the output. 
+#' Default is \code{FALSE}.
+#' @param quiet Logical indicating whether to suppress progress messages. Default is \code{FALSE}.
+#' @return A character vector of file paths to the downloaded files, or a list with file paths and 
+#' metadata information if \code{metadata = TRUE}.
+#'
+#' @details
+#' This function is a modified version of the \code{ee_drive_to_local} function from the \pkg{rgee} 
+#' package. It allows downloading files from Google Drive based on a GEE task object. The files are 
+#' downloaded to the specified destination file path (\code{dsn}) or to a temporary directory if \code{dsn} 
+#' is not provided. The function provides options for handling multiple files with the same name in Google Drive,
+#' including selecting one file, selecting the most recent file, or downloading all files. It 
+#' also supports making the downloaded files publicly accessible and including metadata information 
+#' in the output.
+#'
+#' @importFrom rgee ee_check_packages ee_exist_credentials ee_create_credentials_drive ee_save_credential ee_getTime
+#' @import googledrive drive_find drive_share_anyone with_drive_quiet drive_download
+#'
+#'
 ee_drive_to_local_mod <- function (task, dsn, overwrite = TRUE, consider = TRUE, 
                                    public = FALSE, metadata = FALSE, quiet = FALSE){
   
