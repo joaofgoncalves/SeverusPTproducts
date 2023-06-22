@@ -4,8 +4,28 @@
 # Make datasets ----
 # ----------------------------------------------------------------------------------- #
 
-# Burned area datasets
 
+#' Get and pre-process the Burned Area Dataset
+#'
+#' This function retrieves burned area (BA) data from the specified dataset and 
+#' Google Earth Engine (GEE) asset. Performs a set of filters needed to remove NA's 
+#' and the minimum area size.
+#'
+#' @param baDataset The dataset name ("ICNF" or "EFFIS").
+#' @param baGEEasset The GEE asset representing the burned area dataset.
+#' @param referenceYear The reference year for retrieving BA data.
+#' @param minFireSizeHa The minimum fire size in hectares to filter the BA data (default: 5).
+#' @param dateField The field name representing the date in the BA dataset.
+#' @param yearField The field name representing the year in the BA dataset.
+#' @param areaField The field name representing the area in hectares in the BA dataset.
+#'
+#' @return The burned area data as an ee.FeatureCollection object.
+#'
+#' @examples
+#' baData <- spt_get_ba_dataset("ICNF", "users/username/ICNF_BA", 2022, 10, "date", "year", "area")
+#'
+#' @export
+#'
 
 spt_get_ba_dataset <- function(baDataset, baGEEasset, referenceYear, minFireSizeHa = 5, 
                                dateField, yearField, areaField) {
@@ -44,9 +64,38 @@ spt_get_ba_dataset <- function(baDataset, baGEEasset, referenceYear, minFireSize
 }
 
 
+#' Get an Earth Engine image collection
+#' 
+#' Retrieves the Earth Engine image collection based on the satellite code, processing 
+#' level, and MODIS product (if applicable).
+#'
+#' @param satCode Character. Satellite code specifying the satellite mission. Supported 
+#' values are "S2MSI" (Sentinel-2), "MOD" (MODIS), "MYD" (Aqua/MODIS), "MCD" 
+#' (Combined Aqua/Terra MODIS), "L5TM" (Landsat-5/TM), "L7ETM" (Landsat-7/ETM), 
+#' "L8OLI" (Landsat-8/OLI) and "L9OLI" (Landsat-9/OLI).
+#' @param procLevel Character. Processing level of the satellite imagery. Supported 
+#' values depend on the satellite mission. For Sentinel-2, supported values are "L2A" 
+#' and "L1C". For Landsat missions, supported values are "L2A" and "L1C". Default is "L2A".
+#' @param modisProduct Character. MODIS product code specifying the specific product 
+#' to retrieve. Required for MODIS and Aqua/MODIS missions. Supported values depend 
+#' on the satellite mission. Default is NULL.
+#'
+#' @return An Earth Engine image collection corresponding to the specified satellite 
+#' mission, processing level, and MODIS product (if applicable).
+#'
+#' @examples
+#' # Retrieve Sentinel-2 Level-2A image collection
+#' s2_collection <- spt_get_sat_imgcol(satCode = "S2MSI", procLevel = "L2A")
+#'
+#' # Retrieve MODIS MOD09A1 image collection
+#' modis_collection <- spt_get_sat_imgcol(satCode = "MOD", modisProduct = "MOD09A1")
+#'
+#' @export
+#' 
 
 spt_get_sat_imgcol <- function(satCode = "S2MSI",
-                                     procLevel = "L2A", modisProduct = NULL) {
+                               procLevel = "L2A", 
+                               modisProduct = NULL) {
   
   
   ## ----------------------------------------------------------------------- ##
@@ -362,6 +411,24 @@ spt_get_sat_imgcol <- function(satCode = "S2MSI",
     stop("Satellite code not available or malformed!")
   }
 }
+
+
+#' Radiometric corrections between Landsat TM/ETM and OLI sensors
+#' 
+#' Converts/merges Landsat Thematic Mapper (TM) and Enhanced Thematic Mapper Plus (ETM+) 
+#' imagery to Operational Land Imager (OLI) reflectance using the provided coefficients.
+#'
+#' @param img An Earth Engine image object representing Landsat TM/ETM+ imagery.
+#' 
+#' @return An Earth Engine image object representing Landsat OLI reflectance.
+#'
+#' @examples
+#' # Convert Landsat ETM+ image to OLI reflectance
+#' etm_image <- ee$Image('LANDSAT/LE07/C01/T1_SR/LE07_044034_20181028')
+#' oli_image <- spt_etm_to_oli(etm_image)
+#'
+#' @export
+#' 
 
 spt_etm_to_oli <- function(img){
   
