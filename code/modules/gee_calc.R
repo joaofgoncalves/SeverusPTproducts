@@ -1,4 +1,15 @@
 
+#' Gets a Spectral Index Function based on the index name and satellite
+#'
+#' This function selects and returns the corresponding spectral index calculation 
+#' function based on the specified parameters.
+#'
+#' @param baseIndex The spectral index to be calculated (character).
+#' @param satCode The satellite code (character). Default is NULL.
+#' @param modisProduct The MODIS product (character). Default is NULL.
+#' @return The spectral index calculation function.
+#' @export
+#' 
 
 spt_spectral_index_fun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
   
@@ -72,6 +83,16 @@ spt_spectral_index_fun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
 }
 
 
+#' Get a specific Cloud Mask Function by satellite name
+#'
+#' This function selects and returns the corresponding cloud mask function based on the specified parameters.
+#'
+#' @param satCode The satellite code (character).
+#' @param modisProduct The MODIS product (character). Default is NULL.
+#' @return The cloud mask function.
+#' @export
+#' 
+
 spt_cloud_mask_fun <- function(satCode, modisProduct=NULL){
   
   
@@ -104,6 +125,18 @@ spt_cloud_mask_fun <- function(satCode, modisProduct=NULL){
   }
 }
 
+
+#' Get a specific Scale Function based on the satellite code and processing level
+#'
+#' This function selects and returns the corresponding scaling function based on 
+#' the specified parameters.
+#'
+#' @param satCode The satellite code (character).
+#' @param procLevel The processing level (character). Default is NULL.
+#' @param modisProduct The MODIS product (character). Default is NULL.
+#' @return The scaling function.
+#' @export
+#' 
 
 spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
   
@@ -171,6 +204,24 @@ spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 }
 
 
+#' Process GEE Task
+#'
+#' This function processes a GEE task by performing various calculations and operations
+#' on satellite imagery and burned area data.
+#'
+#' @param task An object representing the GEE task.
+#' @param boundBox A bounding box specifying the spatial extent of the analysis.
+#' @param coordRefSys The coordinate reference system (CRS) code for the analysis.
+#' @param baGEEasset The GEE asset containing the burned area data.
+#' @param dateField The name of the field in the burned area data representing the date.
+#' @param yearField The name of the field in the burned area data representing the year.
+#' @param areaField The name of the field in the burned area data representing the area.
+#' @param outFolder The output folder where the processed data will be saved.
+#'
+#' @return None.
+#'
+#' @export
+#'
 
 spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset, 
                                  dateField, yearField, areaField, outFolder){
@@ -192,7 +243,7 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
   preFireWindowType      = spt_pre_fire_type(task)
   postFireWindowEndMonths= spt_post_fire_ref(task)
   postFireWindowDays     = spt_post_window_days(task)
-
+  primaryCRScode         = spt_primary_crs_code(task) # Added primary CRS code
   
   refPeriods = paste0(# Pre-fire ref period
                       ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),
@@ -206,10 +257,11 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
                               BaseIndex         = baseIndex, 
                               SatCode           = satCode, 
                               BurntAreaDataset  = burntAreaDataset, 
-                              ReferenceYear = referenceYear, 
-                              RefPeriods    = refPeriods, 
-                              addCalcDate   = TRUE, 
-                              VersionNumber = SPT_VERSION)
+                              ReferenceYear  = referenceYear, 
+                              RefPeriods     = refPeriods, 
+                              PrimaryCRScode = primaryCRScode, # Added primary CRS code
+                              addCalcDate    = TRUE, 
+                              VersionNumber  = SPT_VERSION)
   
   # Get the spatial resolution of the data
   spatialRes <- spt_spatial_resolution(task)

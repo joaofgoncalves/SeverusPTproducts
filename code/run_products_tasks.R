@@ -411,10 +411,11 @@ for(tidx in xs){
       symbol$arrow_right, "Creating metadata...\n\n")))
     
     # Generate metadata based  on the pre-defined template
-    #
+    # This table is for the primary CRS in ETRS 1989/PT TM06
     #
     meta <- spt_fill_meta_template(
       metaTemplate = SPT_META_TABLE,
+      
       metaList = list(
         ProductType          = "Observed/historical severity",
         ProductName          = paste("Fire/burn severity / Indicator:",
@@ -422,7 +423,8 @@ for(tidx in xs){
                                      "/",task$preFireType,"window",task$preFireRef,"months composite"),
         SpatialResolution    = paste(res(r0)[1], "meters"),
         TemporalResolution   = paste(task$preFireRef,"months composite"),
-        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763) / Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)",
+        #CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763) / Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)",
+        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763)",
         CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
         CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
                                      "/ rgee-version:",packageVersion("rgee")),
@@ -455,12 +457,26 @@ for(tidx in xs){
       )
     )
     
+    # Generate a second metadata table with WGS 1984 CRS
+    #
+    meta_wgs <- spt_fill_meta_template(
+      metaTemplate = meta,
+      metaList = list(
+        CoordRefSystem = "Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)"
+        )
+    )
+    
+    
     # Export metadata to Markdown txt and JSON files
     out <- try({
       
       spt_export_to_md(meta, paste0(outFilePath,".meta.txt"))
       write.csv(meta, paste0(outFilePath,".meta.csv"), row.names = FALSE, quote = TRUE)
       spt_export_meta_to_json(meta, paste0(outFilePath,".meta.json"))
+      
+      spt_export_to_md(meta_wgs, paste0(outFilePath,".meta.txt"))
+      write.csv(meta_wgs, paste0(outFilePath,".meta.csv"), row.names = FALSE, quote = TRUE)
+      spt_export_meta_to_json(meta_wgs, paste0(outFilePath,".meta.json"))
       
     })
     
@@ -497,7 +513,6 @@ for(tidx in xs){
     
     cat(green(bold(
       symbol$tick, "Metadata sub-task completed! Skipping to the next...\n\n")))
-    
     
   }
   

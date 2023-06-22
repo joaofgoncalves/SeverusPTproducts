@@ -403,8 +403,55 @@ repeat{
     # Generate metadata based  on the pre-defined template
     #
     #
+    # meta <- spt_fill_meta_template(
+    #   metaTemplate = SPT_META_TABLE,
+    #   metaList = list(
+    #     ProductType          = "Observed/historical severity",
+    #     ProductName          = paste("Fire/burn severity / Indicator:",
+    #                                  task$severityIndicator,task$baseIndex,
+    #                                  "/",task$preFireType,"window",task$preFireRef,"months composite"),
+    #     SpatialResolution    = paste(res(r0)[1], "meters"),
+    #     TemporalResolution   = paste(task$preFireRef,"months composite"),
+    #     CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
+    #     CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
+    #     CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
+    #                                  "/ rgee-version:",packageVersion("rgee")),
+    #     BurntAreaDataset     = task$burntAreaDataset,
+    #     BurntAreaDatasetURL  = spt_ba_data_url(task$burntAreaDataset),
+    #     ReferenceYear        = task$referenceYear,
+    #     MinFireSize          = paste(task$minFireSize,"hectares"),
+    #     SatCollectionData    = paste(task$satCode," / ",spt_sat_mission_fullname(task$satCode),
+    #                                  ifelse(task$satCode %in% SPT_VALUES$satCode_md, 
+    #                                         paste(" / Product:",task$modisProduct), ""), sep=""),
+    #     SatProcLevel         = spt_proc_levels(task$procLevel),
+    #     #SatColVersion       =
+    #     CloudMaskUsed        = "Yes",
+    #     CloudMaskMethod      = "Pixel QA band: Cirrus, clouds and/or cloud shadows removed",
+    #     BaseIndex            = paste(task$baseIndex, spt_spec_index_fullname(task$baseIndex),sep=" - "),
+    #     BaseIndexFormula     = spt_spec_index_formula(task$baseIndex, task$satCode),
+    #     SeverityIndicator    = task$severityIndicator,
+    #     SeverityIndicatorForm = spt_severity_indicator_form(task$baseIndex, task$severityIndicator),
+    #     CompAggMeasure        = "Median",
+    #     PreFireType           = paste(task$preFireType, "/ considers the year before fire, i.e., homologous year"),
+    #     PreFireRefPeriod      = paste(task$preFireRef,"months"),
+    #     PostFireType          = "moving",
+    #     PostFireRefPeriod     = paste("Start post-fire window:",
+    #                                   task$postFireRef-task$preFireRef,"months",
+    #                                   "/ End:",task$postFireRef,"months",", i.e.,",
+    #                                   paste(spt_post_window_days(task),collapse=" to "),
+    #                                   "days after ignition date"),
+    #     VersionNumber         = SPT_VERSION,
+    #     VersionFullNumber     = SPT_FULL_VERSION_NR
+    #   )
+    # )
+    
+    
+    # Generate metadata based  on the pre-defined template
+    # This table is for the primary CRS in ETRS 1989/PT TM06
+    #
     meta <- spt_fill_meta_template(
       metaTemplate = SPT_META_TABLE,
+      
       metaList = list(
         ProductType          = "Observed/historical severity",
         ProductName          = paste("Fire/burn severity / Indicator:",
@@ -412,7 +459,8 @@ repeat{
                                      "/",task$preFireType,"window",task$preFireRef,"months composite"),
         SpatialResolution    = paste(res(r0)[1], "meters"),
         TemporalResolution   = paste(task$preFireRef,"months composite"),
-        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 / Secondary CRS: WGS 1984/UTM 29N",
+        #CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763) / Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)",
+        CoordRefSystem       = "Primary CRS: ETRS1989/PTTM06 (EPSG: 3763)",
         CalculationDate      = paste(spt_current_date_time(),"Lisbon GMT +00:00"),
         CalculationPlatforms = paste("Google Earth Engine; R/RStudio; EE-API-version:", rgee::ee_version(),
                                      "/ rgee-version:",packageVersion("rgee")),
@@ -445,15 +493,39 @@ repeat{
       )
     )
     
+    # Generate a second metadata table with WGS 1984 CRS
+    #
+    meta_wgs <- spt_fill_meta_template(
+      metaTemplate = meta,
+      metaList = list(
+        CoordRefSystem = "Secondary CRS: WGS 1984/UTM 29N (EPSG: 32629)"
+      )
+    )
+    
     # Export metadata to Markdown txt and JSON files
+    # out <- try({
+    #   
+    #   spt_export_to_md(meta, paste0(outFilePath,".meta.txt"))
+    #   write.csv(meta, paste0(outFilePath,".meta.csv"), row.names = FALSE, quote = TRUE)
+    #   spt_export_meta_to_json(meta, paste0(outFilePath,".meta.json"))
+    #   
+    # })
+    
+    # Include two metadata versions one for each CRS
     out <- try({
       
+      # Metadata for primary CRS ETRS89 / PT TM06
       spt_export_to_md(meta, paste0(outFilePath,".meta.txt"))
       write.csv(meta, paste0(outFilePath,".meta.csv"), row.names = FALSE, quote = TRUE)
       spt_export_meta_to_json(meta, paste0(outFilePath,".meta.json"))
       
+      # Metadata for secondary CRS - WGS 84/UTM 29N
+      spt_export_to_md(meta_wgs, paste0(spt_replace_crs_code(outFilePath),".meta.txt"))
+      write.csv(meta_wgs, paste0(spt_replace_crs_code(outFilePath),".meta.csv"), 
+                row.names = FALSE, quote = TRUE)
+      spt_export_meta_to_json(meta_wgs, paste0(spt_replace_crs_code(outFilePath),".meta.json"))
+      
     })
-    
     
     if(inherits(out,"try-error")){
       

@@ -1,4 +1,12 @@
 
+#' Get List of Status Values
+#'
+#' This function returns a character vector containing a list of status values 
+#' for a specific process.
+#'
+#' @return A character vector containing the list of status values.
+#' @export
+#' 
 
 spt_status_list <- function(){
   
@@ -35,6 +43,18 @@ spt_status_list <- function(){
   )
 }
 
+
+#' Check Validity of Parameter Values
+#'
+#' This function checks the validity of parameter values based on predefined criteria or value ranges.
+#'
+#' @param value The value(s) to be checked.
+#' @param what A character string specifying the parameter name or type.
+#' @param verbose A logical value indicating whether to display a message when a parameter cannot be checked. Default is TRUE.
+#' @return A logical value indicating whether the value(s) pass the validity check.
+#' @export
+#' 
+
 spt_check_values <- function(value, what, verbose=TRUE) {
   
   # Validate numeric values
@@ -60,6 +80,16 @@ spt_check_values <- function(value, what, verbose=TRUE) {
     }
   }
 }
+
+
+#' Create Tasks Table
+#'
+#' This function creates an empty tasks table with predefined columns to store task-related information.
+#'
+#' @param n The number of rows to create in the tasks table.
+#' @return A data frame representing the tasks table with empty columns.
+#' @export
+#' 
 
 spt_make_tasks_table <- function(n){
   
@@ -99,12 +129,38 @@ spt_make_tasks_table <- function(n){
     
     # Closing task code & status
     closingTaskID       = character(n),
-    closingTaskStatus   = character(n)
+    closingTaskStatus   = character(n),
+    
+    # CRS information
+    primaryCRScode      = character(n),
+    secondaryCRScode    = character(n),
+    primaryCRS          = character(n),
+    secondaryCRS        = character(n)
   )
   
   return(taskTable)
 }
 
+
+#' Generate Tasks
+#'
+#' This function generates a table of tasks based on the provided analysis parameters.
+#'
+#' @param taskTable An optional existing tasks table to append the generated tasks to.
+#' @param satCode The satellite code.
+#' @param procLevel The processing level.
+#' @param modisProduct The MODIS product.
+#' @param baseIndex The base index.
+#' @param severityIndicator The severity indicator.
+#' @param burntAreaDataset The burnt area dataset.
+#' @param referenceYear The reference year.
+#' @param preFireRef The pre-fire reference period in months.
+#' @param preFireType The type of pre-fire reference period.
+#' @param postFireRef The post-fire reference period in months.
+#' @param minFireSize The minimum fire size.
+#' @return A data frame representing the tasks table with appended rows for the generated tasks.
+#' @export
+#' 
 
 spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduct, 
                           baseIndex, severityIndicator, burntAreaDataset,
@@ -193,6 +249,12 @@ spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduc
   newTaskTable$closingTaskID       <- uuid::UUIDgenerate(n = nr)
   newTaskTable$closingTaskStatus   <- "CLOSING NOT COMPLETED"
   
+  # CRS information
+  newTaskTable$primaryCRScode <- "3763"
+  newTaskTable$secondaryCRScode <- "32629"
+  newTaskTable$primaryCRS <- "ETRS1989/PTTM06 (EPSG: 3763)"
+  newTaskTable$secondaryCRS <- "WGS 1984/UTM 29N (EPSG: 32629)"
+  
   
   if(is.null(taskTable)){
     return(newTaskTable)
@@ -202,6 +264,16 @@ spt_generate_tasks <- function(taskTable = NULL, satCode, procLevel, modisProduc
   
 }
 
+
+#' Read Tasks Table
+#'
+#' This function reads a task table from a specified file path and returns the table as a data frame.
+#' Uses a file lock.
+#' 
+#' @param taskTablePath The file path of the task table.
+#' @return A data frame representing the read task table.
+#' @export
+#' 
 
 spt_read_tasks_table <- function(taskTablePath){
   
@@ -220,6 +292,18 @@ spt_read_tasks_table <- function(taskTablePath){
   return(tb)
   
 }
+
+
+#' Write Tasks Table
+#'
+#' This function writes a task table to a specified file path.
+#' Uses a file lock over the to ensure concurrence management.
+#' 
+#' @param taskTable The task table to be written (data frame).
+#' @param taskTablePath The file path where the task table should be written.
+#' @return TRUE if the writing is successful, FALSE otherwise.
+#' @export
+#' 
 
 spt_write_tasks_table <- function(taskTable, taskTablePath){
   
