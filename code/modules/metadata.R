@@ -1,5 +1,17 @@
 
 
+#' Export Metadata to JSON
+#'
+#' This function exports a data frame to a prettified JSON file.
+#'
+#' @param x The data frame to be exported.
+#' @param outFilePath The file path for the JSON output file.
+#'
+#' @examples
+#' spt_export_meta_to_json(myDataFrame, "path/to/output.json")
+#'
+#' @export
+#'
 
 spt_export_meta_to_json <- function(x, outFilePath) {
   # Export the data.frame to a prettified JSON file
@@ -7,6 +19,22 @@ spt_export_meta_to_json <- function(x, outFilePath) {
   cat(json_text, file = outFilePath)
 }
 
+
+#' Fill Metadata Template
+#'
+#' This function fills in a metadata template with values from a metadata list.
+#'
+#' @param metaTemplate The metadata template data frame.
+#' @param metaList The metadata list containing parameter-value pairs.
+#'
+#' @return The filled metadata template with updated values.
+#'
+#' @examples
+#' filledTemplate <- spt_fill_meta_template(metaTemplate, metaList)
+#'
+#' @export
+#'
+#'
 
 spt_fill_meta_template <- function(metaTemplate, metaList) {
   
@@ -25,6 +53,20 @@ spt_fill_meta_template <- function(metaTemplate, metaList) {
   return(metaTemplate)
 }
 
+#' Burned Area Dataset Code
+#'
+#' This function retrieves the code for a given burned area dataset.
+#'
+#' @param baDataset The burnt area dataset name.
+#'
+#' @return Character. The dataset code corresponding to the given 
+#' burned area dataset.
+#'
+#' @examples
+#' code <- spt_ba_dataset_code("ICNF")
+#'
+#' @export
+#'
 
 spt_ba_dataset_code <- function(baDataset) {
   baCodes <- list(
@@ -39,6 +81,21 @@ spt_ba_dataset_code <- function(baDataset) {
   return(baCodes[[baDataset]])
 }
 
+
+#' Spectral Index Full Name
+#'
+#' This function retrieves the full name of a spectral index based on its acronym.
+#'
+#' @param spiAcronym The acronym of the spectral index.
+#'
+#' @return Character. The full name of the spectral index corresponding to 
+#' the given acronym.
+#'
+#' @examples
+#' fullname <- spt_spec_index_fullname("NBR")
+#'
+#' @export
+#'
 
 spt_spec_index_fullname <- function(spiAcronym) {
   spiNames <- list(
@@ -63,6 +120,23 @@ spt_spec_index_fullname <- function(spiAcronym) {
   return(spiNames[[spiAcronym]])
 }
 
+
+#' Spectral Index Formula
+#'
+#' This function retrieves the formula of a spectral index based on its 
+#' acronym and satellite code.
+#'
+#' @param spiAcronym The acronym of the spectral index.
+#' @param satCode The satellite code.
+#'
+#' @return Character. The formula of the spectral index corresponding to the given 
+#' acronym and satellite code.
+#'
+#' @examples
+#' formula <- spt_spec_index_formula("TCTB", "MOD")
+#'
+#' @export
+#'
 
 spt_spec_index_formula <- function(spiAcronym, satCode) {
   
@@ -119,6 +193,20 @@ spt_spec_index_formula <- function(spiAcronym, satCode) {
 }
 
 
+#' Satellite Mission Full Name
+#'
+#' This function retrieves the full name of a satellite mission based on its code.
+#'
+#' @param satCode The code of the satellite
+#'
+#' @return The full name of the satellite mission corresponding to the given code.
+#'
+#' @examples
+#' fullname <- spt_sat_mission_fullname("S2MSI")
+#'
+#' @export
+#'
+
 spt_sat_mission_fullname <- function(satCode) {
   satNames <- list(
     S2MSI  = "Sentinel-2a/b/MSI",
@@ -138,6 +226,24 @@ spt_sat_mission_fullname <- function(satCode) {
 }
 
 
+#' Get the Severity Indicator Formula
+#'
+#' This function generates the formula for a severity indicator based on the 
+#' selected spectral index (spi) and severity indicator (si). Available options 
+#' are delta, Relative delta and Relativized Burn Ratio.
+#'
+#' @param spi The selected spectral index.
+#' @param si The selected severity indicator.
+#'
+#' @return The formula for the severity indicator based on the selected 
+#' spectral index and severity indicator.
+#'
+#' @examples
+#' formula <- spt_severity_indicator_form("NDVI", "DELTA")
+#'
+#' @export
+#'
+
 spt_severity_indicator_form <- function(spi, si) {
   if (si %in% c("DELTA", "DLT")) {
     return(paste(si, " = ", spi, "_prefire - ", spi, "_postfire", sep = ""))
@@ -154,6 +260,20 @@ spt_severity_indicator_form <- function(spi, si) {
 }
 
 
+#' Burned Area Dataset URL
+#'
+#' This function retrieves the URL of the specified burned area dataset.
+#'
+#' @param baDataset The burned area dataset code (eg., EFFIS, ICNF).
+#'
+#' @return The URL of the specified burned area dataset.
+#'
+#' @examples
+#' url <- spt_ba_data_url("EFFIS")
+#'
+#' @export
+#'
+
 spt_ba_data_url <- function(baDataset) {
   if (baDataset == "EFFIS") {
     baDataURL <- "https://effis.jrc.ec.europa.eu/applications/data-and-services"
@@ -165,6 +285,21 @@ spt_ba_data_url <- function(baDataset) {
 
   return(baDataURL)
 }
+
+
+#' Processing Levels description
+#'
+#' This function provides a description of the processing levels for satellite data.
+#'
+#' @param procLevel The processing level of the satellite data.
+#'
+#' @return A description of the processing level.
+#'
+#' @examples
+#' levelDesc <- spt_proc_levels("L1C")
+#'
+#' @export
+#'
 
 spt_proc_levels <- function(procLevel) {
   if (procLevel %in% c("L1C", "L1")) {
