@@ -7,11 +7,11 @@
 
 #' Get a single task by its identifiers
 #'
-#' This function retrieves a specific task from a task table based on the provided parameters. 
-#' It can search for a task using taskID, taskUID, geeTaskID, geeTaskCode, postProcTaskID, or 
+#' This function retrieves a specific task from a task table based on the provided parameters.
+#' It can search for a task using taskID, taskUID, geeTaskID, geeTaskCode, postProcTaskID, or
 #' closingTaskID.
 #'
-#' @param taskTable A data frame representing the task table. If not provided, it will be 
+#' @param taskTable A data frame representing the task table. If not provided, it will be
 #' read from the specified taskTablePath.
 #' @param taskID The ID of the task to retrieve.
 #' @param taskUID The UID of the task to retrieve.
@@ -29,15 +29,15 @@
 #' @export
 #'
 
-spt_get_task <- function(taskTable      = NULL, 
-                         taskID         = NULL, 
-                         taskUID        = NULL, 
+spt_get_task <- function(taskTable      = NULL,
+                         taskID         = NULL,
+                         taskUID        = NULL,
                          geeTaskID      = NULL,
-                         geeTaskCode    = NULL, 
-                         postProcTaskID = NULL, 
+                         geeTaskCode    = NULL,
+                         postProcTaskID = NULL,
                          closingTaskID  = NULL,
                          taskTablePath) {
-  
+
   if (is.null(taskID) && is.null(taskUID) && is.null(geeTaskID) &&
     is.null(geeTaskCode) && is.null(postProcTaskID) && is.null(metadataTaskID) &&
     is.null(closingTaskID)) {
@@ -75,8 +75,8 @@ spt_get_task <- function(taskTable      = NULL,
 
 #' Define the generic methods to access task parameters
 #'
-#' This function is a dispatch method that performs various satellite analysis 
-#' operations based on the input object. The specific method to be executed is determined 
+#' This function is a dispatch method that performs various satellite analysis
+#' operations based on the input object. The specific method to be executed is determined
 #' by the class of the input object.
 #'
 #' @param x An object for which the satellite analysis operation is to be performed.
@@ -115,13 +115,13 @@ spt_modis_product <- function(x) UseMethod("spt_modis_product", x)
 
 spt_spatial_resolution <- function(x) UseMethod("spt_spatial_resolution", x)
 
-spt_primary_crs_code <- function(x) UseMethod("spt_spatial_resolution", x)
+spt_primary_crs_code <- function(x) UseMethod("spt_primary_crs_code", x)
 
-spt_secondary_crs_code <- function(x) UseMethod("spt_spatial_resolution", x)
+spt_secondary_crs_code <- function(x) UseMethod("spt_secondary_crs_code", x)
 
-spt_primary_crs <- function(x) UseMethod("spt_spatial_resolution", x)
+spt_primary_crs <- function(x) UseMethod("spt_primary_crs", x)
 
-spt_secondary_crs <- function(x) UseMethod("spt_spatial_resolution", x)
+spt_secondary_crs <- function(x) UseMethod("spt_secondary_crs", x)
 
 
 ## ------------------------------------------------------------------------------------- ##
@@ -181,10 +181,10 @@ spt_get_taskStatus.task <- function(x, taskStep) {
 
 #' Spatial Resolution for Task
 #'
-#' This function determines the spatial resolution for a given task based on the satellite 
+#' This function determines the spatial resolution for a given task based on the satellite
 #' code and MODIS product (if applicable).
 #'
-#' @param x A task object containing information about the satellite code and the MODIS 
+#' @param x A task object containing information about the satellite code and the MODIS
 #' product (if applicable).
 #'
 #' @return The spatial resolution in meters.
@@ -198,25 +198,25 @@ spt_get_taskStatus.task <- function(x, taskStep) {
 
 spt_spatial_resolution.task <- function(x) {
   if (x$satCode %in% c("L5TM", "L7ETM", "L8OLI", "L8TIRS", "LTH")) {
-    
+
     spatialRes <- 30
-    
+
   } else if (x$satCode %in% c("MOD", "MYD", "MCD")) {
-    if (x$modisProduct %in% c("MOD13Q1", "MOD09GQ", "MOD09Q1", 
+    if (x$modisProduct %in% c("MOD13Q1", "MOD09GQ", "MOD09Q1",
                               "MYD09GQ", "MYD09Q1", "MYD13Q1")) {
       spatialRes <- 250
-      
+
     } else if (x$modisProduct %in% c("MOD09A1", "MYD09A1", "MCD43A4")) {
-      
+
       spatialRes <- 500
-      
+
     } else {
       stop("Cannot find spatial resolution - unsupported MODIS product")
     }
   } else if (x$satCode == "S2MSI") {
-    
+
     spatialRes <- 20
-    
+
   }
   else{
     stop("Satellite code not supported in spt_spatial_resolution")
@@ -228,13 +228,13 @@ spt_spatial_resolution.task <- function(x) {
 
 #' Post-Fire Window Days for Task
 #'
-#' This function calculates the number of days in the post-fire window for a given task, 
+#' This function calculates the number of days in the post-fire window for a given task,
 #' based on the pre-fire and post-fire references.
 #'
 #' @param x A task object containing information about the pre-fire and post-fire references.
 #'
-#' @return A numeric vector with two elements: the number of days in the post-fire window 
-#' from pre-fire reference to post-fire reference, and the number of days in the post-fire 
+#' @return A numeric vector with two elements: the number of days in the post-fire window
+#' from pre-fire reference to post-fire reference, and the number of days in the post-fire
 #' reference.
 #'
 #' @examples
@@ -254,7 +254,7 @@ spt_post_window_days.task <- function(x) {
 
 #' Generate Task Filename
 #'
-#' This function generates a filename for a given task based on its properties and the 
+#' This function generates a filename for a given task based on its properties and the
 #' specified project acronym and version number.
 #'
 #' @param task A task object containing information about the task.
@@ -271,36 +271,36 @@ spt_post_window_days.task <- function(x) {
 #'
 
 spt_task_filename <- function(task, projectAccronym, versionNumber){
-  
+
   satCode           = spt_sat_code(task)
   baseIndex         = spt_base_index(task)
   severityIndicator = spt_severity_indicator(task)
-  
+
   burntAreaDataset  = spt_ba_dataset(task)
   referenceYear     = spt_reference_year(task)
-  
+
   fixedPreFireWindowSize    = spt_pre_fire_ref(task)
   preFireWindowType         = spt_pre_fire_type(task)
   postFireWindowEndMonths   = spt_post_fire_ref(task)
-  primaryCRScode            = spt_primary_crs_code(task) # Added primary CRS code
-  
+  crsCode                   = spt_secondary_crs_code(task) # Added secondary CRS code
+
   refPeriods = paste0(
     # Pre-fire ref period
     ifelse(preFireWindowType %in% c("moving","mov","m"),"R","S"),spt_pad_number(fixedPreFireWindowSize),
     # Post-fire ref period
     "P",spt_pad_number(postFireWindowEndMonths))
-  
-  prodName = spt_product_name(ProjectAccronym   = projectAccronym, 
-                              SeverityIndicator = severityIndicator, 
-                              BaseIndex         = baseIndex, 
-                              SatCode           = satCode, 
-                              BurntAreaDataset  = burntAreaDataset, 
-                              ReferenceYear     = referenceYear, 
-                              RefPeriods        = refPeriods, 
-                              PrimaryCRScode    = primaryCRScode, # Added primary CRS code
-                              addCalcDate       = FALSE, 
+
+  prodName = spt_product_name(ProjectAccronym   = projectAccronym,
+                              SeverityIndicator = severityIndicator,
+                              BaseIndex         = baseIndex,
+                              SatCode           = satCode,
+                              BurntAreaDataset  = burntAreaDataset,
+                              ReferenceYear     = referenceYear,
+                              RefPeriods        = refPeriods,
+                              CRScode           = crsCode, # Added primary CRS code
+                              addCalcDate       = FALSE,
                               VersionNumber     = versionNumber)
-  
+
   return(prodName)
 }
 
@@ -312,12 +312,12 @@ spt_task_filename <- function(task, projectAccronym, versionNumber){
 
 #' Convert Task to Data Frame
 #'
-#' This function converts a task object into a data frame, where each column represents a 
+#' This function converts a task object into a data frame, where each column represents a
 #' task parameter and the corresponding value.
 #'
 #' @param task A task object containing information about the task.
 #'
-#' @return A data frame with two columns: "taskParam" representing the task parameter names, 
+#' @return A data frame with two columns: "taskParam" representing the task parameter names,
 #' and "taskValue" representing the corresponding task values.
 #'
 #' @examples
@@ -341,12 +341,12 @@ spt_task_to_dataframe <- function(task) {
 
 #' Update GEE Task
 #'
-#' This function updates the status and information of a Google Earth Engine (GEE) task in 
+#' This function updates the status and information of a Google Earth Engine (GEE) task in
 #' the task table.
 #'
 #' @param geeTask The GEE task object to update.
 #' @param task The task object containing information about the task.
-#' @param taskTable The task table to update (optional). If not provided, it will be 
+#' @param taskTable The task table to update (optional). If not provided, it will be
 #' read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -361,26 +361,26 @@ spt_task_to_dataframe <- function(task) {
 #'
 
 spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
-  
+
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
-  
+
   if(is.null(taskTable)){
     taskTable <- spt_read_tasks_table(taskTablePath)
   }
-  
+
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
-  
+
   taskStatusList <- try(spt_gee_task_status(geeTask))
-  
+
   if(inherits(taskStatusList,"try-error")){
-    
+
     return(FALSE)
-    
+
   }else{
-    
+
     if(taskStatusList$state %in% c("RUNNING","READY")){
       geeTaskStatus <- "GEE PROCESSING"
     }
@@ -396,35 +396,35 @@ spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
     else{
       geeTaskStatus <- "GEE STATUS UNKNOWN"
     }
-    
+
     idx <- taskTable$taskUID == task$taskUID
     taskTable[idx, "geeTaskCode"]   <- taskStatusList$id
     taskTable[idx, "geeTaskStatus"] <- geeTaskStatus
     taskTable[idx, "fileName"]      <- taskStatusList$description
-    
+
   }
-  
+
   out <- try({
     spt_write_tasks_table(taskTable, taskTablePath)
     filelock::unlock(lck)
   })
-  
+
   if(inherits(out,"try-error")){
     return(FALSE)
   }else{
     return(TRUE)
   }
-  
+
 }
 
 
 #' Start GEE Task status
 #'
-#' This function updates the status of a task in the task table to indicate that the associated 
+#' This function updates the status of a task in the task table to indicate that the associated
 #' Google Earth Engine (GEE) task has started.
 #'
 #' @param task The task object containing information about the task.
-#' @param taskTable The task table to update (optional). If not provided, it will be read 
+#' @param taskTable The task table to update (optional). If not provided, it will be read
 #' from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -438,18 +438,18 @@ spt_update_gee_task <- function(geeTask, task, taskTable=NULL, taskTablePath){
 #'
 
 spt_start_gee_task <- function(task, taskTable=NULL, taskTablePath){
-  
+
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
-  
+
   if(is.null(taskTable)){
     taskTable <- spt_read_tasks_table(taskTablePath)
   }
-  
+
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
-  
+
   idx <- taskTable$taskUID == task$taskUID
   taskTable[idx, "geeTaskStatus"] <- "GEE STARTED"
 
@@ -457,7 +457,7 @@ spt_start_gee_task <- function(task, taskTable=NULL, taskTablePath){
     spt_write_tasks_table(taskTable, taskTablePath)
     filelock::unlock(lck)
   })
-  
+
   if(inherits(out,"try-error")){
     return(FALSE)
   }else{
@@ -472,7 +472,7 @@ spt_start_gee_task <- function(task, taskTable=NULL, taskTablePath){
 #'
 #' @param task The task object containing information about the task.
 #' @param state The new state of the post-processing task.
-#' @param taskTable The task table to update (optional). If not provided, it will 
+#' @param taskTable The task table to update (optional). If not provided, it will
 #' be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -480,7 +480,7 @@ spt_start_gee_task <- function(task, taskTable=NULL, taskTablePath){
 #'
 #' @examples
 #' task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-#' spt_update_post_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+#' spt_update_post_task(task, state = "COMPLETED", taskTable = myTaskTable,
 #' taskTablePath = "path/to/taskTable.csv")
 #'
 #' @export
@@ -490,31 +490,31 @@ spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
-  
+
   if(is.null(taskTable)){
     taskTable <- spt_read_tasks_table(taskTablePath)
   }
-  
+
   if(is.null(lck))
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
-  
-  
+
+
   idx <- taskTable$taskUID == task$taskUID
   taskTable[idx, "postProcTaskStatus"] <- state
-  
+
   out <- try({
     #spt_write_tasks_table(taskTable)
     spt_write_tasks_table(taskTable, taskTablePath)
-    
+
     filelock::unlock(lck)
   })
-  
+
   if(inherits(out,"try-error")){
     return(FALSE)
   }else{
     return(TRUE)
   }
-  
+
 }
 
 
@@ -524,7 +524,7 @@ spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
 #'
 #' @param task The task object containing information about the task.
 #' @param state The new state of the metadata task.
-#' @param taskTable The task table to update (optional). If not provided, 
+#' @param taskTable The task table to update (optional). If not provided,
 #' it will be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -532,7 +532,7 @@ spt_update_post_task <- function(task, state, taskTable=NULL, taskTablePath){
 #'
 #' @examples
 #' task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-#' spt_update_meta_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+#' spt_update_meta_task(task, state = "COMPLETED", taskTable = myTaskTable,
 #' taskTablePath = "path/to/taskTable.csv")
 #'
 #' @export
@@ -542,26 +542,26 @@ spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
-  
+
   if (is.null(taskTable)) {
     taskTable <- spt_read_tasks_table(taskTablePath)
   }
-  
+
   if (is.null(lck)) {
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
   }
-  
-  
+
+
   idx <- taskTable$taskUID == task$taskUID
   taskTable[idx, "metadataTaskStatus"] <- state
-  
+
   out <- try({
     #spt_write_tasks_table(taskTable)
     spt_write_tasks_table(taskTable, taskTablePath)
-    
+
     filelock::unlock(lck)
   })
-  
+
   if (inherits(out, "try-error")) {
     return(FALSE)
   } else {
@@ -576,7 +576,7 @@ spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
 #'
 #' @param task The task object containing information about the task.
 #' @param state The new state of the closing task.
-#' @param taskTable The task table to update (optional). If not provided, 
+#' @param taskTable The task table to update (optional). If not provided,
 #' it will be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -584,7 +584,7 @@ spt_update_meta_task <- function(task, state, taskTable = NULL, taskTablePath) {
 #'
 #' @examples
 #' task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-#' spt_update_closing_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+#' spt_update_closing_task(task, state = "COMPLETED", taskTable = myTaskTable,
 #' taskTablePath = "path/to/taskTable.csv")
 #'
 #' @export
@@ -609,7 +609,7 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
   out <- try({
     #spt_write_tasks_table(taskTable)
     spt_write_tasks_table(taskTable, taskTablePath)
-    
+
     filelock::unlock(lck)
   })
 
@@ -627,7 +627,7 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
 #'
 #' @param task The task object containing information about the task.
 #' @param state The new state of the main task.
-#' @param taskTable The task table to update (optional). If not provided, 
+#' @param taskTable The task table to update (optional). If not provided,
 #' it will be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -635,7 +635,7 @@ spt_update_closing_task <- function(task, state, taskTable = NULL, taskTablePath
 #'
 #' @examples
 #' task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-#' spt_update_main_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+#' spt_update_main_task(task, state = "COMPLETED", taskTable = myTaskTable,
 #' taskTablePath = "path/to/taskTable.csv")
 #'
 #' @export
@@ -660,7 +660,7 @@ spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
   out <- try({
     #spt_write_tasks_table(taskTable)
     spt_write_tasks_table(taskTable, taskTablePath)
-    
+
     filelock::unlock(lck)
   })
 
@@ -676,7 +676,7 @@ spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
 #'
 #' This function removes uncompleted tasks from the task table.
 #'
-#' @param taskTable The task table to remove uncompleted tasks from (optional). 
+#' @param taskTable The task table to remove uncompleted tasks from (optional).
 #' If not provided, it will be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
@@ -692,25 +692,25 @@ spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
-  
+
   if (is.null(taskTable)) {
     taskTable <- spt_read_tasks_table(taskTablePath)
   }
-  
+
   if (is.null(lck)) {
     stop("Failed to acquire a lock over the task table file!", call. = TRUE)
   }
-  
+
   idx <- taskTable$mainStatus == "COMPLETED"
   taskTable <- taskTable[idx, ]
-  
+
   out <- try({
     #spt_write_tasks_table(taskTable)
     spt_write_tasks_table(taskTable, taskTablePath)
-    
+
     filelock::unlock(lck)
   })
-  
+
   if (inherits(out, "try-error")) {
     return(FALSE)
   } else {
