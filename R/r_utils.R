@@ -14,7 +14,7 @@
 #' spt_periods_to_today("2022-01-01", 7)
 #' spt_periods_to_today(as.Date("2021-12-15"), 30)
 #' @export
-#' 
+#'
 
 spt_periods_to_today <- function(date, ndays) {
   today <- Sys.Date()
@@ -38,11 +38,11 @@ spt_periods_to_today <- function(date, ndays) {
 #' spt_pad_number("42", width = 4)
 #' @importFrom stringr str_pad
 #' @export
-#' 
+#'
 
 spt_pad_number <- function(x, width = 3){
   stringr::str_pad(x, width = width, side = "left", pad = 0)
-} 
+}
 
 
 #' Get the Current Date in YYYYMMDD Format
@@ -53,7 +53,7 @@ spt_pad_number <- function(x, width = 3){
 #' @examples
 #' spt_ymd_date()
 #' @export
-#' 
+#'
 
 spt_ymd_date <- function() {
   date <- Sys.Date()
@@ -78,7 +78,7 @@ spt_ymd_date <- function() {
 #' @examples
 #' spt_current_date_time()
 #' @export
-#' 
+#'
 
 spt_current_date_time <- function() {
   current_time <- Sys.time()
@@ -95,7 +95,7 @@ spt_current_date_time <- function() {
 #' @examples
 #' spt_current_year()
 #' @export
-#' 
+#'
 
 spt_current_year <- function() {
   return(format(Sys.time(), "%Y"))
@@ -122,45 +122,45 @@ spt_current_year <- function() {
 #' spt_product_name("PROJ", "SEV", "BASE", "SAT", "BA", "2022", "PERIODS", "CRS", "V1.0")
 #' @importFrom base paste
 #' @export
-#' 
+#'
 
-spt_product_name <- function(ProjectAccronym, 
-                           SeverityIndicator, 
-                           BaseIndex, 
-                           SatCode, 
-                           BurntAreaDataset, 
-                           ReferenceYear, 
-                           RefPeriods, 
-                           PrimaryCRScode,
-                           addCalcDate = FALSE, 
+spt_product_name <- function(ProjectAccronym,
+                           SeverityIndicator,
+                           BaseIndex,
+                           SatCode,
+                           BurntAreaDataset,
+                           ReferenceYear,
+                           RefPeriods,
+                           CRScode,
+                           addCalcDate = FALSE,
                            VersionNumber) {
   if (addCalcDate) {
     CalculationDate <- spt_ymd_date()
 
     productName <- paste(
-      ProjectAccronym, "_", 
-      SeverityIndicator, "_", 
-      BaseIndex, "_",  
+      ProjectAccronym, "_",
+      SeverityIndicator, "_",
+      BaseIndex, "_",
       SatCode, "_",
-      spt_ba_dataset_code(BurntAreaDataset), 
+      spt_ba_dataset_code(BurntAreaDataset),
       ReferenceYear, "_",
-      RefPeriods, "_", 
-      PrimaryCRScode, "_", ## Added CRS code to changes in names from version 0.6-20230506 doc
+      RefPeriods, "_",
+      CRScode, "_", ## Added CRS code to changes in names from version 0.6-20230506 doc
       CalculationDate, "_",
       VersionNumber,
       sep = "")
-    
+
   } else {
-    
+
     productName <- paste(
-      ProjectAccronym, "_", 
-      SeverityIndicator, "_", 
-      BaseIndex, "_",  
+      ProjectAccronym, "_",
+      SeverityIndicator, "_",
+      BaseIndex, "_",
       SatCode, "_",
-      spt_ba_dataset_code(BurntAreaDataset), 
+      spt_ba_dataset_code(BurntAreaDataset),
       ReferenceYear, "_",
-      RefPeriods, "_", 
-      PrimaryCRScode, "_",## Added CRS code to changes in names from version 0.6-20230506 doc
+      RefPeriods, "_",
+      CRScode, "_",## Added CRS code to changes in names from version 0.6-20230506 doc
       VersionNumber,
       sep = "")
   }
@@ -179,7 +179,7 @@ spt_product_name <- function(ProjectAccronym,
 #' @importFrom tools file_ext file_path_sans_ext
 #' @importFrom base paste0
 #' @export
-#' 
+#'
 
 spt_backup_file <- function(targetFile) {
   # Get the file name and extension
@@ -204,7 +204,7 @@ spt_backup_file <- function(targetFile) {
 #' spt_df_to_md(iris)
 #' @importFrom knitr kable
 #' @export
-#' 
+#'
 
 spt_df_to_md <- function(df) {
   knitr::kable(df,
@@ -224,7 +224,7 @@ spt_df_to_md <- function(df) {
 #' spt_export_to_md(iris, "output.md")
 #' @importFrom kableExtra save_kable
 #' @export
-#' 
+#'
 
 spt_export_to_md <- function(df, filename) {
   # Create a pretty table
@@ -246,7 +246,7 @@ spt_export_to_md <- function(df, filename) {
 #' spt_file_dates("data.txt", tdelta = 60)
 #' spt_file_dates("data.txt")
 #' @export
-#' 
+#'
 
 spt_file_dates <- function(filename, tdelta = 60) {
   if(!file.exists(filename)) {
@@ -257,7 +257,7 @@ spt_file_dates <- function(filename, tdelta = 60) {
     ctime <- file.info(filename)$ctime # file creation time
     mtime <- file.info(filename)$mtime # file modification time
     now <- Sys.time()
-    if(difftime(now,ctime,units = "mins") < tdelta || 
+    if(difftime(now,ctime,units = "mins") < tdelta ||
        difftime(now,mtime,units="mins") < tdelta) {
       return(TRUE)
     } else {
@@ -276,7 +276,7 @@ spt_file_dates <- function(filename, tdelta = 60) {
 #' @examples
 #' spt_create_file("output.txt")
 #' @export
-#' 
+#'
 
 spt_create_file <- function(filename) {
   if(file.exists(filename)){
@@ -297,12 +297,12 @@ spt_create_file <- function(filename) {
 #' @param extdir A character string representing the path to extract the contents of the ZIP file. Default is the current working directory.
 #' @importFrom tools file_ext
 #' @export
-#' 
+#'
 
 spt_download_unzip <- function(url, dest_file, extdir) {
-  
+
   download.file(url, dest_file, mode = "wb")
-  
+
   if (tools::file_ext(dest_file) == "zip") {
     unzip(dest_file, exdir = extdir, overwrite = TRUE)
   }
@@ -322,8 +322,10 @@ spt_download_unzip <- function(url, dest_file, extdir) {
 #' spt_replace_crs_code("data_32629.csv")
 #' spt_replace_crs_code("data_32629.csv", from = "32629", to = "4326")
 #' @export
-#' 
+#'
 
 spt_replace_crs_code <- function(x, from = "32629", to = "3763"){
-  gsub(paste0("_",from,"_"),paste0("_",to,"_"),x)
+
+  return(
+    gsub(paste0("_",from,"_"), paste0("_",to,"_"), x))
 }
