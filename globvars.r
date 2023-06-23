@@ -15,7 +15,7 @@ library(clisymbols)
 # Global variables
 
 
-## ---- PARAMETERS TO CHANGE ---- 
+## ---- PARAMETERS TO CHANGE ----
 
 SPT_PROJ_COORD_SYSTEM_CODE <<- "EPSG:32629"
 
@@ -24,8 +24,8 @@ SPT_GDRIVE_FOLDER <<- "GEE"
 SPT_TASK_TABLE_FILENAME <<- "SPT_MainTaskTable.csv"
 SPT_TASK_TABLE_BASENAME <<- "SPT_MainTaskTable"
 SPT_TASK_TABLE_FORMAT   <<- "csv"
-SPT_TASK_TABLE_DIR      <<- "./code/task_table"
-SPT_TASK_TABLE_PATH     <<- "./code/task_table/SPT_MainTaskTable.csv"
+SPT_TASK_TABLE_DIR      <<- "./R/task_table"
+SPT_TASK_TABLE_PATH     <<- "./R/task_table/SPT_MainTaskTable.csv"
 
 SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
 SPT_EFFIS_HIST_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_hist"
@@ -44,11 +44,11 @@ SPT_GEE_TASK_PATH <<- "./out/gee_tasks"
 SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products"
 
 
-## ---- DO NOT CHANGE THIS PART FROM HERE ---- 
+## ---- DO NOT CHANGE THIS PART FROM HERE ----
 
 SPT_PROJ_ACRONYM <- "SPT"
 
-SPT_META_TEMPLATE <<- "./code/meta_template/SPT_meta_template.xlsx"
+SPT_META_TEMPLATE <<- "./R/meta_template/SPT_meta_template.xlsx"
 SPT_META_TABLE <- readxl::read_excel(SPT_META_TEMPLATE)
 SPT_META_TABLE[is.na(SPT_META_TABLE[,"Value"]), 2] <- ""
 SPT_META_TABLE <<- SPT_META_TABLE
@@ -60,7 +60,7 @@ SPT_FULL_VERSION_NR <<- "v0.1.2"
 
 # List of admissible values for each parameter
 SPT_VALUES <<- list(
-  
+
   # Valid satellite codes
   satCode = c(
     "S2MSI", "MOD", "MYD", "MCD", "L5TM", "L7ETM",
@@ -70,7 +70,7 @@ SPT_VALUES <<- list(
   satCode_s2 = c("S2MSI"),
   satCode_lt = c("L5TM", "L7ETM","L8OLI", "L8TIRS", "LTH"),
   satCode_md = c("MOD", "MYD", "MCD"),
-  
+
   # Processing levels
   procLevel = c("L1", "L1C", "L2", "L2A",
                 "NA", "N/A", NA), # This may be undefined if MODIS is selected!
@@ -82,18 +82,18 @@ SPT_VALUES <<- list(
   modisProduct_terra = c("MOD09A1", "MOD13Q1", "MOD09GQ", "MOD09Q1"),
   modisProduct_aqua = c("MYD09A1","MYD09GQ", "MYD09Q1", "MYD13Q1"),
   modisProduct_comb = c("MCD43A4"),
-  
+
   baseIndex = c(
-    "NBR", "NDVI", "EVI", "TCTB", "TCTG", "TCTW", 
-    "NBRSWIR", "MIRBI", "CSI", "NBRP", "LST", 
+    "NBR", "NDVI", "EVI", "TCTB", "TCTG", "TCTW",
+    "NBRSWIR", "MIRBI", "CSI", "NBRP", "LST",
     "LAI", "GPP", "NPP", "ALB", "FVC"
   ),
   baseIndex_spi = c( "NBR", "NDVI", "EVI", "NBRSWIR", "MIRBI", "CSI", "NBRP"),
   baseIndex_tct = c( "TCTB", "TCTG", "TCTW"),
-  
+
   severityIndicator = c("DELTA", "DLT", "RDELTA", "RDT", "RBR", "S95"),
   burntAreaDataset = c(
-    "ICNF", "EFFIS", "MCD64", 
+    "ICNF", "EFFIS", "MCD64",
     "MICNF", # Modified date-imputation fires from ICNF db
     "FireCCI", "VIIRS"
   ),
