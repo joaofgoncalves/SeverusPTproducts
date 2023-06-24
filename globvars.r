@@ -48,8 +48,12 @@ SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products"
 
 SPT_PROJ_ACRONYM <- "SPT"
 
-SPT_META_TEMPLATE <<- "./R/meta_template/SPT_meta_template.xlsx"
-SPT_META_TABLE <- readxl::read_excel(SPT_META_TEMPLATE)
+# SPT_META_TEMPLATE <<- "./R/meta_template/SPT_meta_template.xlsx"
+# SPT_META_TABLE <- readxl::read_excel(SPT_META_TEMPLATE)
+
+SPT_META_TEMPLATE <<- "./R/meta_template/SPT_meta_template.csv"
+SPT_META_TABLE <- readr::read_csv(SPT_META_TEMPLATE)
+
 SPT_META_TABLE[is.na(SPT_META_TABLE[,"Value"]), 2] <- ""
 SPT_META_TABLE <<- SPT_META_TABLE
 

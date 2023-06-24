@@ -1,10 +1,10 @@
 Package: SeverusPTproducts
 Type: Package
 Title: Generate SeverusPT products for mapping burn severity
-Version: 0.1.0
+Version: 0.1.2
 Author: Joao Goncalves
 Maintainer: Joao Goncalves <joao.goncalves@cibio.up.pt>
-Description: Generate SeverusPT products for mapping burn severity in GEE
+Description: Generate SeverusPT products for mapping burn severity in GEE using the "Delta-approach"
 License: GPL (>=2)
 URL: https://severus.pt
 Encoding: UTF-8

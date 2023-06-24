@@ -37,9 +37,9 @@ Despite increasing investments in fire suppression, extreme fire events have bec
 ## Authors and contributors
 
 _Main author_:
-João Gonçalves
+João Gonçalves    
 
 _Contributors_:
-Duarte Velho
-Bruno Marcos
-Ana Paula Portela
+Duarte Velho     
+Bruno Marcos    
+Ana Paula Portela     
