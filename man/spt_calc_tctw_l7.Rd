@@ -13,7 +13,7 @@ spt_calc_tctw_l7(img)
 An image containing the TCTW values.
 }
 \description{
-Calculates the TCTW (Tasseled Cap Transformation Wetness) for Landsat-7 images using the 
+Calculates the TCTW (Tasseled Cap Transformation Wetness) for Landsat-7 images using the
 Blue, Green, Red, NIR, SWIR1, and SWIR2 bands.
 }
 \details{

@@ -17,7 +17,7 @@ spt_save_gee_status_list(task, geeStatusList, geeTaskPath)
 This function saves a GEE status list to disk as RDS and CSV files.
 }
 \details{
-The function saves the GEE status list to disk in two formats: RDS and CSV. It uses the \code{saveRDS} 
-function to save the status list as an RDS file, and \code{write.csv} to save it as a CSV file. 
+The function saves the GEE status list to disk in two formats: RDS and CSV. It uses the \code{saveRDS}
+function to save the status list as an RDS file, and \code{write.csv} to save it as a CSV file.
 The files are named based on the task ID andtask UID to ensure uniqueness.
 }

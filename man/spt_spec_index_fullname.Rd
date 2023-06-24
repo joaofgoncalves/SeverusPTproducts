@@ -10,7 +10,7 @@ spt_spec_index_fullname(spiAcronym)
 \item{spiAcronym}{The acronym of the spectral index.}
 }
 \value{
-Character. The full name of the spectral index corresponding to 
+Character. The full name of the spectral index corresponding to
 the given acronym.
 }
 \description{

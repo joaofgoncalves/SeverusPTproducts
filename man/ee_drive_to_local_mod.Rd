@@ -17,39 +17,39 @@ ee_drive_to_local_mod(
 \arguments{
 \item{task}{The GEE task object.}
 
-\item{dsn}{The destination file path where the files will be downloaded. If not specified, a 
+\item{dsn}{The destination file path where the files will be downloaded. If not specified, a
 temporary directory will be used.}
 
-\item{overwrite}{Logical indicating whether to overwrite existing files with the same name. 
+\item{overwrite}{Logical indicating whether to overwrite existing files with the same name.
 Default is \code{TRUE}.}
 
-\item{consider}{Logical or character indicating how to handle multiple files with the same 
+\item{consider}{Logical or character indicating how to handle multiple files with the same
 name in Google Drive.
-                If \code{TRUE}, it prompts the user to select one file. If \code{"last"}, 
+                If \code{TRUE}, it prompts the user to select one file. If \code{"last"},
                 it selects the most recent file.
                 If \code{"all"}, it downloads all files. Default is \code{TRUE}.}
 
-\item{public}{Logical indicating whether to make the downloaded files publicly accessible. 
+\item{public}{Logical indicating whether to make the downloaded files publicly accessible.
 Default is \code{FALSE}.}
 
-\item{metadata}{Logical indicating whether to include metadata information in the output. 
+\item{metadata}{Logical indicating whether to include metadata information in the output.
 Default is \code{FALSE}.}
 
 \item{quiet}{Logical indicating whether to suppress progress messages. Default is \code{FALSE}.}
 }
 \value{
-A character vector of file paths to the downloaded files, or a list with file paths and 
+A character vector of file paths to the downloaded files, or a list with file paths and
 metadata information if \code{metadata = TRUE}.
 }
 \description{
 This function downloads files from Google Drive to the local storage.
 }
 \details{
-This function is a modified version of the \code{ee_drive_to_local} function from the \pkg{rgee} 
-package. It allows downloading files from Google Drive based on a GEE task object. The files are 
-downloaded to the specified destination file path (\code{dsn}) or to a temporary directory if \code{dsn} 
+This function is a modified version of the \code{ee_drive_to_local} function from the \pkg{rgee}
+package. It allows downloading files from Google Drive based on a GEE task object. The files are
+downloaded to the specified destination file path (\code{dsn}) or to a temporary directory if \code{dsn}
 is not provided. The function provides options for handling multiple files with the same name in Google Drive,
-including selecting one file, selecting the most recent file, or downloading all files. It 
-also supports making the downloaded files publicly accessible and including metadata information 
+including selecting one file, selecting the most recent file, or downloading all files. It
+also supports making the downloaded files publicly accessible and including metadata information
 in the output.
 }

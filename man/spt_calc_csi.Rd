@@ -13,7 +13,7 @@ spt_calc_csi(img)
 An image representing the CSI.
 }
 \description{
-Calculates the Char Soil Index (CSI) from an input image using the NIR and SWIR2 
+Calculates the Char Soil Index (CSI) from an input image using the NIR and SWIR2
 bands.
 }
 \details{
@@ -21,7 +21,7 @@ This function calculates the Char Soil Index (CSI) using the NIR and SWIR2 bands
 The formula for CSI is: NIR / SWIR2.
 
 The input image should contain the NIR and SWIR2 bands as specified in the function.
-The output image will have a band named 'CSI' and will inherit the properties of the 
+The output image will have a band named 'CSI' and will inherit the properties of the
 input image.
 
 # Smith et al. 2007

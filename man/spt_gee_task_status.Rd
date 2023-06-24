@@ -28,6 +28,7 @@ retrieves the basename of the URI for the Google Drive file and stores it as \co
 # Assuming 'geeTask' is a valid GEE task object
 spt_gee_task_status(geeTask)
 
+
 }
 \seealso{
 \code{\link{ee_utils_py_to_r}}, \code{\link{basename}}

@@ -12,11 +12,11 @@ spt_spec_index_formula(spiAcronym, satCode)
 \item{satCode}{The satellite code.}
 }
 \value{
-Character. The formula of the spectral index corresponding to the given 
+Character. The formula of the spectral index corresponding to the given
 acronym and satellite code.
 }
 \description{
-This function retrieves the formula of a spectral index based on its 
+This function retrieves the formula of a spectral index based on its
 acronym and satellite code.
 }
 \examples{

@@ -7,27 +7,27 @@
 spt_scale_lt_oli_sr(img)
 }
 \arguments{
-\item{img}{An Earth Engine image object representing Landsat OLI surface reflectance 
+\item{img}{An Earth Engine image object representing Landsat OLI surface reflectance
 imagery.}
 }
 \value{
-An Earth Engine image object with the optical bands scaled to surface 
+An Earth Engine image object with the optical bands scaled to surface
 reflectance values.
 }
 \description{
-This function scales the surface reflectance bands of Landsat OLI imagery to 
-their corresponding surface reflectance values using pre-defined scaling factors 
-and offsets. It applies the scaling to the optical bands (Coastal, Blue, Green, Red, 
+This function scales the surface reflectance bands of Landsat OLI imagery to
+their corresponding surface reflectance values using pre-defined scaling factors
+and offsets. It applies the scaling to the optical bands (Coastal, Blue, Green, Red,
 NIR, SWIR1, SWIR2) and adds the scaled bands as new bands to the input image.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-  \item Selects the optical bands (Coastal, Blue, Green, Red, NIR, SWIR1, SWIR2) from 
+  \item Selects the optical bands (Coastal, Blue, Green, Red, NIR, SWIR1, SWIR2) from
   the input image using the \code{select} function.
-  \item Scales the selected bands by multiplying them with a scaling factor (0.0000275) 
+  \item Scales the selected bands by multiplying them with a scaling factor (0.0000275)
   and subtracting an offset (-0.2) using the \code{multiply} and \code{add} functions.
-  \item Adds the scaled bands as new bands to the input image using the \code{addBands} 
+  \item Adds the scaled bands as new bands to the input image using the \code{addBands}
   function.
 }
 }

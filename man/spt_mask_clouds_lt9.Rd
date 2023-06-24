@@ -10,25 +10,25 @@ spt_mask_clouds_lt9(img)
 \item{img}{An Earth Engine image object representing Landsat 9 imagery.}
 }
 \value{
-An Earth Engine image object with clouds, cloud shadows, and cirrus 
+An Earth Engine image object with clouds, cloud shadows, and cirrus
 clouds masked out.
 }
 \description{
-This function applies a cloud mask to Landsat 9 imagery based on the quality 
-assessment (QA) layer. Clouds, cloud shadows, and cirrus clouds are identified 
+This function applies a cloud mask to Landsat 9 imagery based on the quality
+assessment (QA) layer. Clouds, cloud shadows, and cirrus clouds are identified
 using specific bit masks and are then masked out in the image.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-  \item Selects the quality assessment (QA) layer from the input image using 
+  \item Selects the quality assessment (QA) layer from the input image using
   the \code{select} function.
-  \item Defines the bit masks for cirrus clouds, clouds, and cloud shadows using 
+  \item Defines the bit masks for cirrus clouds, clouds, and cloud shadows using
   the \code{ee$Number} function and bitwise left shift operator (\code{\%<<\%}).
-  \item Applies the masks for cirrus clouds, clouds, and cloud shadows by performing 
-  bitwise operations (\code{bitwiseAnd}) on the QA layer and checking if the 
+  \item Applies the masks for cirrus clouds, clouds, and cloud shadows by performing
+  bitwise operations (\code{bitwiseAnd}) on the QA layer and checking if the
   corresponding bits are set to zero.
-  \item Updates the image mask using the \code{updateMask} function, where pixels 
+  \item Updates the image mask using the \code{updateMask} function, where pixels
   identified as cirrus clouds, clouds, or cloud shadows are masked out.
 }
 }

@@ -12,7 +12,7 @@ spt_sat_code(x)
 \item{...}{Additional arguments to be passed to the dispatched method.}
 }
 \description{
-This function is a dispatch method that performs various satellite analysis 
-operations based on the input object. The specific method to be executed is determined 
+This function is a dispatch method that performs various satellite analysis
+operations based on the input object. The specific method to be executed is determined
 by the class of the input object.
 }

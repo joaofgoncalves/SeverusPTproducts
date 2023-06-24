@@ -9,7 +9,7 @@ spt_start_gee_task(task, taskTable = NULL, taskTablePath)
 \arguments{
 \item{task}{The task object containing information about the task.}
 
-\item{taskTable}{The task table to update (optional). If not provided, it will be read 
+\item{taskTable}{The task table to update (optional). If not provided, it will be read
 from the specified \code{taskTablePath}.}
 
 \item{taskTablePath}{The file path to the task table.}
@@ -18,7 +18,7 @@ from the specified \code{taskTablePath}.}
 \code{TRUE} if the update is successful, \code{FALSE} otherwise.
 }
 \description{
-This function updates the status of a task in the task table to indicate that the associated 
+This function updates the status of a task in the task table to indicate that the associated
 Google Earth Engine (GEE) task has started.
 }
 \examples{

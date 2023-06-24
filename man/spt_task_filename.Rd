@@ -17,7 +17,7 @@ spt_task_filename(task, projectAccronym, versionNumber)
 A character string representing the generated filename for the task.
 }
 \description{
-This function generates a filename for a given task based on its properties and the 
+This function generates a filename for a given task based on its properties and the
 specified project acronym and version number.
 }
 \examples{

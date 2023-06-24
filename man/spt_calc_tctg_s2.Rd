@@ -13,12 +13,12 @@ spt_calc_tctg_s2(img)
 An image containing the TCTG values.
 }
 \description{
-Calculates the TCTG (Tasseled Cap Transformation Greenness) for Sentinel-2 images using the 
+Calculates the TCTG (Tasseled Cap Transformation Greenness) for Sentinel-2 images using the
 Blue, Green, Red, NIR, SWIR1, and SWIR2 bands.
 }
 \details{
 The TCTG is calculated using the following formula:
-\deqn{TCTG = (BLUE \times -0.3599) + (GREEN \times -0.3533) + (RED \times -0.4734) + 
+\deqn{TCTG = (BLUE \times -0.3599) + (GREEN \times -0.3533) + (RED \times -0.4734) +
 (NIR \times 0.6633) + (SWIR1 \times 0.0087) + (SWIR2 \times -0.2856)}
 }
 \examples{

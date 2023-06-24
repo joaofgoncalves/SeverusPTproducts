@@ -23,7 +23,7 @@ The input image should contain the SWIR1 and SWIR2 bands as specified in the fun
 The output image will have a band named 'MIRBI' and will inherit the properties of the input image.
 
 Trigg, S., & Flasse, S. (2001). An evaluation of different
-bi-spectral spaces for discriminating burned shrub-savannah. International Journal 
+bi-spectral spaces for discriminating burned shrub-savannah. International Journal
 of RemoteSensing, 22(13), 2641-2647. https://doi.org/10.1080/01431160110053185
 
 NOTE: THIS INDEX WAS ADJUSTED TO NEGATIVE FORM TO GIVE POSITIVE DELTAS HIGH SEVERITY

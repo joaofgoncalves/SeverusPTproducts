@@ -18,7 +18,7 @@ The GEE status list read from disk.
 This function reads a GEE status list from disk in RDS format.
 }
 \details{
-The function reads the GEE status list from disk using the \code{readRDS} function. It assumes 
-that the status list was previously saved in the specified \code{geeTaskPath} using the 
+The function reads the GEE status list from disk using the \code{readRDS} function. It assumes
+that the status list was previously saved in the specified \code{geeTaskPath} using the
 \code{spt_save_gee_status_list} function.
 }

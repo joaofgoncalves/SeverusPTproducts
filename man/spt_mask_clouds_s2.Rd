@@ -13,8 +13,8 @@ spt_mask_clouds_s2(img)
 An Earth Engine image object with clouds and cirrus masked.
 }
 \description{
-This function applies a cloud and cirrus mask to Sentinel-2 imagery based on the quality 
-assessment (QA) layer. It identifies cloud and cirrus pixels using specific bit masks and 
+This function applies a cloud and cirrus mask to Sentinel-2 imagery based on the quality
+assessment (QA) layer. It identifies cloud and cirrus pixels using specific bit masks and
 creates a mask to remove those pixels from the image.
 }
 \details{
@@ -22,7 +22,7 @@ The function performs the following steps:
 \enumerate{
   \item Selects the quality assessment (QA) layer from the input image.
   \item Defines bit masks for cloud and cirrus (bits 10 and 11).
-  \item Creates a mask by checking that both cloud and cirrus flags are set to zero, 
+  \item Creates a mask by checking that both cloud and cirrus flags are set to zero,
   indicating clear conditions.
   \item Applies the mask to the input image using the \code{updateMask} function.
 }

@@ -7,7 +7,7 @@
 spt_rm_uncompleted_tasks(taskTable = NULL, taskTablePath)
 }
 \arguments{
-\item{taskTable}{The task table to remove uncompleted tasks from (optional). 
+\item{taskTable}{The task table to remove uncompleted tasks from (optional).
 If not provided, it will be read from the specified \code{taskTablePath}.}
 
 \item{taskTablePath}{The file path to the task table.}

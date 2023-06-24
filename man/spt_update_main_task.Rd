@@ -11,7 +11,7 @@ spt_update_main_task(task, state, taskTable = NULL, taskTablePath)
 
 \item{state}{The new state of the main task.}
 
-\item{taskTable}{The task table to update (optional). If not provided, 
+\item{taskTable}{The task table to update (optional). If not provided,
 it will be read from the specified \code{taskTablePath}.}
 
 \item{taskTablePath}{The file path to the task table.}
@@ -24,7 +24,7 @@ This function updates the status of a main task in the task table.
 }
 \examples{
 task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-spt_update_main_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+spt_update_main_task(task, state = "COMPLETED", taskTable = myTaskTable,
 taskTablePath = "path/to/taskTable.csv")
 
 }

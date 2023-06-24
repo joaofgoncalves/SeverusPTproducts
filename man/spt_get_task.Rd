@@ -16,7 +16,7 @@ spt_get_task(
 )
 }
 \arguments{
-\item{taskTable}{A data frame representing the task table. If not provided, it will be 
+\item{taskTable}{A data frame representing the task table. If not provided, it will be
 read from the specified taskTablePath.}
 
 \item{taskID}{The ID of the task to retrieve.}
@@ -37,8 +37,8 @@ read from the specified taskTablePath.}
 A data frame representing the retrieved task, with an additional "task" class.
 }
 \description{
-This function retrieves a specific task from a task table based on the provided parameters. 
-It can search for a task using taskID, taskUID, geeTaskID, geeTaskCode, postProcTaskID, or 
+This function retrieves a specific task from a task table based on the provided parameters.
+It can search for a task using taskID, taskUID, geeTaskID, geeTaskCode, postProcTaskID, or
 closingTaskID.
 }
 \examples{

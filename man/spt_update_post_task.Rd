@@ -11,7 +11,7 @@ spt_update_post_task(task, state, taskTable = NULL, taskTablePath)
 
 \item{state}{The new state of the post-processing task.}
 
-\item{taskTable}{The task table to update (optional). If not provided, it will 
+\item{taskTable}{The task table to update (optional). If not provided, it will
 be read from the specified \code{taskTablePath}.}
 
 \item{taskTablePath}{The file path to the task table.}
@@ -24,7 +24,7 @@ This function updates the status of a post-processing task in the task table.
 }
 \examples{
 task <- spt_get_task(taskTable = myTaskTable, taskID = "12345")
-spt_update_post_task(task, state = "COMPLETED", taskTable = myTaskTable, 
+spt_update_post_task(task, state = "COMPLETED", taskTable = myTaskTable,
 taskTablePath = "path/to/taskTable.csv")
 
 }

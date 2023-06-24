@@ -10,11 +10,11 @@ spt_task_to_dataframe(task)
 \item{task}{A task object containing information about the task.}
 }
 \value{
-A data frame with two columns: "taskParam" representing the task parameter names, 
+A data frame with two columns: "taskParam" representing the task parameter names,
 and "taskValue" representing the corresponding task values.
 }
 \description{
-This function converts a task object into a data frame, where each column represents a 
+This function converts a task object into a data frame, where each column represents a
 task parameter and the corresponding value.
 }
 \examples{

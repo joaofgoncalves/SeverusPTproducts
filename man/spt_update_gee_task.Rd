@@ -11,7 +11,7 @@ spt_update_gee_task(geeTask, task, taskTable = NULL, taskTablePath)
 
 \item{task}{The task object containing information about the task.}
 
-\item{taskTable}{The task table to update (optional). If not provided, it will be 
+\item{taskTable}{The task table to update (optional). If not provided, it will be
 read from the specified \code{taskTablePath}.}
 
 \item{taskTablePath}{The file path to the task table.}
@@ -20,7 +20,7 @@ read from the specified \code{taskTablePath}.}
 \code{TRUE} if the update is successful, \code{FALSE} otherwise.
 }
 \description{
-This function updates the status and information of a Google Earth Engine (GEE) task in 
+This function updates the status and information of a Google Earth Engine (GEE) task in
 the task table.
 }
 \examples{

@@ -13,7 +13,7 @@ spt_calc_tctg_l7(img)
 An image containing the TCTG values.
 }
 \description{
-Calculates the TCTG (Tasseled Cap Transformation Greenness) for Landsat-7 images using the 
+Calculates the TCTG (Tasseled Cap Transformation Greenness) for Landsat-7 images using the
 Blue, Green, Red, NIR, SWIR1, and SWIR2 bands.
 }
 \details{

@@ -13,10 +13,10 @@ spt_scale_lt_toa(img)
 An Earth Engine image object with the TOA reflectance values
 }
 \description{
-This function maintains the top-of-atmosphere (TOA) reflectance (placeholder function because values 
+This function maintains the top-of-atmosphere (TOA) reflectance (placeholder function because values
 area already scaled in this case)
 }
 \details{
-The function simply multiplies the input image by a scaling factor of 1 using the \code{multiply} function. 
+The function simply multiplies the input image by a scaling factor of 1 using the \code{multiply} function.
 This operation retains the original TOA values of the image.
 }

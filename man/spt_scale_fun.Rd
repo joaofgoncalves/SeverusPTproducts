@@ -17,6 +17,6 @@ spt_scale_fun(satCode, procLevel = NULL, modisProduct = NULL)
 The scaling function.
 }
 \description{
-This function selects and returns the corresponding scaling function based on 
+This function selects and returns the corresponding scaling function based on
 the specified parameters.
 }

@@ -13,11 +13,11 @@ spt_calc_nbrp_s2(img)
 An image representing the NBR+ for Sentinel-2.
 }
 \description{
-Calculates the NBR+ (Normalized Burn Ratio Plus) for Sentinel-2 images using the SWIR2, 
+Calculates the NBR+ (Normalized Burn Ratio Plus) for Sentinel-2 images using the SWIR2,
 RE4, Green, and Blue bands.
 }
 \details{
-This function calculates the NBR+ (Normalized Burn Ratio Plus) for Sentinel-2 images using 
+This function calculates the NBR+ (Normalized Burn Ratio Plus) for Sentinel-2 images using
 the SWIR2, RE4, Green, and Blue bands.
 The formula for NBR+ is: -1 * ((SWIR2 - RE4 - Green - Blue) / (SWIR2 + RE4 + Green + Blue)).
 
@@ -36,7 +36,7 @@ The adjustment was made according to the specified note.
 
 }
 \references{
-Alcaras, M. 2022. "Satellite-Based Burn Severity Mapping: Implementation of the Normalized Burn 
-Ratio Plus (NBR+) for Sentinel-2 and Landsat-8." 
+Alcaras, M. 2022. "Satellite-Based Burn Severity Mapping: Implementation of the Normalized Burn
+Ratio Plus (NBR+) for Sentinel-2 and Landsat-8."
 Remote Sensing, 14(7), 1727. DOI: 10.3390/rs14071727.
 }

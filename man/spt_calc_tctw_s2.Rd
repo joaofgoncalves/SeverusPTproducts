@@ -13,11 +13,12 @@ spt_calc_tctw_s2(img)
 An image containing the TCTW values.
 }
 \description{
-Calculates the TCTW (Tasseled Cap Transformation Wetness) for Sentinel-2 images using the Blue, 
+Calculates the TCTW (Tasseled Cap Transformation Wetness) for Sentinel-2 images using the Blue,
 Green, Red, NIR, SWIR1, and SWIR2 bands.
 }
 \details{
 The TCTW is calculated using the following formula:
-\deqn{TCTW = (BLUE \times 0.2578) + (GREEN \times 0.2305) + (RED \times 0.0883) + (NIR \times 0.1071) + 
+\deqn{TCTW = (BLUE \times 0.2578) + (GREEN \times 0.2305) +
+(RED \times 0.0883) + (NIR \times 0.1071) +
 (SWIR1 \times -0.7611) + (SWIR2 \times -0.5308)}
 }

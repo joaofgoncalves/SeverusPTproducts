@@ -13,21 +13,21 @@ spt_mask_clouds_lt7(img)
 An Earth Engine image object with clouds and cloud shadows masked out.
 }
 \description{
-This function applies a cloud mask to Landsat 7 imagery based on the quality 
-assessment (QA) layer. Clouds and cloud shadows are identified using specific 
+This function applies a cloud mask to Landsat 7 imagery based on the quality
+assessment (QA) layer. Clouds and cloud shadows are identified using specific
 bit masks and are then masked out in the image.
 }
 \details{
 The function performs the following steps:
 \enumerate{
-  \item Selects the quality assessment (QA) layer from the input image using 
+  \item Selects the quality assessment (QA) layer from the input image using
   the \code{select} function.
-  \item Defines the cloud and cloud shadow bit masks using the \code{ee$Number} 
+  \item Defines the cloud and cloud shadow bit masks using the \code{ee$Number}
   function and bitwise left shift operator (\code{\%<<\%}).
-  \item Applies the cloud and cloud shadow masks by performing bitwise operations 
-  (\code{bitwiseAnd}) on the QA layer and checking if the corresponding bits are 
+  \item Applies the cloud and cloud shadow masks by performing bitwise operations
+  (\code{bitwiseAnd}) on the QA layer and checking if the corresponding bits are
   set to zero.
-  \item Updates the image mask using the \code{updateMask} function, where pixels 
+  \item Updates the image mask using the \code{updateMask} function, where pixels
   identified as clouds or cloud shadows are masked out.
 }
 }

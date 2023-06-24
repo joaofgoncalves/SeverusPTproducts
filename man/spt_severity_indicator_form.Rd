@@ -12,12 +12,12 @@ spt_severity_indicator_form(spi, si)
 \item{si}{The selected severity indicator.}
 }
 \value{
-The formula for the severity indicator based on the selected 
+The formula for the severity indicator based on the selected
 spectral index and severity indicator.
 }
 \description{
-This function generates the formula for a severity indicator based on the 
-selected spectral index (spi) and severity indicator (si). Available options 
+This function generates the formula for a severity indicator based on the
+selected spectral index (spi) and severity indicator (si). Available options
 are delta, Relative delta and Relativized Burn Ratio.
 }
 \examples{

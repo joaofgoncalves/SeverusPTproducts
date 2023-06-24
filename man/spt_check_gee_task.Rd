@@ -11,25 +11,25 @@ spt_check_gee_task(geeTask, sleep = 60, verbose = FALSE)
 
 \item{sleep}{The number of seconds to sleep between status checks (default is 60 seconds).}
 
-\item{verbose}{If TRUE, verbose output will be printed during the status check (default 
+\item{verbose}{If TRUE, verbose output will be printed during the status check (default
 is FALSE).}
 }
 \value{
 The final status of the GEE task as a list.
 }
 \description{
-This function checks the status of a GEE task at regular intervals and waits until the 
+This function checks the status of a GEE task at regular intervals and waits until the
 task is completed, failed, or cancelled.
 }
 \details{
-The function initializes the `status` variable as "RUNNING" and starts a timer. It then 
+The function initializes the `status` variable as "RUNNING" and starts a timer. It then
 enters a `repeat` loop
-where it calls the `spt_gee_task_status` function to retrieve the current status of the GEE 
-task. The loop continues until the task status is one of "COMPLETED", "FAILED", "CANCELLED", 
-or "CANCEL_REQUESTED". During each iteration, the function calculates the time difference and 
+where it calls the `spt_gee_task_status` function to retrieve the current status of the GEE
+task. The loop continues until the task status is one of "COMPLETED", "FAILED", "CANCELLED",
+or "CANCEL_REQUESTED". During each iteration, the function calculates the time difference and
 prints the GEE process ID, task status, and approximate run time if `verbose` is set to TRUE.
 
-Once the loop is exited, the function checks the final status and prints appropriate 
+Once the loop is exited, the function checks the final status and prints appropriate
 messages if `verbose` is TRUE. It then returns the final status of the GEE task as a list.
 }
 \examples{

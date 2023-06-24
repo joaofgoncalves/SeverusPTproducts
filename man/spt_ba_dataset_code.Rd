@@ -10,7 +10,7 @@ spt_ba_dataset_code(baDataset)
 \item{baDataset}{The burnt area dataset name.}
 }
 \value{
-Character. The dataset code corresponding to the given 
+Character. The dataset code corresponding to the given
 burned area dataset.
 }
 \description{

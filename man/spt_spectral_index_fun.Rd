@@ -17,6 +17,6 @@ spt_spectral_index_fun(baseIndex, satCode = NULL, modisProduct = NULL)
 The spectral index calculation function.
 }
 \description{
-This function selects and returns the corresponding spectral index calculation 
+This function selects and returns the corresponding spectral index calculation
 function based on the specified parameters.
 }

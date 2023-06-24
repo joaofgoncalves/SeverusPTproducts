@@ -13,7 +13,7 @@ spt_calc_tctb_l7(img)
 An image containing the TCTB values.
 }
 \description{
-Calculates the TCTB (Tasseled Cap Transformation Brightness) for Landsat-7 images using the 
+Calculates the TCTB (Tasseled Cap Transformation Brightness) for Landsat-7 images using the
 Blue, Green, Red, NIR, SWIR1, and SWIR2 bands.
 }
 \details{

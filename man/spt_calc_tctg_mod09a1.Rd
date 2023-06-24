@@ -7,14 +7,14 @@
 spt_calc_tctg_mod09a1(img)
 }
 \arguments{
-\item{img}{An input image containing the Blue, Green, Red, NIR, NIR2, SWIR1, and 
+\item{img}{An input image containing the Blue, Green, Red, NIR, NIR2, SWIR1, and
 SWIR2 bands.}
 }
 \value{
 An image containing the TCTG values.
 }
 \description{
-Calculates the TCTG (Tasseled Cap Transformation Greenness) for MOD09A1 images using 
+Calculates the TCTG (Tasseled Cap Transformation Greenness) for MOD09A1 images using
 the Blue, Green, Red, NIR, NIR2, SWIR1, and SWIR2 bands.
 }
 \details{

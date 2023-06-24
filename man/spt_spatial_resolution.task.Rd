@@ -7,14 +7,14 @@
 \method{spt_spatial_resolution}{task}(x)
 }
 \arguments{
-\item{x}{A task object containing information about the satellite code and the MODIS 
+\item{x}{A task object containing information about the satellite code and the MODIS
 product (if applicable).}
 }
 \value{
 The spatial resolution in meters.
 }
 \description{
-This function determines the spatial resolution for a given task based on the satellite 
+This function determines the spatial resolution for a given task based on the satellite
 code and MODIS product (if applicable).
 }
 \examples{

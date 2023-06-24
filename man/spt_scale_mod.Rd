@@ -13,11 +13,11 @@ spt_scale_mod(img)
 An `ee$Image` object with scaled pixel values.
 }
 \description{
-This function scales the pixel values of an image in MOD format by multiplying 
+This function scales the pixel values of an image in MOD format by multiplying
 them with a scaling factor of 0.0001.
 }
 \details{
-The function applies a scaling factor of 0.0001 to the pixel values of the input image. 
-This scaling is commonly used to convert MOD-format pixel values to their physical 
+The function applies a scaling factor of 0.0001 to the pixel values of the input image.
+This scaling is commonly used to convert MOD-format pixel values to their physical
 measurement units.
 }

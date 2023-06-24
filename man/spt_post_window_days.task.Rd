@@ -10,12 +10,12 @@
 \item{x}{A task object containing information about the pre-fire and post-fire references.}
 }
 \value{
-A numeric vector with two elements: the number of days in the post-fire window 
-from pre-fire reference to post-fire reference, and the number of days in the post-fire 
+A numeric vector with two elements: the number of days in the post-fire window
+from pre-fire reference to post-fire reference, and the number of days in the post-fire
 reference.
 }
 \description{
-This function calculates the number of days in the post-fire window for a given task, 
+This function calculates the number of days in the post-fire window for a given task,
 based on the pre-fire and post-fire references.
 }
 \examples{

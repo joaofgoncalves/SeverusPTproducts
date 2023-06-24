@@ -12,7 +12,7 @@ spt_product_name(
   BurntAreaDataset,
   ReferenceYear,
   RefPeriods,
-  PrimaryCRScode,
+  CRScode,
   addCalcDate = FALSE,
   VersionNumber
 )
@@ -32,11 +32,11 @@ spt_product_name(
 
 \item{RefPeriods}{A character string representing the reference periods.}
 
-\item{PrimaryCRScode}{A character string representing the primary CRS code.}
-
 \item{addCalcDate}{A logical value indicating whether to include the calculation date in the product name. Default is FALSE.}
 
 \item{VersionNumber}{A character string representing the version number.}
+
+\item{PrimaryCRScode}{A character string representing the primary CRS code.}
 }
 \value{
 A character string representing the generated product name.

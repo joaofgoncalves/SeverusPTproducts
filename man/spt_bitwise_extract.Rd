@@ -12,20 +12,20 @@ spt_bitwise_extract(value, fromBit, toBit = NULL)
 \item{fromBit}{The starting bit position from which extraction should begin.}
 
 \item{toBit}{(optional) The ending bit position at which extraction should stop.
-If not provided, extraction will be performed for a single bit at 
+If not provided, extraction will be performed for a single bit at
 the \code{fromBit} position.}
 }
 \value{
 A numeric value representing the extracted bits.
 }
 \description{
-This function performs bitwise operations to extract a range of bits from a numeric value. 
+This function performs bitwise operations to extract a range of bits from a numeric value.
 It can extract a single bit or a range of bits specified by the start and end positions.
 }
 \details{
-The function performs bitwise right shift and bitwise AND operations to extract the 
-desired bits from the input value. If only \code{fromBit} is provided, a single bit is 
-extracted. If both \code{fromBit} and \code{toBit} are provided, a range of bits is extracted, 
+The function performs bitwise right shift and bitwise AND operations to extract the
+desired bits from the input value. If only \code{fromBit} is provided, a single bit is
+extracted. If both \code{fromBit} and \code{toBit} are provided, a range of bits is extracted,
 inclusive of both positions. The extracted bits are returned as a numeric value.
 }
 \examples{
