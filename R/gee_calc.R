@@ -33,6 +33,15 @@ spt_spectral_index_fun <- function(baseIndex, satCode=NULL, modisProduct=NULL){
     MIRBI   = spt_calc_mirbi,
     CSI     = spt_calc_csi,
 
+    # New indices added from Duarte Velho contributed code:
+    BAI   = spt_calc_bai,
+    DBSI  = spt_calc_dbsi,
+    NBR2  = spt_calc_nbr2,
+    GEMI  = spt_calc_gemi,
+    SAVI  = spt_calc_savi,
+    MSAVI = spt_calc_msavi,
+    NDWI  = spt_calc_ndwi,
+
     # Satellite specific indices
     NBRP = list(
       S2MSI = spt_calc_nbrp_s2,
@@ -151,7 +160,7 @@ spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 
   scaleFuns <- list(
 
-    S2MSI = scaleData_S2,
+    S2MSI = spt_scale_s2,
 
     L5TM  = list(
       L1  = spt_scale_lt_toa,

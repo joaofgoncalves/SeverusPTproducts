@@ -86,9 +86,15 @@ SPT_VALUES <<- list(
   baseIndex = c(
     "NBR", "NDVI", "EVI", "TCTB", "TCTG", "TCTW",
     "NBRSWIR", "MIRBI", "CSI", "NBRP", "LST",
-    "LAI", "GPP", "NPP", "ALB", "FVC"
+    "LAI", "GPP", "NPP", "ALB", "FVC",
+    # New indices added from Duarte Velho contributed code:
+    "BAI",  "DBSI", "NBR2", "GEMI", "SAVI", "MSAVI", "NDWI"
   ),
-  baseIndex_spi = c( "NBR", "NDVI", "EVI", "NBRSWIR", "MIRBI", "CSI", "NBRP"),
+
+  baseIndex_spi = c( "NBR", "NDVI", "EVI", "NBRSWIR", "MIRBI", "CSI", "NBRP",
+                     # New indices added from Duarte Velho contributed code:
+                     "BAI",  "DBSI", "NBR2", "GEMI", "SAVI", "MSAVI", "NDWI"),
+
   baseIndex_tct = c( "TCTB", "TCTG", "TCTW"),
 
   severityIndicator = c("DELTA", "DLT", "RDELTA", "RDT", "RBR", "S95"),
