@@ -53,8 +53,12 @@ spt_rm_uncompleted_tasks(taskTablePath = SPT_TASK_TABLE_PATH)
 
 ttb <-
   spt_generate_tasks(taskTable    = spt_read_tasks_table(SPT_TASK_TABLE_PATH),
-                     satCode           = c("L8OLI"),
-                     baseIndex         = c("NDVI","NBRSWIR","MIRBI","TCTG","NBR"),
+
+                     satCode           = c("L8OLI","S2MSI"),
+
+                     #baseIndex         = c("NDVI","NBRSWIR","MIRBI","TCTG","NBR"),
+                     baseIndex         = c("CSI","BAI"),
+
                      procLevel         = "L2",
                      modisProduct      = NA,
                      severityIndicator = c("DELTA","RDT","RBR"),
@@ -68,21 +72,21 @@ ttb <-
 spt_write_tasks_table(taskTable = ttb,taskTablePath = SPT_TASK_TABLE_PATH)
 View(spt_read_tasks_table(SPT_TASK_TABLE_PATH))
 
-ttb <-
-  spt_generate_tasks(taskTable    = spt_read_tasks_table(SPT_TASK_TABLE_PATH),
-                     satCode           = c("S2MSI"),
-                     baseIndex         = c("NBR"),
-                     procLevel         = "L2",
-                     modisProduct      = NA,
-                     severityIndicator = c("DELTA","RDT","RBR"),
-                     burntAreaDataset  = "EFFIS",
-                     referenceYear     = 2017:2022,
-                     preFireRef        = 3,
-                     preFireType       = "moving",
-                     postFireRef       = seq(15,24,by=3),
-                     minFireSize       = 10)
-
-spt_write_tasks_table(taskTable = ttb,taskTablePath = SPT_TASK_TABLE_PATH)
-View(spt_read_tasks_table(SPT_TASK_TABLE_PATH))
+# ttb <-
+#   spt_generate_tasks(taskTable    = spt_read_tasks_table(SPT_TASK_TABLE_PATH),
+#                      satCode           = c("S2MSI"),
+#                      baseIndex         = c("NBR"),
+#                      procLevel         = "L2",
+#                      modisProduct      = NA,
+#                      severityIndicator = c("DELTA","RDT","RBR"),
+#                      burntAreaDataset  = "EFFIS",
+#                      referenceYear     = 2017:2022,
+#                      preFireRef        = 3,
+#                      preFireType       = "moving",
+#                      postFireRef       = seq(15,24,by=3),
+#                      minFireSize       = 10)
+#
+# spt_write_tasks_table(taskTable = ttb,taskTablePath = SPT_TASK_TABLE_PATH)
+# View(spt_read_tasks_table(SPT_TASK_TABLE_PATH))
 
 

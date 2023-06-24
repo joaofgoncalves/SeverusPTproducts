@@ -1,0 +1,36 @@
+Parameter,Value
+ProjectAcronym,SeverusPT
+ProjectName,A web-based data product and service for fire severity assessment and prediction in mainland Portugal
+ProjectWebsite,https://severus.pt/en/ 
+ContactEntity,CIBIO/InBIO/BIOPOLIS/ECOCHANGE Team - University of Porto
+ContactAddress,"U. Porto, Campus de Vairão, R. Padre Armando Quintas 7, 4485-661 Vairão"
+ContactEmail,geral@severus.pt 
+ProductType,
+ProductName,
+SpatialResolution,
+TemporalResolution,
+CoordRefSystem,
+CalculationDate,
+CalculationPlatforms,
+BurntAreaDataset,
+BurntAreaDatasetURL,
+ReferenceYear,
+MinFireSize,
+SatCollectionData,
+SatProcLevel,
+SatColVersion,
+CloudMaskUsed,
+CloudMaskMethod,
+OtherCorrections,
+BaseIndex,
+BaseIndexFormula,
+SeverityIndicator,
+SeverityIndicatorForm,
+CompAggMeasure,
+PreFireType,
+PreFireRefPeriod,
+PostFireType,
+PostFireRefPeriod,
+ScaleFactor,Multiply by 0.0001
+VersionNumber,
+VersionFullNumber,
