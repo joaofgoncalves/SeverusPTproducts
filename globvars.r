@@ -27,12 +27,13 @@ SPT_TASK_TABLE_FORMAT   <<- "csv"
 SPT_TASK_TABLE_DIR      <<- "./R/task_table"
 SPT_TASK_TABLE_PATH     <<- "./R/task_table/SPT_MainTaskTable.csv"
 
-SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
+#SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/EFFIS_20230313"
+SPT_EFFIS_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_all"
 SPT_EFFIS_HIST_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_hist"
 SPT_EFFIS_CURR_GEE_ASSET <<- "users/joaofgo/severus_pt/effis_current"
 
 SPT_EFFIS_YEAR_FIELD <<- "year"
-SPT_EFFIS_DATE_FIELD <<- "FIREDATE"
+SPT_EFFIS_DATE_FIELD <<- "fire_date"
 SPT_EFFIS_AREA_FIELD <<- "area_ht"
 
 SPT_ICNF_GEE_ASSET  <<- "users/joaofgo/severus_pt/AA_ICNF_2000_2021_PT_v3"
@@ -41,7 +42,7 @@ SPT_ICNF_DATE_FIELD <<- "data_inici"
 SPT_ICNF_AREA_FIELD <<- "area_ht"
 
 SPT_GEE_TASK_PATH <<- "./out/gee_tasks"
-SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products"
+SPT_GEE_PRODUCTS_PATH <<- "./out/gee_products/temp"
 
 
 ## ---- DO NOT CHANGE THIS PART FROM HERE ----
