@@ -1,0 +1,9 @@
+{
+  "all_users_can_read": true,
+  "owners": [],
+  "readers": [
+    "serviceAccount:severuspt--ty-mapper-859ec08f5@intrepid-nova-195705.iam.gserviceaccount.com",
+    "serviceAccount:severuspt--y-analyst-a6ae88443@intrepid-nova-195705.iam.gserviceaccount.com"
+  ],
+  "writers": []
+}

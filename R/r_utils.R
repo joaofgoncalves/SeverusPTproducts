@@ -3,6 +3,22 @@
 ## Ancillary R functions ----
 ## ----------------------------------------------------------------------------------- ##
 
+#' Calculate the date that is a specified number of days before today
+#'
+#' This function calculates the date that is a specified number of days before the current date.
+#'
+#' @param dd The number of days to subtract from the current date.
+#'
+#' @return A date object representing the calculated date.
+#'
+#' @export
+#'
+
+todaySubDate <- function(dd) {
+  return(Sys.Date() - dd)
+}
+
+
 #' Calculate the Number of Periods from a Date to Today
 #'
 #' This function calculates the number of periods from a given date to today, based on a specified number of days per period.
