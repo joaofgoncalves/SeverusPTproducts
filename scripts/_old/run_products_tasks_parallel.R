@@ -556,7 +556,7 @@ repeat{
   }
 
   # Save task metadata
-  spt_export_to_md(spt_task_to_dataframe(task), paste0(outFilePath,".task.txt"))
+  #spt_export_to_md(spt_task_to_dataframe(task), paste0(outFilePath,".task.txt"))
 
 
   cat("\n---- TASK UPDATE ----\n\n")
