@@ -54,16 +54,17 @@ spt_rm_uncompleted_tasks(taskTablePath = SPT_TASK_TABLE_PATH)
 ttb <-
   spt_generate_tasks(taskTable    = spt_read_tasks_table(SPT_TASK_TABLE_PATH),
 
-                     satCode           = c("L8OLI","S2MSI"),
+                     satCode           = c("S2MSI"),
 
                      #baseIndex         = c("NDVI","NBRSWIR","MIRBI","TCTG","NBR"),
-                     baseIndex         = c("CSI","BAI"),
+                     #baseIndex         = c("CSI","BAI"),
+                     baseIndex         = c("NBR"),
 
-                     procLevel         = "L2",
+                     procLevel         = "L1",
                      modisProduct      = NA,
                      severityIndicator = c("DELTA","RDT","RBR"),
                      burntAreaDataset  = "EFFIS",
-                     referenceYear     = 2022,
+                     referenceYear     = 2017,
                      preFireRef        = 3,
                      preFireType       = "moving",
                      postFireRef       = seq(3,12,by=3),

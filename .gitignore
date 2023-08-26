@@ -2,12 +2,11 @@
 .Rhistory
 .RData
 .Ruserdata
-/OUT/gee_products
-/OUT/gee_tasks
-/OUT/logs
+/out
 /temp
 /data
 /tests
 /_bkps_
 /_install_
 gee_last_init.log
+/tasks/update_effis_asset.log

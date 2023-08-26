@@ -9,8 +9,6 @@ library(knitr)
 library(kableExtra)
 library(crayon)
 library(clisymbols)
-# library(foreach)
-# library(doParallel)
 
 # Global variables
 
