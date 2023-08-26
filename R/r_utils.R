@@ -3,6 +3,28 @@
 ## Ancillary R functions ----
 ## ----------------------------------------------------------------------------------- ##
 
+#' Calculate the time difference between two time points
+#'
+#' This function calculates the time difference between two given time points and returns
+#' the result in minutes and seconds.
+#'
+#' @param start_time The start time point.
+#' @param end_time The end time point.
+#'
+#' @return A character string representing the elapsed time in minutes and seconds.
+#'
+#' @export
+#'
+
+calculate_time_difference <- function(start_time, end_time) {
+  time_diff <- difftime(end_time, start_time, units = "secs")
+  minutes <- floor(time_diff / 60)
+  seconds <- as.numeric(time_diff) %% 60
+  result <- paste("Elapsed time:", minutes, "minutes and", round(seconds), "seconds")
+  return(result)
+}
+
+
 #' Calculate the date that is a specified number of days before today
 #'
 #' This function calculates the date that is a specified number of days before the current date.
