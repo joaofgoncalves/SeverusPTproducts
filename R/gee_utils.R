@@ -92,7 +92,7 @@ spt_check_gee_task <- function(geeTask, sleep=60, verbose=FALSE){
   repeat{
 
     # call the spt_gee_task_status function and store the result in the status variable
-    geeStatus <- spt_gee_task_status(geeTaskObj)
+    geeStatus <- spt_gee_task_status(geeTask)
 
     status <- geeStatus$state
 
