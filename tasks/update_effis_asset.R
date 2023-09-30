@@ -153,6 +153,8 @@ if(inherits(init_ee,"try-error")){
 
     aapt <- aapt %>% mutate(fire_dt = as.Date(substr(fire_date,1,10)))
 
+    write_sf(aapt, "C:/MyFiles/R-dev/SeverusPTproducts/temp/effis_pt.shp")
+
     aapt_cur_yr <- aapt %>% filter(year == current_year)
     aapt_last7d <- aapt %>% filter(fire_dt >= todaySubDate(7))
     aapt_last15d <- aapt %>% filter(fire_dt >= todaySubDate(15))
