@@ -13,7 +13,7 @@ spt_etm_to_oli(img)
 An Earth Engine image object representing Landsat OLI reflectance.
 }
 \description{
-Converts/merges Landsat Thematic Mapper (TM) and Enhanced Thematic Mapper Plus (ETM+) 
+Converts/merges Landsat Thematic Mapper (TM) and Enhanced Thematic Mapper Plus (ETM+)
 imagery to Operational Land Imager (OLI) reflectance using the provided coefficients.
 }
 \examples{

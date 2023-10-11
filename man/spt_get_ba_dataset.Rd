@@ -33,8 +33,8 @@ spt_get_ba_dataset(
 The burned area data as an ee.FeatureCollection object.
 }
 \description{
-This function retrieves burned area (BA) data from the specified dataset and 
-Google Earth Engine (GEE) asset. Performs a set of filters needed to remove NA's 
+This function retrieves burned area (BA) data from the specified dataset and
+Google Earth Engine (GEE) asset. Performs a set of filters needed to remove NA's
 and the minimum area size.
 }
 \examples{

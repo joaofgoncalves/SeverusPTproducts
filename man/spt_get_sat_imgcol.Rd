@@ -7,25 +7,25 @@
 spt_get_sat_imgcol(satCode = "S2MSI", procLevel = "L2A", modisProduct = NULL)
 }
 \arguments{
-\item{satCode}{Character. Satellite code specifying the satellite mission. Supported 
-values are "S2MSI" (Sentinel-2), "MOD" (MODIS), "MYD" (Aqua/MODIS), "MCD" 
-(Combined Aqua/Terra MODIS), "L5TM" (Landsat-5/TM), "L7ETM" (Landsat-7/ETM), 
+\item{satCode}{Character. Satellite code specifying the satellite mission. Supported
+values are "S2MSI" (Sentinel-2), "MOD" (MODIS), "MYD" (Aqua/MODIS), "MCD"
+(Combined Aqua/Terra MODIS), "L5TM" (Landsat-5/TM), "L7ETM" (Landsat-7/ETM),
 "L8OLI" (Landsat-8/OLI) and "L9OLI" (Landsat-9/OLI).}
 
-\item{procLevel}{Character. Processing level of the satellite imagery. Supported 
-values depend on the satellite mission. For Sentinel-2, supported values are "L2A" 
+\item{procLevel}{Character. Processing level of the satellite imagery. Supported
+values depend on the satellite mission. For Sentinel-2, supported values are "L2A"
 and "L1C". For Landsat missions, supported values are "L2A" and "L1C". Default is "L2A".}
 
-\item{modisProduct}{Character. MODIS product code specifying the specific product 
-to retrieve. Required for MODIS and Aqua/MODIS missions. Supported values depend 
+\item{modisProduct}{Character. MODIS product code specifying the specific product
+to retrieve. Required for MODIS and Aqua/MODIS missions. Supported values depend
 on the satellite mission. Default is NULL.}
 }
 \value{
-An Earth Engine image collection corresponding to the specified satellite 
+An Earth Engine image collection corresponding to the specified satellite
 mission, processing level, and MODIS product (if applicable).
 }
 \description{
-Retrieves the Earth Engine image collection based on the satellite code, processing 
+Retrieves the Earth Engine image collection based on the satellite code, processing
 level, and MODIS product (if applicable).
 }
 \examples{
