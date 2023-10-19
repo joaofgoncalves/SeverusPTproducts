@@ -3,6 +3,7 @@
 library(sf)
 library(tidyverse)
 library(ggplot2)
+library(patchwork)
 
 ## ---------------------------------------------------------------------------------------- ##
 
@@ -94,8 +95,6 @@ g3 <- ggplot(wrong_date_counts_long %>% filter(name == "nr_fires"),
   ylab("Number of annual wildfires")
 
 plot(g3)
-
-library(patchwork)
 
 m <- g1 | g2 | g3
 
