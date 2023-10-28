@@ -5,25 +5,28 @@ library(tidyverse)
 library(ggplot2)
 library(patchwork)
 
+
 ## ---------------------------------------------------------------------------------------- ##
-
-aa <- read_sf("C:/MyFiles/R-dev/SeverusPTproducts/temp/modis.ba.poly.shp") %>%
-  st_set_crs("EPSG:4326") # Set proper CRS / before was GCS Unknown
-
-aapt <- aa %>%
-  filter(COUNTRY == "PT") %>% # Filter data only to Portugal
-  mutate(year = substr(FIREDATE,1,4)) %>% # Add year field
-  rename(fire_date = FIREDATE) %>%
-  mutate(AREA_HA = as.numeric(AREA_HA)) %>% # Convert area field to numeric
-  st_make_valid() %>%  # Data corrections to avoid topological errors
-  st_buffer(0.0) %>%
-  mutate(area_ht = as.numeric(st_area(.)/10000)) # Add area field in hectares / remove units
-
-
-aapt <- aapt %>% mutate(fire_dt = as.Date(substr(fire_date,1,10)))
-
+#
+# aa <- read_sf("C:/MyFiles/R-dev/SeverusPTproducts/temp/modis.ba.poly.shp") %>%
+#   st_set_crs("EPSG:4326") # Set proper CRS / before was GCS Unknown
+#
+# aapt <- aa %>%
+#   filter(COUNTRY == "PT") %>% # Filter data only to Portugal
+#   mutate(year = substr(FIREDATE,1,4)) %>% # Add year field
+#   rename(fire_date = FIREDATE) %>%
+#   mutate(AREA_HA = as.numeric(AREA_HA)) %>% # Convert area field to numeric
+#   st_make_valid() %>%  # Data corrections to avoid topological errors
+#   st_buffer(0.0) %>%
+#   mutate(area_ht = as.numeric(st_area(.)/10000)) # Add area field in hectares / remove units
+#
+#
+# aapt <- aapt %>% mutate(fire_dt = as.Date(substr(fire_date,1,10)))
+#
 #write_sf(aapt, "C:/MyFiles/R-dev/SeverusPTproducts/temp/effis_pt.shp")
 
+
+aapt <- read_sf("C:/MyFiles/R-dev/SeverusPTproducts/temp/effis_pt.shp")
 
 ## ---------------------------------------------------------------------------------------- ##
 
@@ -58,11 +61,11 @@ wrong_date_counts_long <- wrong_date_counts %>%
 g1 <- ggplot(wrong_date_counts_long %>% filter(name == "p_area"),
              aes(x=year, y=value, fill=date)) +
   geom_bar(stat = "identity",alpha=0.8) +
-  scale_fill_manual(values=c("#DB2929","#50784C")) +
-  scale_x_continuous(breaks = 2000:2021) +
+  scale_fill_manual(values=c("#50784C","#DB2929")) +
+  #scale_x_continuous(breaks = 2000:2023) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual burned area")
 
@@ -71,11 +74,11 @@ plot(g1)
 g2 <- ggplot(wrong_date_counts_long %>% filter(name == "p_nr_fires"),
              aes(x=year, y=value, fill=date)) +
   geom_bar(stat = "identity",alpha=0.8) +
-  scale_fill_manual(values=c( "#DB2929","#50784C")) +
-  scale_x_continuous(breaks = 2000:2021) +
+  scale_fill_manual(values=c("#50784C","#DB2929")) +
+  #scale_x_continuous(breaks = 2000:2023) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual wildfires")
 
@@ -84,11 +87,11 @@ plot(g2)
 g3 <- ggplot(wrong_date_counts_long %>% filter(name == "nr_fires"),
              aes(x=year, y=value, fill=date)) +
   geom_bar(stat = "identity",alpha=0.8) +
-  scale_fill_manual(values=c( "#DB2929","#50784C")) +
-  scale_x_continuous(breaks = 2000:2021) +
+  scale_fill_manual(values=c("#50784C","#DB2929")) +
+  #scale_x_continuous(breaks = 2000:2023) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual burned area") +
   xlab("Year") +
