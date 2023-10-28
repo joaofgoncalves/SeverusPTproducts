@@ -3,6 +3,8 @@
 library(sf)
 library(tidyverse)
 library(ggplot2)
+library(patchwork)
+
 
 p <- "C:/MyFiles/R-dev/SeverusPT/DATA/VECTOR/ICNF_AA/AA_ICNF_2000_2021_mergedWGS84_v3.shp"
 
@@ -44,11 +46,11 @@ g1 <- ggplot(wrong_date_counts_long %>% filter(name == "p_area"),
   scale_x_continuous(breaks = 2000:2021) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual burned area")
 
-plot(g1)
+#plot(g1)
 
 g2 <- ggplot(wrong_date_counts_long %>% filter(name == "p_nr_fires"),
              aes(x=year, y=value, fill=date)) +
@@ -57,11 +59,11 @@ g2 <- ggplot(wrong_date_counts_long %>% filter(name == "p_nr_fires"),
   scale_x_continuous(breaks = 2000:2021) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual wildfires")
 
-plot(g2)
+#plot(g2)
 
 g3 <- ggplot(wrong_date_counts_long %>% filter(name == "nr_fires"),
              aes(x=year, y=value, fill=date)) +
@@ -70,15 +72,15 @@ g3 <- ggplot(wrong_date_counts_long %>% filter(name == "nr_fires"),
   scale_x_continuous(breaks = 2000:2021) +
   theme_bw() +
   theme(axis.text.x = element_text(angle=90, vjust = 0.5)) +
-  theme(legend.position = "bottom") +
+  theme(legend.position = "bottom", text=element_text(size = 14)) +
   xlab("Year") +
   ylab("% of annual burned area") +
   xlab("Year") +
   ylab("Number of annual wildfires")
 
-plot(g3)
+#plot(g3)
 
-library(patchwork)
+
 
 m <- g1 | g2 | g3
 
