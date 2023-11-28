@@ -32,7 +32,7 @@ source("./R/metadata.R")
 ## --------------------------------------------------------------------------- ##
 
 
-ee_Initialize(user = "joaofgoncalves", gcs = TRUE, drive=TRUE)
+ee_Initialize(user = "joaofgoncalves", gcs = TRUE, drive = TRUE)
 
 
 ## --------------------------------------------------------------------------- ##

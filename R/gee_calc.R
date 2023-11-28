@@ -596,13 +596,13 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
   ### Process the GEE task to google drive
 
   geeProcTask = ee_image_to_drive(
-    image       = accumRasterClip,
-    description = prodName,
-    folder      = outFolder,
-    region      = boundBox,
-    scale       = spatialRes,
-    crs         = coordRefSys,
-    maxPixels   = 1E12
+    image         = accumRasterClip,
+    description   = prodName,
+    folder        = outFolder,
+    region        = boundBox,
+    scale         = spatialRes,
+    crs           = coordRefSys,
+    maxPixels     = 1E12
   )
 
   geeProcTask$start()
