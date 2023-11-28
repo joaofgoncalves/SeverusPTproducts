@@ -54,21 +54,24 @@ spt_rm_uncompleted_tasks(taskTablePath = SPT_TASK_TABLE_PATH)
 ttb <-
   spt_generate_tasks(taskTable    = spt_read_tasks_table(SPT_TASK_TABLE_PATH),
 
-                     satCode           = c("S2MSI"),
+                     satCode           ="MOD",#= c("S2MSI"),
 
                      #baseIndex         = c("NDVI","NBRSWIR","MIRBI","TCTG","NBR"),
                      #baseIndex         = c("CSI","BAI"),
                      baseIndex         = c("NBR"),
 
-                     procLevel         = "L1",
-                     modisProduct      = NA,
-                     severityIndicator = c("DELTA","RDT","RBR"),
+                     procLevel         = "L2",
+                     modisProduct      = "MOD13Q1",#= NA,
+
+                     #severityIndicator = c("DELTA","RDT","RBR"),
+                     severityIndicator = c("DELTA"),
+
                      burntAreaDataset  = "EFFIS",
-                     referenceYear     = 2017,
+                     referenceYear     = 2001,
                      preFireRef        = 3,
                      preFireType       = "moving",
-                     postFireRef       = seq(3,12,by=3),
-                     minFireSize       = 10)
+                     postFireRef       = 3,
+                     minFireSize       = 1)
 
 spt_write_tasks_table(taskTable = ttb,taskTablePath = SPT_TASK_TABLE_PATH)
 View(spt_read_tasks_table(SPT_TASK_TABLE_PATH))

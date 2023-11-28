@@ -10,3 +10,5 @@
 /_install_
 gee_last_init.log
 /tasks/update_effis_asset.log
+/scripts/make_task_table.R
+/R/task_table/SPT_MainTaskTable.csv
