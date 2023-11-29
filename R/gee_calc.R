@@ -315,19 +315,25 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
     scale_data_fun_lt5 = spt_scale_fun("L5TM", procLevel)
     base_index_fun_lt5 = spt_spectral_index_fun(baseIndex, "L5TM")
 
-    # LT5
+    # LT7
     lt7_sits           = spt_get_sat_imgcol(satCode = "L7ETM", procLevel = procLevel)
     cloud_mask_fun_lt7 = spt_cloud_mask_fun("L7ETM")
     scale_data_fun_lt7 = spt_scale_fun("L7ETM", procLevel)
     base_index_fun_lt7 = spt_spectral_index_fun(baseIndex, "L7ETM")
 
-    # LT5
+    # LT8
     lt8_sits           = spt_get_sat_imgcol(satCode = "L8OLI",  procLevel = procLevel)
     cloud_mask_fun_lt8 = spt_cloud_mask_fun("L8OLI")
     scale_data_fun_lt8 = spt_scale_fun("L8OLI", procLevel)
     base_index_fun_lt8 = spt_spectral_index_fun(baseIndex, "L8OLI")
   }
 
+
+  # Adjust to the proper homologous year depending on the number of days
+  # since fire
+  nyr_sta = ceiling(postFireWindowDays[1]/365)
+  nyr_end = ceiling(postFireWindowDays[2]/365)
+  nr_yrs_to_subtract = -1*max(c(nyr_sta, nyr_end))
 
   # Set the start and end of the post-fire window
   timeWindowStart = ee$Number(postFireWindowDays[1])
@@ -362,10 +368,16 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
       prefireDate_end = fd
 
       # Moving window referencing the same period one year before
+      # Aka "Homologous year" approach
     }else if(preFireWindowType %in% c("moving","mov","m")){
+#
+#       prefireDate_sta = postfireDate_sta$advance(-1, 'year')
+#       prefireDate_end = postfireDate_end$advance(-1, 'year')
 
-      prefireDate_sta = postfireDate_sta$advance(-1, 'year')
-      prefireDate_end = postfireDate_end$advance(-1, 'year')
+      prefireDate_sta = postfireDate_sta$advance(
+        ee$Number(nr_yrs_to_subtract), 'year')
+      prefireDate_end = postfireDate_end$advance(
+        ee$Number(nr_yrs_to_subtract), 'year')
     }
 
     #### Interpolate images for Landsat-7/ETM ----
@@ -602,7 +614,13 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
     region        = boundBox,
     scale         = spatialRes,
     crs           = coordRefSys,
-    maxPixels     = 1E12
+    maxPixels     = 1E12,
+    # https://developers.google.com/earth-engine/apidocs/export-image-todrive
+    # Export COG
+    fileFormat    = "GeoTIFF",
+    formatOptions = list(
+      cloudOptimized = TRUE
+    )
   )
 
   geeProcTask$start()
