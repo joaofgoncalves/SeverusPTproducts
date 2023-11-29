@@ -9,9 +9,9 @@ library(knitr)
 library(kableExtra)
 library(crayon)
 library(clisymbols)
+library(sf)
 
 # Global variables
-
 
 ## ---- PARAMETERS TO CHANGE ----
 
