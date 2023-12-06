@@ -326,7 +326,7 @@ repeat{
       symbol$arrow_right, "Projecting raster data to ETRS-1989/PT-TM06...\n\n")))
 
 
-    # Project data to ETRS 1989 / PT TM 06 CRS
+    # Project data to ETRS 1989 / PT-TM06 CRS
     #
     #
     r1 <- try(spt_project_to_pttm06(outFilePath, datatype ="INT4S", method="near"))

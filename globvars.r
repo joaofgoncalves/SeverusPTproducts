@@ -58,10 +58,15 @@ SPT_META_TABLE <<- SPT_META_TABLE
 
 SPT_LOG_PATH <<- "./out/logs"
 
-SPT_VERSION <<- "v01"
-SPT_FULL_VERSION_NR <<- "v0.1.2"
+SPT_VERSION <<- "v02"
+SPT_FULL_VERSION_NR <<- "v2.0.0"
 
-# List of admissible values for each parameter
+
+
+## ------------------------------------------------------- ##
+## List of admissible values for each parameter
+## ------------------------------------------------------- ##
+
 SPT_VALUES <<- list(
 
   # Valid satellite codes
