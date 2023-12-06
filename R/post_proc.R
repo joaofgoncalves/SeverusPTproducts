@@ -16,7 +16,7 @@
 #' @export
 #'
 
-spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, COG=TRUE, ...) {
+spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, COG=FALSE, ...) {
 
   # Read the raster file
   rst <- rast(rstPath)
@@ -25,15 +25,22 @@ spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, COG=TRUE, ...) {
   rst[rst == 0] <- NA
 
   if(writeRast){
-    writeRaster(rst, rstPath, overwrite=TRUE,
-                gdal = c("TILED=YES", "COMPRESS=LZW"), ...)
 
     # Add overviews?
     if(COG){
+
+      writeRaster(rst, rstPath, overwrite=TRUE,
+                  gdal = c("TILED=YES", "COMPRESS=LZW"), ...)
+
       cat("Writing raster overviews...\n")
       gdal_addo(rstPath, clean=TRUE)
       gdal_addo(rstPath)
       cat("done!\n\n")
+
+    }else{
+
+      writeRaster(rst, rstPath, overwrite=TRUE,
+                  gdal = c("COMPRESS=LZW"), ...)
     }
   }
 
@@ -61,7 +68,7 @@ spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, COG=TRUE, ...) {
 #' @export
 #'
 
-spt_project_to_pttm06 <- function(x, writeData=TRUE, outPath=NULL, COG=TRUE, ...) {
+spt_project_to_pttm06 <- function(x, writeData=TRUE, outPath=NULL, COG=FALSE, ...) {
 
   if(is.character(x)){
     filePath <- x
@@ -85,15 +92,30 @@ spt_project_to_pttm06 <- function(x, writeData=TRUE, outPath=NULL, COG=TRUE, ...
 
   # Transform the raster to the target coordinate reference system
   if(writeData){
-    rst <- project(x, crs("EPSG:3763"), res=res(x)[1], overwrite=TRUE, filename=outPath,
-                   gdal = c("TILED=YES", "COMPRESS=LZW"), ...)
+
 
     # Add overviews?
     if(COG){
+
+      rst <- project(x,
+                     crs("EPSG:3763"),
+                     res=res(x)[1],
+                     overwrite=TRUE,
+                     filename=outPath,
+                     gdal = c("TILED=YES", "COMPRESS=LZW"), ...)
+
       cat("Writing raster overviews...\n")
       gdal_addo(outPath, clean=TRUE)
       gdal_addo(outPath)
       cat("done!\n\n")
+    }else{
+
+      rst <- project(x,
+                     crs("EPSG:3763"),
+                     res=res(x)[1],
+                     overwrite=TRUE,
+                     filename=outPath,
+                     gdal = c("COMPRESS=LZW"), ...)
     }
 
   }else{

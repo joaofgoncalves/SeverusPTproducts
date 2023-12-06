@@ -233,7 +233,8 @@ spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 #'
 
 spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
-                                 dateField, yearField, areaField, outFolder){
+                                 dateField, yearField, areaField, outFolder,
+                                 cog = FALSE){
 
   # Get run parameters
   mainTaskStatus    = spt_get_taskStatus(task,taskStep = "main")
@@ -607,21 +608,35 @@ spt_process_gee_task <- function(task,boundBox, coordRefSys, baGEEasset,
 
   ### Process the GEE task to google drive
 
-  geeProcTask = ee_image_to_drive(
-    image         = accumRasterClip,
-    description   = prodName,
-    folder        = outFolder,
-    region        = boundBox,
-    scale         = spatialRes,
-    crs           = coordRefSys,
-    maxPixels     = 1E12,
-    # https://developers.google.com/earth-engine/apidocs/export-image-todrive
-    # Export COG
-    fileFormat    = "GeoTIFF",
-    formatOptions = list(
-      cloudOptimized = TRUE
+  if(cog){
+    geeProcTask = ee_image_to_drive(
+      image         = accumRasterClip,
+      description   = prodName,
+      folder        = outFolder,
+      region        = boundBox,
+      scale         = spatialRes,
+      crs           = coordRefSys,
+      maxPixels     = 1E12,
+      # https://developers.google.com/earth-engine/apidocs/export-image-todrive
+      # Export COG
+      fileFormat    = "GeoTIFF",
+      formatOptions = list(
+        cloudOptimized = TRUE
+      )
     )
-  )
+  }else{
+    geeProcTask = ee_image_to_drive(
+      image         = accumRasterClip,
+      description   = prodName,
+      folder        = outFolder,
+      region        = boundBox,
+      scale         = spatialRes,
+      crs           = coordRefSys,
+      maxPixels     = 1E12,
+      fileFormat    = "GeoTIFF"
+    )
+  }
+
 
   geeProcTask$start()
 
