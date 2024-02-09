@@ -8,6 +8,7 @@
 #' @param rstPath A character string representing the path to the raster file.
 #' @param writeRast A logical value indicating whether to write the modified raster
 #' to the same file. Default is TRUE.
+#' @param COG Make Cloud optimized GeoTIFF? (default: FALSE)
 #' @param ... Additional arguments to be passed to the writeRaster function if
 #' writeRast is TRUE.
 #' @return If writeRast is TRUE, the function returns a raster object representing
@@ -61,6 +62,7 @@ spt_raster_zeros_to_na <- function(rstPath, writeRast=TRUE, COG=FALSE, ...) {
 #' new file. Default is TRUE.
 #' @param outPath A character string representing the output file path for the projected
 #' raster. Ignored if writeData is FALSE.
+#' @param COG Make Cloud optimized GeoTIFF? (default: FALSE)
 #' @param ... Additional arguments to be passed to the project function.
 #' @return If writeData is TRUE, the function returns a raster object representing the
 #' projected raster. Otherwise, it returns NULL.

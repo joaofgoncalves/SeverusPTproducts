@@ -226,6 +226,7 @@ spt_scale_fun <- function(satCode, procLevel=NULL, modisProduct=NULL){
 #' @param yearField The name of the field in the burned area data representing the year.
 #' @param areaField The name of the field in the burned area data representing the area.
 #' @param outFolder The output folder where the processed data will be saved.
+#' @param cog Make Cloud optimized GeoTIFF? (default: FALSE)
 #'
 #' @return None.
 #'
