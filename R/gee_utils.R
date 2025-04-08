@@ -169,8 +169,10 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
 
       outFile <- paste0(outFolder,"/",taskStatusList$description,".",dataFormat)
 
-      out <- try(ee_drive_to_local(task = geeTask, dsn = outFile,
-                                   overwrite = TRUE, consider = "last"))
+      out <- try(ee_drive_to_local(task      = geeTask,
+                                   dsn       = outFile,
+                                   overwrite = TRUE,
+                                   consider  = "last"))
 
     }else{
       return(NULL)
@@ -182,8 +184,10 @@ spt_download_gdrive <- function(geeTask, outFolder, dataFormat="tif"){
 
     outFile <- paste0(outFolder,"/",geeTask$description,".",dataFormat)
 
-    out <- try(ee_drive_to_local(task = geeTask, dsn = outFile,
-                                 overwrite = TRUE, consider = "last"))
+    out <- try(ee_drive_to_local(task      = geeTask,
+                                 dsn       = outFile,
+                                 overwrite = TRUE,
+                                 consider  = "last"))
 
   }else{
     stop("Non-supported object type in geeTask for method spt_download_gdrive.")

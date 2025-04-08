@@ -339,10 +339,17 @@ spt_create_file <- function(filename) {
 
 spt_download_unzip <- function(url, dest_file, extdir) {
 
-  download.file(url, dest_file, mode = "wb")
+  download_it <- try(download.file(url, dest_file, mode = "wb"))
 
-  if (tools::file_ext(dest_file) == "zip") {
-    unzip(dest_file, exdir = extdir, overwrite = TRUE)
+  if(tools::file_ext(dest_file) == "zip" &
+     !inherits(download_it,"try-error")) {
+    unzip_it <- try(unzip(dest_file, exdir = extdir, overwrite = TRUE))
+  }else{
+    return(FALSE)
+  }
+
+  if(!inherits(download_it,"try-error") & !inherits(unzip_it,"try-error")){
+    return(TRUE)
   }
 }
 
@@ -366,4 +373,40 @@ spt_replace_crs_code <- function(x, from = "32629", to = "3763"){
 
   return(
     gsub(paste0("_",from,"_"), paste0("_",to,"_"), x))
+}
+
+#' Check if a file is older than a specified age in hours
+#'
+#' This function checks if a given file is older than a specified number of hours.
+#'
+#' @param file_path A character string specifying the path to the file.
+#' @param file_age A numeric value specifying the age in hours to check against.
+#' @return A logical value. Returns \code{TRUE} if the file is older than \code{file_age} hours, \code{FALSE} otherwise.
+#' @examples
+#' \dontrun{
+#'   # Example usage:
+#'   # Check if "example.txt" is older than 24 hours
+#'   file_path <- "example.txt"
+#'   file_age <- 24
+#'   is_older <- spt_check_file_age(file_path, file_age)
+#'   print(is_older)
+#' }
+#' @export
+#'
+
+spt_check_file_age <- function(file_path, file_age) {
+
+  # Check if the file exists
+  if (!file.exists(file_path)) {
+    stop("File does not exist.")
+  }
+
+  # Get the file's modification time
+  file_mod_time <- file.info(file_path)$mtime
+
+  # Calculate the age of the file in hours
+  file_age_hours <- difftime(Sys.time(), file_mod_time, units = "hours")
+
+  # Return TRUE if the file is younger than file_age
+  return(file_age_hours <= file_age)
 }
