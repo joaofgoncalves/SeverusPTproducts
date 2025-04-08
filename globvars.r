@@ -10,6 +10,8 @@ library(kableExtra)
 library(crayon)
 library(clisymbols)
 library(sf)
+library(geojsonio)
+library(jsonlite)
 
 # Global variables
 
@@ -17,7 +19,7 @@ library(sf)
 
 SPT_PROJ_COORD_SYSTEM_CODE <<- "EPSG:32629"
 
-SPT_GDRIVE_FOLDER <<- "GEE"
+SPT_GDRIVE_FOLDER <<- "GEE_SEVERUSPT"
 
 SPT_TASK_TABLE_FILENAME <<- "SPT_MainTaskTable.csv"
 SPT_TASK_TABLE_BASENAME <<- "SPT_MainTaskTable"
@@ -64,7 +66,10 @@ SPT_FULL_VERSION_NR <<- "v2.0.0"
 
 
 ## ------------------------------------------------------- ##
+##
+## DO NOT CHANGE FROM HERE
 ## List of admissible values for each parameter
+##
 ## ------------------------------------------------------- ##
 
 SPT_VALUES <<- list(
