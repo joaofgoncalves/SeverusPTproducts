@@ -672,23 +672,23 @@ spt_update_main_task <- function(task, state, taskTable = NULL, taskTablePath) {
 }
 
 
-#' Remove Uncompleted Tasks
+#' Remove completed tasks
 #'
-#' This function removes uncompleted tasks from the task table.
+#' This function removes completed tasks from the task table.
 #'
-#' @param taskTable The task table to remove uncompleted tasks from (optional).
+#' @param taskTable The task table to remove completed tasks from (optional).
 #' If not provided, it will be read from the specified \code{taskTablePath}.
 #' @param taskTablePath The file path to the task table.
 #'
 #' @return \code{TRUE} if the removal is successful, \code{FALSE} otherwise.
 #'
 #' @examples
-#' spt_rm_uncompleted_tasks(taskTable = myTaskTable, taskTablePath = "path/to/taskTable.csv")
+#' spt_rm_completed_tasks(taskTable = myTaskTable, taskTablePath = "path/to/taskTable.csv")
 #'
 #' @export
 #'
 
-spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
+spt_rm_completed_tasks <- function(taskTable = NULL, taskTablePath) {
   # Acquire a lock over the file
   lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
                                ".lock"), timeout = 30000)
@@ -702,7 +702,7 @@ spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
   }
 
   idx <- taskTable$mainStatus == "COMPLETED"
-  taskTable <- taskTable[idx, ]
+  taskTable <- taskTable[-idx, ]
 
   out <- try({
     #spt_write_tasks_table(taskTable)
@@ -719,3 +719,96 @@ spt_rm_uncompleted_tasks <- function(taskTable = NULL, taskTablePath) {
 }
 
 
+
+#' Remove not completed tasks
+#'
+#' This function removes uncompleted tasks from the task table.
+#'
+#' @param taskTable The task table to remove not completed tasks from (optional).
+#' If not provided, it will be read from the specified \code{taskTablePath}.
+#' @param taskTablePath The file path to the task table.
+#'
+#' @return \code{TRUE} if the removal is successful, \code{FALSE} otherwise.
+#'
+#' @examples
+#' spt_rm_not_completed_tasks(taskTable = myTaskTable, taskTablePath = "path/to/taskTable.csv")
+#'
+#' @export
+#'
+
+spt_rm_not_completed_tasks <- function(taskTable = NULL, taskTablePath) {
+  # Acquire a lock over the file
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+
+  if (is.null(taskTable)) {
+    taskTable <- spt_read_tasks_table(taskTablePath)
+  }
+
+  if (is.null(lck)) {
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  }
+
+  idx <- taskTable$mainStatus == "NOT COMPLETED"
+  taskTable <- taskTable[-idx, ]
+
+  out <- try({
+    #spt_write_tasks_table(taskTable)
+    spt_write_tasks_table(taskTable, taskTablePath)
+
+    filelock::unlock(lck)
+  })
+
+  if (inherits(out, "try-error")) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
+
+
+
+#' Remove all tasks
+#'
+#' This function removes all tasks from the task table.
+#'
+#' @param taskTable The task table to remove all tasks from (optional).
+#' If not provided, it will be read from the specified \code{taskTablePath}.
+#' @param taskTablePath The file path to the task table.
+#'
+#' @return \code{TRUE} if the removal is successful, \code{FALSE} otherwise.
+#'
+#' @examples
+#' spt_rm_all_tasks(taskTable = myTaskTable, taskTablePath = "path/to/taskTable.csv")
+#'
+#' @export
+#'
+
+spt_rm_all_tasks <- function(taskTable = NULL, taskTablePath) {
+  # Acquire a lock over the file
+  lck <- filelock::lock(paste0(tools::file_path_sans_ext(taskTablePath),
+                               ".lock"), timeout = 30000)
+
+  if (is.null(taskTable)) {
+    taskTable <- spt_read_tasks_table(taskTablePath)
+  }
+
+  if (is.null(lck)) {
+    stop("Failed to acquire a lock over the task table file!", call. = TRUE)
+  }
+
+  idx <- 1:nrow(taskTable)
+  taskTable <- taskTable[-idx, ]
+
+  out <- try({
+    spt_write_tasks_table(taskTable, taskTablePath)
+
+    filelock::unlock(lck)
+  })
+
+  if (inherits(out, "try-error")) {
+    return(FALSE)
+  } else {
+    return(TRUE)
+  }
+}
