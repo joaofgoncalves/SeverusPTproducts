@@ -141,19 +141,23 @@ if(inherits(init_ee,"try-error")){
     aa <- read_sf("C:/MyFiles/R-dev/SeverusPTproducts/temp/modis.ba.poly.shp") %>%
       st_set_crs("EPSG:4326") # Set proper CRS / before was GCS Unknown
 
+
     aapt <- aa %>%
       filter(COUNTRY == "PT") %>% # Filter data only to Portugal
+      st_transform("EPSG:32629") %>%
       mutate(year = substr(FIREDATE,1,4)) %>% # Add year field
       rename(fire_date = FIREDATE) %>%
       mutate(AREA_HA = as.numeric(AREA_HA)) %>% # Convert area field to numeric
       st_make_valid() %>%  # Data corrections to avoid topological errors
-      st_buffer(0.0) %>%
-      mutate(area_ht = as.numeric(st_area(.)/10000)) # Add area field in hectares / remove units
-
+      st_buffer(dist=0.0) %>%
+      mutate(area_ht = as.numeric(st_area(.)/10000)) %>%  # Add area field in hectares / remove units
+      st_transform("EPSG:4326") %>%
+      st_make_valid()
 
     aapt <- aapt %>% mutate(fire_dt = as.Date(substr(fire_date,1,10)))
 
     write_sf(aapt, "C:/MyFiles/R-dev/SeverusPTproducts/temp/effis_pt.shp")
+    #write_sf(aapt, "C:/MyFiles/R-dev/SeverusPTproducts/temp/effis_pt_w_buff_utm29.shp")
 
     aapt_cur_yr <- aapt %>% filter(year == current_year)
     aapt_last7d <- aapt %>% filter(fire_dt >= todaySubDate(7))
