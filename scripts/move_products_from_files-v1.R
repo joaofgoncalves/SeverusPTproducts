@@ -11,12 +11,14 @@ library(tools)
 
 
 
-data_dir <- "D:/DATA/SeverusPT/DATASETS/SPT_Products_v02/"
+#data_dir <- "D:/DATA/SeverusPT/DATASETS/SPT_Products_v02/"
+data_dir <- "C:/MyFiles/R-dev/SeverusPTproducts/out/gee_products/temp/v20251007"
 
-data_move<-"D:/DATA/SeverusPT/DATASETS/SPT_Products_v02_vf/"
+#data_move<-"D:/DATA/SeverusPT/DATASETS/SPT_Products_v02_vf/"
+data_move <- "C:/MyFiles/R-dev/SeverusPTproducts/out/gee_products/temp/v20251007_vf"
 
 
-fl <- list.files(data_dir, pattern=".tif$")
+fl <- list.files(data_dir, pattern="\\.tif$")
 fl_all <- list.files(data_dir, full.names=TRUE)
 
 
@@ -50,6 +52,14 @@ get_product_name <- function(x){
   #gsub("LT","LH",pname)
   }
 
+add_trail_slash <- function(path) {
+  # Check if the last character is a slash
+  if (substr(path, nchar(path), nchar(path)) != "/") {
+    path <- paste0(path, "/")
+  }
+  return(path)
+}
+
 
 # List all products in the data
 cat(unique(sapply(fl, FUN = get_product_name, USE.NAMES = FALSE)),sep = "\n")
@@ -64,7 +74,7 @@ for(i in 1:length(fl)){
   prod_name <- get_product_name(fni)
 
   # Folder/product name where to move the files
-  out_dir <- paste(data_move,prod_name,sep="")
+  out_dir <- paste(add_trail_slash(data_move),prod_name,sep="")
 
   if(!dir.exists(out_dir)){
     dir.create(out_dir)
@@ -85,6 +95,8 @@ for(i in 1:length(fl)){
 
   cli_progress_update()
 }
+
+
 
 ## ---------------------------------------------------------------------- ##
 ## Compress products to zip files
